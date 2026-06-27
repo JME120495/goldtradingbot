@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  role          Role      @default(CLIENT)
+  passwordHash  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  licenses      License[]
+  tradingAccounts TradingAccount[]
+  payments      Payment[]
+  supportTickets SupportTicket[]
+  affiliateData Affiliate?
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+  AFFILIATE
+}
+
+model Product {
+  id            String    @id @default(uuid())
+  name          String    // e.g. "Gold Scalper MT5"
+  slug          String    @unique
+  description   String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  plans         ProductPlan[]
+  licenses      License[]
+}
+
+model ProductPlan {
+  id            String    @id @default(uuid())
+  productId     String
+  product       Product   @relation(fields: [productId], references: [id])
+  name          String    // e.g. "Starter", "Standard", "Pro", "VIP"
+  lotAllowed    Float     // 0.01, 0.10, 0.50, 1.00
+  prices        Json      // { weekly: 20, monthly: 59, quarterly: 149, biyearly: 249, yearly: 449 }
+  isTrial       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  licenses      License[]
+}
+
+model License {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  productId     String
+  product       Product   @relation(fields: [productId], references: [id])
+  planId        String
+  plan          ProductPlan @relation(fields: [planId], references: [id])
+  tradingAccountId String?
+  tradingAccount TradingAccount? @relation(fields: [tradingAccountId], references: [id])
+  
+  key           String    @unique @default(uuid())
+  status        LicenseStatus @default(ACTIVE)
+  lotAllowed    Float     // Snapshot from plan at time of purchase
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  payments      Payment[]
+}
+
+enum LicenseStatus {
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+  CANCELLED
+}
+
+model TradingAccount {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  accountNumber String
+  broker        String
+  server        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  licenses      License[]
+  @@unique([accountNumber, broker])
+}
+
+model Payment {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  licenseId     String?
+  license       License?  @relation(fields: [licenseId], references: [id])
+  
+  amount        Float
+  currency      String    @default("USD")
+  status        PaymentStatus @default(PENDING)
+  provider      PaymentProvider // STRIPE, PAYPAL, NOWPAYMENTS
+  providerTxId  String?   @unique
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYPAL
+  NOWPAYMENTS
+  FLUTTERWAVE
+}
+
+model Affiliate {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  code          String    @unique // ref/CODE
+  clicks        Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  sales         AffiliateSale[]
+}
+
+model AffiliateSale {
+  id            String    @id @default(uuid())
+  affiliateId   String
+  affiliate     Affiliate @relation(fields: [affiliateId], references: [id])
+  amount        Float
+  commission    Float
+  isRenewal     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+}
+
+model SupportTicket {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  subject       String
+  message       String
+  status        TicketStatus @default(OPEN)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
