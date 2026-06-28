@@ -3,16 +3,15 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 model User {
   id            String    @id @default(uuid())
   email         String    @unique
   name          String?
-  role          Role      @default(CLIENT)
+  role          String    @default("CLIENT")
   passwordHash  String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -22,12 +21,6 @@ model User {
   payments      Payment[]
   supportTickets SupportTicket[]
   affiliateData Affiliate?
-}
-
-enum Role {
-  ADMIN
-  CLIENT
-  AFFILIATE
 }
 
 model Product {
@@ -49,7 +42,7 @@ model ProductPlan {
   product       Product   @relation(fields: [productId], references: [id])
   name          String    // e.g. "Starter", "Standard", "Pro", "VIP"
   lotAllowed    Float     // 0.01, 0.10, 0.50, 1.00
-  prices        Json      // { weekly: 20, monthly: 59, quarterly: 149, biyearly: 249, yearly: 449 }
+  prices        String    // JSON as string for SQLite compatibility: { weekly: 20, monthly: 59, quarterly: 149, biyearly: 249, yearly: 449 }
   isTrial       Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -69,20 +62,13 @@ model License {
   tradingAccount TradingAccount? @relation(fields: [tradingAccountId], references: [id])
   
   key           String    @unique @default(uuid())
-  status        LicenseStatus @default(ACTIVE)
+  status        String    @default("ACTIVE")
   lotAllowed    Float     // Snapshot from plan at time of purchase
   expiresAt     DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   payments      Payment[]
-}
-
-enum LicenseStatus {
-  ACTIVE
-  SUSPENDED
-  EXPIRED
-  CANCELLED
 }
 
 model TradingAccount {
@@ -108,26 +94,12 @@ model Payment {
   
   amount        Float
   currency      String    @default("USD")
-  status        PaymentStatus @default(PENDING)
-  provider      PaymentProvider // STRIPE, PAYPAL, NOWPAYMENTS
+  status        String    @default("PENDING")
+  provider      String    // STRIPE, PAYPAL, NOWPAYMENTS, FLUTTERWAVE
   providerTxId  String?   @unique
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-}
-
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  REFUNDED
-}
-
-enum PaymentProvider {
-  STRIPE
-  PAYPAL
-  NOWPAYMENTS
-  FLUTTERWAVE
 }
 
 model Affiliate {
@@ -135,6 +107,7 @@ model Affiliate {
   userId        String    @unique
   user          User      @relation(fields: [userId], references: [id])
   code          String    @unique // ref/CODE
+  commissionRate Float    @default(10.0)
   clicks        Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -158,13 +131,7 @@ model SupportTicket {
   user          User      @relation(fields: [userId], references: [id])
   subject       String
   message       String
-  status        TicketStatus @default(OPEN)
+  status        String    @default("OPEN")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-}
-
-enum TicketStatus {
-  OPEN
-  IN_PROGRESS
-  CLOSED
 }
