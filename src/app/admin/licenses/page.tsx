@@ -15,7 +15,7 @@ export default function AdminLicenses() {
 
   const fetchLicenses = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:3000/admin/licenses');
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}` + '/admin/licenses');
       setLicenses(res.data);
     } catch (err) {
       console.error(err);
@@ -28,7 +28,7 @@ export default function AdminLicenses() {
     const newStatus = currentStatus === 'ACTIVE' ? 'BLOCKED' : 'ACTIVE';
     if(!confirm(`${t('confirm_toggle')} ${newStatus}?`)) return;
     try {
-      await axios.patch(`http://127.0.0.1:3000/admin/licenses/${id}/status`, { status: newStatus });
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/licenses/${id}/status`, { status: newStatus });
       fetchLicenses();
     } catch (err) {
       alert("Error updating status");

@@ -20,7 +20,8 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:3000/auth/login', { email, password });
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const res = await axios.post(`${API_URL}/auth/login`, { email, password });
       Cookies.set('token', res.data.access_token, { expires: 1 });
       router.push('/dashboard');
     } catch (err) {

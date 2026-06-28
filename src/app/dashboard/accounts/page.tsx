@@ -17,7 +17,7 @@ export default function AccountsPage() {
   const fetchAccounts = async () => {
     try {
       const token = Cookies.get('token');
-      const res = await axios.get('http://localhost:3000/trading-accounts', {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}` + '/trading-accounts', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAccounts(res.data);
@@ -41,7 +41,7 @@ export default function AccountsPage() {
     
     try {
       const token = Cookies.get('token');
-      await axios.post('http://localhost:3000/trading-accounts', {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}` + '/trading-accounts', {
         accountNumber,
         broker,
         server
@@ -65,7 +65,7 @@ export default function AccountsPage() {
     
     try {
       const token = Cookies.get('token');
-      await axios.delete(`http://localhost:3000/trading-accounts/${id}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/trading-accounts/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       await fetchAccounts();

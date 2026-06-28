@@ -15,7 +15,7 @@ export default function AdminAffiliates() {
 
   const fetchAffiliates = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:3000/admin/affiliates');
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}` + '/admin/affiliates');
       setAffiliates(res.data);
     } catch (err) {
       console.error(err);
@@ -26,7 +26,7 @@ export default function AdminAffiliates() {
 
   const updateRate = async (id: string, rate: number) => {
     try {
-      await axios.patch(`http://127.0.0.1:3000/admin/affiliates/${id}/commission`, { rate });
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/affiliates/${id}/commission`, { rate });
       fetchAffiliates();
     } catch (err) {
       alert("Error updating rate");
@@ -36,7 +36,7 @@ export default function AdminAffiliates() {
   const deleteAffiliate = async (id: string) => {
     if(!confirm(t('confirm_delete_affiliate'))) return;
     try {
-      await axios.delete(`http://127.0.0.1:3000/admin/affiliates/${id}`);
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/affiliates/${id}`);
       fetchAffiliates();
     } catch (err) {
       alert("Error deleting affiliate");
