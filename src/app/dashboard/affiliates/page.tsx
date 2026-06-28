@@ -68,6 +68,16 @@ export default function AffiliatesDashboard() {
             {t('become_partner')}
           </button>
         </div>
+      ) : stats.affiliate.status === 'PENDING' ? (
+        <div className="bg-[#0F1115] border border-yellow-500/30 p-8 rounded-2xl text-center">
+          <h2 className="text-2xl font-bold mb-2 text-yellow-500">Demande en attente</h2>
+          <p className="text-gray-400">Votre demande d'affiliation est en cours d'examen par un administrateur.</p>
+        </div>
+      ) : stats.affiliate.status === 'REJECTED' ? (
+        <div className="bg-[#0F1115] border border-red-500/30 p-8 rounded-2xl text-center">
+          <h2 className="text-2xl font-bold mb-2 text-red-500">Demande refusée</h2>
+          <p className="text-gray-400">Malheureusement, votre demande d'affiliation a été refusée.</p>
+        </div>
       ) : (
         <>
           <div className="bg-[#0F1115] border border-white/10 p-6 rounded-2xl flex items-center justify-between">

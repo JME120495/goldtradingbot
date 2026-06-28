@@ -33,6 +33,15 @@ export default function AdminAffiliates() {
     }
   };
 
+  const updateStatus = async (id: string, status: string) => {
+    try {
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/affiliates/${id}/status`, { status });
+      fetchAffiliates();
+    } catch (err) {
+      alert("Error updating status");
+    }
+  };
+
   const deleteAffiliate = async (id: string) => {
     if(!confirm(t('confirm_delete_affiliate'))) return;
     try {
@@ -55,6 +64,7 @@ export default function AdminAffiliates() {
               <th className="p-4 text-gray-400">{t('code')}</th>
               <th className="p-4 text-gray-400">{t('total_earned')}</th>
               <th className="p-4 text-gray-400">{t('commission_rate')} (%)</th>
+              <th className="p-4 text-gray-400">Statut</th>
               <th className="p-4 text-gray-400">{t('actions')}</th>
             </tr>
           </thead>
@@ -75,7 +85,26 @@ export default function AdminAffiliates() {
                   />
                 </td>
                 <td className="p-4">
-                  <button onClick={() => deleteAffiliate(aff.id)} className="text-red-400 hover:text-red-300">
+                  <span className={`px-2 py-1 rounded text-xs font-bold ${
+                    aff.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
+                    aff.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' :
+                    'bg-yellow-500/20 text-yellow-400'
+                  }`}>
+                    {aff.status || 'PENDING'}
+                  </span>
+                </td>
+                <td className="p-4 flex gap-2">
+                  {aff.status !== 'APPROVED' && (
+                    <button onClick={() => updateStatus(aff.id, 'APPROVED')} className="text-green-400 hover:text-green-300 font-semibold">
+                      Approuver
+                    </button>
+                  )}
+                  {aff.status !== 'REJECTED' && (
+                    <button onClick={() => updateStatus(aff.id, 'REJECTED')} className="text-orange-400 hover:text-orange-300 font-semibold">
+                      Rejeter
+                    </button>
+                  )}
+                  <button onClick={() => deleteAffiliate(aff.id)} className="text-red-400 hover:text-red-300 font-semibold">
                     {t('delete')}
                   </button>
                 </td>

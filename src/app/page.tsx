@@ -49,7 +49,7 @@ export default function Home() {
       lot: 0.10,
       minCapital: 1000,
       prices: { weekly: 49, monthly: 149, semi_annual: 749, yearly: 1299 },
-      features: ["2 Live Accounts", "Priority Support"],
+      features: ["1 Live Account", "Priority Support"],
       isPopular: true,
     },
     {
@@ -57,7 +57,7 @@ export default function Home() {
       lot: 0.50,
       minCapital: 5000,
       prices: { weekly: 99, monthly: 299, semi_annual: 1499, yearly: 2599 },
-      features: ["5 Live Accounts", "Priority Support"],
+      features: ["1 Live Account", "Priority Support"],
       isPopular: false,
     },
     {
@@ -65,7 +65,7 @@ export default function Home() {
       lot: 1.00,
       minCapital: 10000,
       prices: { weekly: 199, monthly: 599, semi_annual: 2999, yearly: 4999 },
-      features: ["Unlimited Accounts", "1-on-1 Setup & Support"],
+      features: ["1 Live Account", "1-on-1 Setup & Support"],
       isPopular: false,
     }
   ];
@@ -86,6 +86,7 @@ export default function Home() {
               <Link href="#features" className="hover:text-[#D4AF37] transition-colors">{t('Navigation.features')}</Link>
               <Link href="#how-it-works" className="hover:text-[#D4AF37] transition-colors">{t('Navigation.how_it_works')}</Link>
               <Link href="#pricing" className="hover:text-[#D4AF37] transition-colors">{t('Navigation.pricing')}</Link>
+              <Link href="/dashboard/affiliates" className="hover:text-[#D4AF37] transition-colors">Portail Parrainage</Link>
               <Link href="/faq" className="hover:text-[#D4AF37] transition-colors">{t('Navigation.faq')}</Link>
             </div>
             <div className="flex gap-4 items-center">

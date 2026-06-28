@@ -48,6 +48,7 @@ export class AffiliatesService {
       tier,
       commissionRate,
       totalEarned,
+      status: affiliate.status,
       salesHistory: affiliate.sales
     };
   }

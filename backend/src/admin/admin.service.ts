@@ -27,6 +27,13 @@ export class AdminService {
     });
   }
 
+  async updateAffiliateStatus(id: string, status: string) {
+    return this.prisma.affiliate.update({
+      where: { id },
+      data: { status }
+    });
+  }
+
   async deleteAffiliate(id: string) {
     return this.prisma.affiliate.delete({ where: { id } });
   }

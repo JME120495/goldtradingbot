@@ -15,6 +15,11 @@ export class AdminController {
     return this.adminService.updateAffiliateCommission(id, rate);
   }
 
+  @Patch('affiliates/:id/status')
+  updateAffiliateStatus(@Param('id') id: string, @Body('status') status: string) {
+    return this.adminService.updateAffiliateStatus(id, status);
+  }
+
   @Delete('affiliates/:id')
   deleteAffiliate(@Param('id') id: string) {
     return this.adminService.deleteAffiliate(id);

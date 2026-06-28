@@ -25,8 +25,8 @@ export default function AdminLicenses() {
   };
 
   const toggleStatus = async (id: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'ACTIVE' ? 'BLOCKED' : 'ACTIVE';
-    if(!confirm(`${t('confirm_toggle')} ${newStatus}?`)) return;
+    const newStatus = currentStatus === 'ACTIVE' ? 'CANCELLED' : 'ACTIVE';
+    if(!confirm(`${newStatus === 'CANCELLED' ? 'Annuler' : 'Activer'} cette licence ?`)) return;
     try {
       await axios.patch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/licenses/${id}/status`, { status: newStatus });
       fetchLicenses();
@@ -60,7 +60,7 @@ export default function AdminLicenses() {
                 <td className="p-4">{lic.plan?.lotAllowed}</td>
                 <td className="p-4">
                   <span className={`px-2 py-1 rounded text-xs font-bold ${lic.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                    {lic.status}
+                    {lic.status === 'CANCELLED' ? 'ANNULÉ' : lic.status}
                   </span>
                 </td>
                 <td className="p-4">
@@ -68,7 +68,7 @@ export default function AdminLicenses() {
                     onClick={() => toggleStatus(lic.id, lic.status)} 
                     className={`font-semibold ${lic.status === 'ACTIVE' ? 'text-red-400 hover:text-red-300' : 'text-green-400 hover:text-green-300'}`}
                   >
-                    {lic.status === 'ACTIVE' ? t('block') : t('unblock')}
+                    {lic.status === 'ACTIVE' ? 'Annuler' : 'Activer'}
                   </button>
                 </td>
               </tr>

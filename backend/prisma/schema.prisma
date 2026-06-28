@@ -111,6 +111,7 @@ model Affiliate {
   code          String    @unique // ref/CODE
   commissionRate Float    @default(10.0)
   clicks        Int       @default(0)
+  status        String    @default("PENDING")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
