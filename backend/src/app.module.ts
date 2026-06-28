@@ -11,6 +11,7 @@ import { AffiliatesModule } from './affiliates/affiliates.module';
 import { CrmModule } from './crm/crm.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AdminModule } from './admin/admin.module';
+import { TradingAccountsModule } from './trading-accounts/trading-accounts.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AdminModule } from './admin/admin.module';
     AffiliatesModule,
     CrmModule,
     AdminModule,
+    TradingAccountsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

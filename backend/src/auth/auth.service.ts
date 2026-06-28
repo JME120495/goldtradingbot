@@ -23,6 +23,8 @@ export class AuthService {
         email: data.email,
         name: data.name,
         passwordHash: hashedPassword,
+        phone: data.phone,
+        preferredCurrency: data.preferredCurrency || 'USD',
       },
     });
     return this.generateTokens(user.id, user.role);
