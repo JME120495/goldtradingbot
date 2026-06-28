@@ -18,7 +18,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}` + '/plans');
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/_/backend'}` + '/plans');
         setPlans(res.data);
       } catch (err) {
         console.error(err);
