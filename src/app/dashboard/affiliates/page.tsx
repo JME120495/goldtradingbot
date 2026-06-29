@@ -17,7 +17,7 @@ export default function AffiliatesDashboard() {
     const fetchStats = async () => {
       try {
         const token = Cookies.get('token');
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/_/backend'}` + '/affiliates/stats', {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`}` + '/affiliates/stats', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStats(res.data);
@@ -33,7 +33,7 @@ export default function AffiliatesDashboard() {
   const joinAffiliateProgram = async () => {
     try {
       const token = Cookies.get('token');
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || '/_/backend'}` + '/affiliates/join', {}, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`}` + '/affiliates/join', {}, {
          headers: { Authorization: `Bearer ${token}` }
       });
       window.location.reload();

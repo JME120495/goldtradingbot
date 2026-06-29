@@ -14,13 +14,13 @@ export default function DownloadsPage() {
     try {
       const token = Cookies.get('token');
       // 1. Generate Signed URL
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || '/_/backend'}` + '/downloads/generate-url', 
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`}` + '/downloads/generate-url', 
         { product: productSlug },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
       // 2. Redirect to download
-      const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || '/_/backend'}${res.data.url}`;
+      const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`}${res.data.url}`;
       window.location.href = downloadUrl;
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error generating download link. Ensure you have an active license.');

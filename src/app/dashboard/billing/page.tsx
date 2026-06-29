@@ -21,7 +21,7 @@ export default function BillingPage() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/_/backend'}` + '/plans');
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`}` + '/plans');
         setPlans(res.data);
       } catch (err) {
         console.error(err);
@@ -36,7 +36,7 @@ export default function BillingPage() {
     setError('');
     try {
       const token = Cookies.get('token');
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || '/_/backend'}` + '/payments/initiate', 
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`}` + '/payments/initiate', 
         { 
           productId: plan.productId,
           planId: plan.id,

@@ -25,7 +25,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const fullPhone = `${phoneCode}${phoneNumber}`;
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || '/_/backend';
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`;
       const res = await axios.post(`${API_URL}/auth/register`, { 
         name, 
         email, 
