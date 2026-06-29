@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Param, Body, Post } from '@nestjs/common';
 import { AdminService } from './admin.service';
 
 @Controller('admin')
@@ -25,6 +25,11 @@ export class AdminController {
     return this.adminService.deleteAffiliate(id);
   }
 
+  @Post('affiliates')
+  createAffiliate(@Body('email') email: string) {
+    return this.adminService.createAffiliateManually(email);
+  }
+
   @Get('licenses')
   getLicenses() {
     return this.adminService.getLicenses();
@@ -33,5 +38,15 @@ export class AdminController {
   @Patch('licenses/:id/status')
   updateLicenseStatus(@Param('id') id: string, @Body('status') status: string) {
     return this.adminService.updateLicenseStatus(id, status);
+  }
+
+  @Post('licenses')
+  createLicense(@Body() body: { email: string, planId: string, durationDays: number }) {
+    return this.adminService.createLicenseManually(body.email, body.planId, body.durationDays);
+  }
+
+  @Get('plans')
+  getPlans() {
+    return this.adminService.getPlans();
   }
 }

@@ -38,6 +38,29 @@ export class AdminService {
     return this.prisma.affiliate.delete({ where: { id } });
   }
 
+  async createAffiliateManually(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    
+    const existing = await this.prisma.affiliate.findUnique({ where: { userId: user.id } });
+    if (existing) {
+      return existing;
+    }
+
+    const randomStr = Math.random().toString(36).substring(2, 8).toLowerCase();
+    const code = `${user.name ? user.name.split(' ')[0].toLowerCase() : 'ref'}${randomStr}`;
+
+    return this.prisma.affiliate.create({
+      data: {
+        userId: user.id,
+        code,
+        status: 'APPROVED',
+      }
+    });
+  }
+
   async getLicenses() {
     return this.prisma.license.findMany({
       include: {
@@ -51,6 +74,43 @@ export class AdminService {
     return this.prisma.license.update({
       where: { id },
       data: { status }
+    });
+  }
+
+  async createLicenseManually(email: string, planId: string, durationDays: number) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const plan = await this.prisma.productPlan.findUnique({ where: { id: planId } });
+    if (!plan) {
+      throw new Error('Plan not found');
+    }
+
+    let expiresAt: Date | null = null;
+    if (durationDays > 0) {
+      expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + durationDays);
+    }
+
+    return this.prisma.license.create({
+      data: {
+        userId: user.id,
+        productId: plan.productId,
+        planId: plan.id,
+        status: 'ACTIVE',
+        lotAllowed: plan.lotAllowed,
+        expiresAt
+      }
+    });
+  }
+
+  async getPlans() {
+    return this.prisma.productPlan.findMany({
+      include: {
+        product: { select: { name: true } }
+      }
     });
   }
 }

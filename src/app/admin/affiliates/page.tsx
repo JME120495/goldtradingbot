@@ -52,9 +52,39 @@ export default function AdminAffiliates() {
     }
   };
 
+  const addAffiliateManually = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email');
+    if (!email) return;
+
+    try {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/affiliates`, { email });
+      fetchAffiliates();
+      (e.target as HTMLFormElement).reset();
+      alert('Affiliate added successfully');
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Error adding affiliate. Ensure user exists.');
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">{t('manage_affiliates')}</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">{t('manage_affiliates')}</h1>
+        <form onSubmit={addAffiliateManually} className="flex gap-2">
+          <input 
+            type="email" 
+            name="email" 
+            placeholder="User Email" 
+            required 
+            className="bg-[#0F1115] border border-white/20 rounded-lg px-4 py-2 text-white outline-none focus:border-[#D4AF37]"
+          />
+          <button type="submit" className="bg-[#D4AF37] text-black font-bold px-4 py-2 rounded-lg hover:bg-[#AA8B2C] transition-colors">
+            Ajouter manuellement
+          </button>
+        </form>
+      </div>
       
       <div className="bg-[#0F1115] border border-white/10 rounded-2xl overflow-hidden">
         <table className="w-full text-left text-sm">

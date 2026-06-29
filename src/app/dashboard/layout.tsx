@@ -13,11 +13,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mounted, setMounted] = useState(false);
   const t = useTranslations('Dashboard');
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
   useEffect(() => {
     setMounted(true);
     const token = Cookies.get('token');
     if (!token) {
       router.push('/login');
+    } else {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.role === 'ADMIN') {
+          setIsAdmin(true);
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
   }, [router]);
 
@@ -35,6 +46,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: t('billing'), href: '/dashboard/billing', icon: CreditCard },
     { name: t('affiliates'), href: '/dashboard/affiliates', icon: Users },
   ];
+
+  if (isAdmin) {
+    navItems.push({ name: 'Admin Panel', href: '/admin', icon: Users }); // Using Users icon as placeholder for Admin
+  }
 
   return (
     <div className="min-h-screen bg-[#050505] text-white flex">

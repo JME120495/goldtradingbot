@@ -86,7 +86,6 @@ export default function Home() {
               <Link href="#features" className="hover:text-[#D4AF37] transition-colors">{t('Navigation.features')}</Link>
               <Link href="#how-it-works" className="hover:text-[#D4AF37] transition-colors">{t('Navigation.how_it_works')}</Link>
               <Link href="#pricing" className="hover:text-[#D4AF37] transition-colors">{t('Navigation.pricing')}</Link>
-              <Link href="/dashboard/affiliates" className="hover:text-[#D4AF37] transition-colors">Portail Parrainage</Link>
               <Link href="/faq" className="hover:text-[#D4AF37] transition-colors">{t('Navigation.faq')}</Link>
             </div>
             <div className="flex gap-4 items-center">
