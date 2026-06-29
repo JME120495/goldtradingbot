@@ -44,7 +44,7 @@ export default function DownloadsPage() {
           <h3 className="text-xl font-bold mb-2">Gold Scalper MT5</h3>
           <p className="text-gray-400 mb-6 text-sm">Version 1.0.0 • Updated today</p>
           <button 
-            onClick={() => handleDownload('gold-scalper')}
+            onClick={() => handleDownload('gold-scalper-mt5')}
             disabled={loading}
             className="w-full bg-[#D4AF37] text-black font-bold py-3 rounded-xl hover:bg-[#AA8B2C] disabled:opacity-50"
           >
