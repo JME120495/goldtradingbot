@@ -38,8 +38,9 @@ export class PaymentsService {
 
     // 2. Call Flutterwave API (Mocked logic)
     // Return a mocked payment link passing metadata in URL for mock webhook to use
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     return {
-      paymentLink: `http://localhost:4000/checkout/mock-flutterwave?tx_ref=${txRef}&amount=${amount}&productId=${data.productId}&planId=${data.planId}&duration=${data.duration}`
+      paymentLink: `${frontendUrl}/checkout/mock-flutterwave?tx_ref=${txRef}&amount=${amount}&productId=${data.productId}&planId=${data.planId}&duration=${data.duration}`
     };
   }
 
