@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -12,10 +13,16 @@ import { CrmModule } from './crm/crm.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AdminModule } from './admin/admin.module';
 import { TradingAccountsModule } from './trading-accounts/trading-accounts.module';
+import { Mt5LicensesModule } from './mt5-licenses/mt5-licenses.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,   // 60 seconds
+      limit: 30,    // 30 requests per window (default, overridden per-route)
+    }]),
     AuthModule,
     UsersModule,
     PrismaModule,
@@ -26,8 +33,15 @@ import { TradingAccountsModule } from './trading-accounts/trading-accounts.modul
     CrmModule,
     AdminModule,
     TradingAccountsModule,
+    Mt5LicensesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

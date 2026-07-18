@@ -12,6 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: t('dashboard'), href: '/admin' },
     { name: t('affiliates'), href: '/admin/affiliates' },
     { name: t('licenses'), href: '/admin/licenses' },
+    { name: t('mt5_licenses'), href: '/admin/mt5-licenses' },
   ];
 
   return (

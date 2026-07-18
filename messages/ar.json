@@ -76,7 +76,10 @@
     "status": "الحالة",
     "block": "حظر",
     "unblock": "إلغاء الحظر",
-    "confirm_toggle": "تأكيد التغيير إلى"
+    "confirm_toggle": "تأكيد التغيير إلى",
+    "mt5_licenses": "تراخيص MT5",
+    "mt5_licenses_title": "إدارة تراخيص MT5",
+    "mt5_licenses_subtitle": "إنشاء ومراقبة وإدارة تراخيص EA لعملائك"
   },
   "Auth": {
     "login_title": "مرحباً بعودتك",

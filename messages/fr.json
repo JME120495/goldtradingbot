@@ -76,7 +76,10 @@
     "status": "Statut",
     "block": "Bloquer",
     "unblock": "Réactiver",
-    "confirm_toggle": "Confirmer le passage au statut :"
+    "confirm_toggle": "Confirmer le passage au statut :",
+    "mt5_licenses": "Licences MT5",
+    "mt5_licenses_title": "Gestion des Licences MT5",
+    "mt5_licenses_subtitle": "Créer, surveiller et gérer les licences EA pour vos clients"
   },
   "Auth": {
     "login_title": "Bon retour",

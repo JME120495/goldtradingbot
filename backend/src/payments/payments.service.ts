@@ -5,8 +5,8 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PaymentsService {
   private readonly logger = new Logger(PaymentsService.name);
   
-  // Fake keys for mock environment
-  private readonly FLUTTERWAVE_SECRET = process.env.FLUTTERWAVE_SECRET || 'FLWSECK_TEST-dummy';
+  // Flutterwave secret from environment variable
+  private readonly FLUTTERWAVE_SECRET = process.env.FLUTTERWAVE_SECRET;
 
   constructor(private prisma: PrismaService) {}
 
@@ -38,7 +38,10 @@ export class PaymentsService {
 
     // 2. Call Flutterwave API (Mocked logic)
     // Return a mocked payment link passing metadata in URL for mock webhook to use
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const frontendUrl = process.env.FRONTEND_URL;
+    if (!frontendUrl) {
+      throw new Error('FRONTEND_URL environment variable is required');
+    }
     return {
       paymentLink: `${frontendUrl}/checkout/mock-flutterwave?tx_ref=${txRef}&amount=${amount}&productId=${data.productId}&planId=${data.planId}&duration=${data.duration}`
     };

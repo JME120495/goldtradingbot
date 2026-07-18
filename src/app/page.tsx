@@ -121,7 +121,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link href="/register">
                 <Button size="lg" className="bg-[#D4AF37] text-black hover:bg-[#AA8B2C] font-bold h-14 px-8 text-lg border-0">
-                  {t('Hero.start_trial')}
+                  {t('Navigation.get_started')}
                 </Button>
               </Link>
               <Link href="#pricing">
@@ -280,10 +280,6 @@ export default function Home() {
                 </Link>
               </div>
             ))}
-          </div>
-          
-          <div className="mt-12 text-center text-gray-400 text-sm">
-            <p>🎁 {t('Pricing.trial_promo')}</p>
           </div>
         </section>
       </main>

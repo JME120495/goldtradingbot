@@ -8,19 +8,12 @@ export class CrmService {
 
   constructor(private prisma: PrismaService) {}
 
-  // Run every hour to check free trials
+  // Run every hour for general CRM checks
   @Cron(CronExpression.EVERY_HOUR)
-  async checkFreeTrials() {
-    this.logger.log('Starting CRM routine: Checking free trials...');
+  async checkCrmTasks() {
+    this.logger.log('Starting CRM routine...');
     
-    // In a real scenario, we'd query licenses where isTrial = true
-    // For this simulation, we'll just log the logic.
-    const now = new Date();
-    
-    this.logger.log('[MOCK CRM] Sending Email 1 (Immédiatement) to new signups...');
-    this.logger.log('[MOCK CRM] Sending Email 2 (12h) "Comment se déroule votre essai ?"...');
-    this.logger.log('[MOCK CRM] Sending Email 3 (20h) "Votre essai expire bientôt."...');
-    this.logger.log('[MOCK CRM] Sending Email 4 (Expiration) "Activez votre licence avec WELCOME10".');
+    // CRM logic for paying users would go here
     
     this.logger.log('CRM routine finished.');
   }

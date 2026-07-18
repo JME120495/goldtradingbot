@@ -16,9 +16,10 @@ model User {
   passwordHash  String?
   phone         String?   @unique
   preferredCurrency String @default("USD")
+  refreshTokenHash String?   // hashed refresh token for rotation
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  
+
   licenses      License[]
   tradingAccounts TradingAccount[]
   payments      Payment[]
@@ -138,4 +139,44 @@ model SupportTicket {
   status        String    @default("OPEN")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+/// Standalone license table for MT5 EA verification.
+/// Decoupled from the User/Product system so that the EA
+/// can do a fast, flat lookup without joins.
+model Mt5License {
+  id              Int       @id @default(autoincrement())
+
+  // Client identity (flat — no FK to User for now)
+  clientName      String    @db.VarChar(120)
+  clientEmail     String    @db.VarChar(160)
+  clientWhatsapp  String?   @db.VarChar(30)
+
+  // MT5 account details
+  accountNumber   BigInt
+  broker          String    @default("") @db.VarChar(100)
+  server          String    @default("") @db.VarChar(100)
+
+  // EA product (JMEGOLD_DUAL, GOLD_SCALPER, GOLDDOUBLESTOP, ALL)
+  eaName          String    @default("ALL") @db.VarChar(60)
+
+  // Plan & trading parameters
+  plan            String    @default("Starter") @db.VarChar(20)
+  lot             Decimal   @default(0.01) @db.Decimal(6, 2)
+
+  // Status & validity
+  status          String    @default("active") @db.VarChar(20)
+  expiryDate      DateTime  @db.Date
+
+  // Tracking (updated by the verify endpoint)
+  lastCheckAt     DateTime? @db.Timestamptz()
+  lastCheckIp     String?   @db.VarChar(60)
+  checkCount      Int       @default(0)
+
+  createdAt       DateTime  @default(now()) @db.Timestamptz()
+  updatedAt       DateTime  @updatedAt @db.Timestamptz()
+
+  @@unique([accountNumber, eaName])
+  @@index([expiryDate])
+  @@map("mt5_licenses")
 }
