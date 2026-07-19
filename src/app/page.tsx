@@ -166,14 +166,14 @@ export default function Home() {
             <h2 className="text-3xl font-bold mb-4">{t('Recommendations.title')}</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">{t('Recommendations.desc')}</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 max-w-4xl mx-auto gap-6">
             <div className="bg-[#1A1C23] border border-[#D4AF37]/20 rounded-2xl p-6 text-center hover:border-[#D4AF37]/50 transition-colors">
               <div className="w-16 h-16 mx-auto bg-[#D4AF37]/10 rounded-full flex items-center justify-center mb-4">
                 <svg className="w-8 h-8 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               </div>
               <h3 className="text-xl font-bold mb-2">{t('Recommendations.broker_title')}</h3>
               <p className="text-gray-400 text-sm mb-6">{t('Recommendations.broker_desc')}</p>
-              <a href="https://fusionmarkets.com/?refcode=113895" target="_blank" rel="noreferrer" className="text-[#D4AF37] font-semibold text-sm hover:underline">
+              <a href="https://fusionmarkets.com/?refcode=113900" target="_blank" rel="noreferrer" className="text-[#D4AF37] font-semibold text-sm hover:underline">
                 {t('Recommendations.broker_link')} →
               </a>
             </div>
@@ -184,14 +184,6 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold mb-2">{t('Recommendations.vps_title')}</h3>
               <p className="text-gray-400 text-sm">{t('Recommendations.vps_desc')}</p>
-            </div>
-            
-            <div className="bg-[#1A1C23] border border-[#D4AF37]/20 rounded-2xl p-6 text-center hover:border-[#D4AF37]/50 transition-colors">
-              <div className="w-16 h-16 mx-auto bg-[#D4AF37]/10 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              </div>
-              <h3 className="text-xl font-bold mb-2">{t('Recommendations.session_title')}</h3>
-              <p className="text-gray-400 text-sm">{t('Recommendations.session_desc')}</p>
             </div>
           </div>
         </section>
