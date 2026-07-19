@@ -118,5 +118,11 @@
     "sales": "Total Sales",
     "commission": "Commission Earned",
     "become_partner": "Become a Partner"
+  },
+  "Performance": {
+    "title": "Tested performance, a consistency-driven approach",
+    "p1": "Our Expert Advisor was developed and tested with a clear goal: seeking consistent performance while applying strict risk management.",
+    "p2": "During our internal tests and in observed market conditions, our strategy has frequently generated results equal to or greater than $20 USD per day on recommended configurations.",
+    "disclaimer": "These results are provided for informational purposes and do not constitute a guarantee of performance. Financial markets involve risks, and results may vary depending on capital, market conditions, broker, order execution, and used parameters."
   }
 }

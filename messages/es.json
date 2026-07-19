@@ -118,5 +118,11 @@
     "sales": "Ventas Totales",
     "commission": "Comisiones Ganadas",
     "become_partner": "Convertirse en Socio"
+  },
+  "Performance": {
+    "title": "Rendimiento probado, un enfoque basado en la consistencia",
+    "p1": "Nuestro Expert Advisor fue desarrollado y probado con un objetivo claro: buscar un rendimiento constante aplicando una estricta gestión de riesgos.",
+    "p2": "Durante nuestras pruebas internas y en las condiciones de mercado observadas, nuestra estrategia ha generado frecuentemente resultados iguales o superiores a 20 USD por día en las configuraciones recomendadas.",
+    "disclaimer": "Estos resultados se proporcionan con fines informativos y no constituyen una garantía de rendimiento. Los mercados financieros implican riesgos, y los resultados pueden variar según el capital, las condiciones del mercado, el bróker, la ejecución de órdenes y los parámetros utilizados."
   }
 }

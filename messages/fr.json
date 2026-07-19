@@ -118,5 +118,11 @@
     "sales": "Ventes Totales",
     "commission": "Commissions Gagnées",
     "become_partner": "Devenir Partenaire"
+  },
+  "Performance": {
+    "title": "Des performances testées, une approche axée sur la régularité",
+    "p1": "Notre Expert Advisor a été développé et testé avec un objectif clair : rechercher des performances régulières tout en appliquant une gestion rigoureuse du risque.",
+    "p2": "Lors de nos tests internes et dans les conditions de marché observées, notre stratégie a fréquemment généré des résultats équivalents ou supérieurs à 20 USD par jour sur les configurations recommandées.",
+    "disclaimer": "Ces résultats sont fournis à titre indicatif et ne constituent pas une garantie de performance. Les marchés financiers comportent des risques, et les résultats peuvent varier en fonction du capital, des conditions de marché, du broker, de l'exécution des ordres et des paramètres utilisés."
   }
 }

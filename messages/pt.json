@@ -118,5 +118,11 @@
     "sales": "Vendas Totais",
     "commission": "Comissões Ganhas",
     "become_partner": "Tornar-se Parceiro"
+  },
+  "Performance": {
+    "title": "Desempenho testado, uma abordagem focada na consistência",
+    "p1": "Nosso Expert Advisor foi desenvolvido e testado com um objetivo claro: buscar desempenho consistente aplicando um rigoroso gerenciamento de risco.",
+    "p2": "Durante nossos testes internos e nas condições de mercado observadas, nossa estratégia gerou frequentemente resultados iguais ou superiores a 20 USD por dia nas configurações recomendadas.",
+    "disclaimer": "Estes resultados são fornecidos apenas para fins informativos e não constituem uma garantia de desempenho. Os mercados financeiros envolvem riscos, e os resultados podem variar dependendo do capital, condições de mercado, corretora, execução de ordens e parâmetros utilizados."
   }
 }

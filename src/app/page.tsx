@@ -160,6 +160,26 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Performance Section */}
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5">
+          <div className="bg-[#0F1115] border border-[#D4AF37]/20 rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden shadow-[0_0_40px_rgba(212,175,55,0.05)]">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-50" />
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#D4AF37]/20 to-transparent rounded-full flex items-center justify-center mb-6">
+              <svg className="w-8 h-8 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+            </div>
+            <h2 className="text-3xl font-bold mb-6 text-white">{t('Performance.title')}</h2>
+            <div className="space-y-6 text-gray-300 text-lg leading-relaxed">
+              <p>{t('Performance.p1')}</p>
+              <p>{t('Performance.p2')}</p>
+            </div>
+            <div className="mt-8 pt-8 border-t border-white/5">
+              <p className="text-sm text-gray-500 italic">
+                {t('Performance.disclaimer')}
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Recommendations Section */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5">
           <div className="text-center mb-12">
