@@ -27,7 +27,7 @@
     "title": "Optimal Setup Recommendations",
     "desc": "For the best trading results and uninterrupted performance, we highly recommend the following setup:",
     "broker_title": "Recommended Broker",
-    "broker_desc": "We partner with Fusion Markets for lowest spreads on XAUUSD.",
+    "broker_desc": "We recommend the Fusion Markets broker for its 0 spreads on major currency pairs and its very low commission of $2 per lot.",
     "broker_link": "Open Fusion Markets Account",
     "vps_title": "Use a VPS",
     "vps_desc": "Run the EA on a Virtual Private Server (VPS) for 24/7 uptime and lowest latency.",

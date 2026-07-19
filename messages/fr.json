@@ -27,7 +27,7 @@
     "title": "Recommandations pour un Setup Optimal",
     "desc": "Pour obtenir les meilleurs résultats et des performances sans interruption, nous vous conseillons ce qui suit :",
     "broker_title": "Broker Conseillé",
-    "broker_desc": "Nous vous recommandons Fusion Markets pour ses spreads ultra-faibles sur XAUUSD.",
+    "broker_desc": "Nous vous conseillons le broker Fusion Markets pour ses spreads de 0 sur les paires de devises majeures et sa commission très faible de 2 dollars par lot.",
     "broker_link": "Ouvrir un compte Fusion Markets",
     "vps_title": "Utilisez un VPS",
     "vps_desc": "Il est intéressant d'utiliser ce bot avec un VPS pour qu'il fonctionne de façon optimale (24/7).",
