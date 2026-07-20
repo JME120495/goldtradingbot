@@ -108,9 +108,36 @@ export class AdminService {
 
   async getPlans() {
     return this.prisma.productPlan.findMany({
-      include: {
-        product: { select: { name: true } }
+      include: { product: true }
+    });
+  }
+
+  async seedProducts() {
+    const product = await this.prisma.product.create({
+      data: {
+        name: 'Gold Scalper MT5',
+        slug: 'gold-scalper-mt5',
+        description: 'Expert Advisor Gold Scalper (MT5)'
       }
     });
+
+    await this.prisma.productPlan.createMany({
+      data: [
+        {
+          productId: product.id,
+          name: 'Starter',
+          lotAllowed: 0.01,
+          prices: '{"monthly": 50, "yearly": 400}'
+        },
+        {
+          productId: product.id,
+          name: 'Pro',
+          lotAllowed: 0.1,
+          prices: '{"monthly": 100, "yearly": 800}'
+        }
+      ]
+    });
+
+    return { success: true, message: 'Products seeded successfully' };
   }
 }

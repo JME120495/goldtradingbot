@@ -49,4 +49,9 @@ export class AdminController {
   getPlans() {
     return this.adminService.getPlans();
   }
+
+  @Post('seed')
+  seedProducts() {
+    return this.adminService.seedProducts();
+  }
 }
