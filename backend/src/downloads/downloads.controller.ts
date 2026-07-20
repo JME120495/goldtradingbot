@@ -8,6 +8,12 @@ export class DownloadsController {
   constructor(private readonly downloadsService: DownloadsService) {}
 
   @UseGuards(AuthGuard('jwt'))
+  @Get('products')
+  async getProducts() {
+    return this.downloadsService.getProducts();
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Post('generate-url')
   async generateUrl(@Request() req, @Body('product') product: string) {
     return this.downloadsService.generateSignedUrl(req.user.userId, product);

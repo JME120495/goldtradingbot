@@ -11,6 +11,17 @@ export class DownloadsService {
     private jwtService: JwtService
   ) {}
 
+  async getProducts() {
+    return this.prisma.product.findMany({
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+      }
+    });
+  }
+
   async generateSignedUrl(userId: string, productSlug: string) {
     const license = await this.prisma.license.findFirst({
       where: {
