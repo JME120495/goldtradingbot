@@ -57,6 +57,12 @@ export class PaymentsService {
       const payment = await this.prisma.payment.findUnique({ where: { providerTxId: txRef } });
       if (!payment) return { status: 'ignored' };
 
+      // Vérification d'idempotence : on s'assure qu'on ne traite qu'une seule fois
+      if (payment.status === 'COMPLETED') {
+        this.logger.log(`Webhook ignoré : Le paiement ${txRef} est déjà traité.`);
+        return { status: 'already_processed' };
+      }
+
       // Update Payment Status
       await this.prisma.payment.update({
         where: { id: payment.id },
