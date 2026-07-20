@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
-import { Home, Key, Download, CreditCard, LogOut, Users } from 'lucide-react';
+import { Home, Key, Download, CreditCard, LogOut, Users, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -45,6 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: t('downloads'), href: '/dashboard/downloads', icon: Download },
     { name: t('billing'), href: '/dashboard/billing', icon: CreditCard },
     { name: t('affiliates'), href: '/dashboard/affiliates', icon: Users },
+    { name: 'Profil', href: '/dashboard/profile', icon: User },
   ];
 
   if (isAdmin) {

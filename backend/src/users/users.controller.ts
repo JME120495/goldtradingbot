@@ -16,4 +16,9 @@ export class UsersController {
   async updateMe(@Request() req, @Body() body: any) {
     return this.usersService.updateMe(req.user.userId, body);
   }
+
+  @Patch('password')
+  async changePassword(@Request() req, @Body() body: any) {
+    return this.usersService.changePassword(req.user.userId, body);
+  }
 }
