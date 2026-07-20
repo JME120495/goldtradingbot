@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMt5LicenseDto } from './dto/create-mt5-license.dto';
+import { SyncHistoryDto } from './dto/sync-history.dto';
 
 @Injectable()
 export class Mt5LicensesService {
@@ -228,5 +229,115 @@ export class Mt5LicensesService {
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // ----------------------------------------------------------
+  //  History Tracking
+  // ----------------------------------------------------------
+
+  async syncHistory(dto: SyncHistoryDto) {
+    const accountBigInt = BigInt(dto.account);
+    const eaName = dto.ea || 'ALL';
+
+    // 1. Upsert Account Stats
+    await this.prisma.mt5AccountStat.upsert({
+      where: {
+        accountNumber_eaName: {
+          accountNumber: accountBigInt,
+          eaName: eaName,
+        },
+      },
+      update: {
+        balance: dto.balance,
+        equity: dto.equity,
+        margin: dto.margin,
+        freeMargin: dto.freeMargin,
+      },
+      create: {
+        accountNumber: accountBigInt,
+        eaName: eaName,
+        balance: dto.balance,
+        equity: dto.equity,
+        margin: dto.margin,
+        freeMargin: dto.freeMargin,
+      },
+    });
+
+    // 2. Upsert Trades if any
+    if (dto.trades && dto.trades.length > 0) {
+      // Using a transaction to insert/update all trades efficiently
+      await this.prisma.$transaction(
+        dto.trades.map((trade) =>
+          this.prisma.mt5Trade.upsert({
+            where: { ticket: BigInt(trade.ticket) },
+            update: {
+              symbol: trade.symbol,
+              type: trade.type,
+              volume: trade.volume,
+              openPrice: trade.openPrice,
+              closePrice: trade.closePrice,
+              openTime: new Date(trade.openTime),
+              closeTime: new Date(trade.closeTime),
+              profit: trade.profit,
+              commission: trade.commission,
+              swap: trade.swap,
+            },
+            create: {
+              ticket: BigInt(trade.ticket),
+              accountNumber: accountBigInt,
+              eaName: eaName,
+              symbol: trade.symbol,
+              type: trade.type,
+              volume: trade.volume,
+              openPrice: trade.openPrice,
+              closePrice: trade.closePrice,
+              openTime: new Date(trade.openTime),
+              closeTime: new Date(trade.closeTime),
+              profit: trade.profit,
+              commission: trade.commission,
+              swap: trade.swap,
+            },
+          }),
+        ),
+      );
+    }
+
+    return { success: true, message: 'History synchronized' };
+  }
+
+  async getAccountHistory(accountNumber: number) {
+    const accountBigInt = BigInt(accountNumber);
+
+    const stats = await this.prisma.mt5AccountStat.findMany({
+      where: { accountNumber: accountBigInt },
+    });
+
+    const trades = await this.prisma.mt5Trade.findMany({
+      where: { accountNumber: accountBigInt },
+      orderBy: { closeTime: 'desc' },
+      take: 100, // Limit to last 100 trades for performance
+    });
+
+    return {
+      stats: stats.map((s) => ({
+        ...s,
+        accountNumber: Number(s.accountNumber),
+        balance: Number(s.balance),
+        equity: Number(s.equity),
+        margin: Number(s.margin),
+        freeMargin: Number(s.freeMargin),
+      })),
+      trades: trades.map((t) => ({
+        ...t,
+        ticket: Number(t.ticket),
+        accountNumber: Number(t.accountNumber),
+        volume: Number(t.volume),
+        openPrice: Number(t.openPrice),
+        closePrice: Number(t.closePrice),
+        profit: Number(t.profit),
+        commission: Number(t.commission),
+        swap: Number(t.swap),
+      })),
+    };
   }
 }

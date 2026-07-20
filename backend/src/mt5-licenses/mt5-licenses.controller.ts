@@ -15,6 +15,7 @@ import { Throttle } from '@nestjs/throttler';
 import { Mt5LicensesService } from './mt5-licenses.service';
 import { VerifyLicenseDto } from './dto/verify-license.dto';
 import { CreateMt5LicenseDto } from './dto/create-mt5-license.dto';
+import { SyncHistoryDto } from './dto/sync-history.dto';
 import type { Request } from 'express';
 
 @Controller('api/license')
@@ -111,5 +112,29 @@ export class Mt5LicensesController {
       parseInt(offset || '0', 10),
       search,
     );
+  }
+
+  // ----------------------------------------------------------
+  //  History Endpoints
+  // ----------------------------------------------------------
+
+  @Post('sync-history')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 60, ttl: 60000 } })
+  async syncHistory(@Body() body: SyncHistoryDto) {
+    if (!body.account) {
+      throw new BadRequestException('Compte manquant.');
+    }
+    return this.mt5LicensesService.syncHistory(body);
+  }
+
+  @Get('admin/history/:account')
+  @UseGuards(AuthGuard('jwt'))
+  async getAccountHistory(@Req() req: Request) {
+    const accountNumber = parseInt(req.params.account as string, 10);
+    if (isNaN(accountNumber)) {
+      throw new BadRequestException('Numéro de compte invalide.');
+    }
+    return this.mt5LicensesService.getAccountHistory(accountNumber);
   }
 }

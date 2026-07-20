@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -532,10 +533,16 @@ export default function AdminMt5Licenses() {
                     <td className="p-4 text-gray-500 text-xs whitespace-nowrap">
                       {formatDateTime(lic.lastCheckAt)}
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 flex items-center gap-4">
+                      <Link
+                        href={`/admin/mt5-licenses/${lic.accountNumber}`}
+                        className="font-semibold text-sm text-[#D4AF37] hover:text-[#AA8B2C] transition-colors whitespace-nowrap"
+                      >
+                        Trading
+                      </Link>
                       <button
                         onClick={() => toggleStatus(lic)}
-                        className={`font-semibold text-sm transition-colors ${
+                        className={`font-semibold text-sm transition-colors whitespace-nowrap ${
                           lic.status === 'active'
                             ? 'text-amber-400 hover:text-amber-300'
                             : 'text-emerald-400 hover:text-emerald-300'

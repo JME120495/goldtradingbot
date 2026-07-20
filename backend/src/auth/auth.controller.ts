@@ -1,6 +1,6 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
@@ -26,7 +26,8 @@ export class AuthController {
   @Post('logout')
   @UseGuards(AuthGuard('jwt'))
   async logout(@Req() req: Request) {
-    const userId = req.user['sub'];
+    const user = req.user as any;
+    const userId = user?.['sub'];
     await this.authService.logout(userId);
     return { message: 'Logged out successfully' };
   }

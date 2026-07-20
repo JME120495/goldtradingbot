@@ -77,8 +77,8 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
     });
-    if (!user) {
-      throw new UnauthorizedException('User not found');
+    if (!user || !user.refreshTokenHash) {
+      throw new UnauthorizedException('User not found or no refresh token');
     }
     const isValid = await argon2.verify(
       user.refreshTokenHash,
