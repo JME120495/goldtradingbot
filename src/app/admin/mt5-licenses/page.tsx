@@ -219,20 +219,38 @@ export default function AdminMt5Licenses() {
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  const handleSeed = async () => {
+    try {
+      if (!window.confirm("Créer les produits dans la base de données ?")) return;
+      const res = await axios.post(`${API_URL}/api/admin/seed`, {}, { headers: getAuthHeaders() });
+      alert("Produits créés avec succès !");
+    } catch (err: any) {
+      alert("Erreur: " + err.message);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center flex-wrap gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">{t('mt5_licenses_title')}</h1>
-          <p className="text-gray-400 mt-1">{t('mt5_licenses_subtitle')}</p>
+          <h1 className="text-3xl font-bold mb-2">Licences MT5</h1>
+          <p className="text-gray-400">Gérez les licences et accès aux robots MT5.</p>
         </div>
-        <button
+        <div className="flex space-x-4">
+          <button
+            onClick={handleSeed}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl flex items-center font-bold"
+          >
+            Créer les Produits (Base de données)
+          </button>
+          <button
           onClick={() => setShowForm(!showForm)}
           className="bg-[#D4AF37] text-black font-bold px-5 py-2.5 rounded-xl hover:bg-[#AA8B2C] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
         >
           {showForm ? '✕ Fermer' : '+ Nouvelle Licence'}
         </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
