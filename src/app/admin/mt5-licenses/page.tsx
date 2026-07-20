@@ -222,7 +222,7 @@ export default function AdminMt5Licenses() {
   const handleSeed = async () => {
     try {
       if (!window.confirm("Créer les produits dans la base de données ?")) return;
-      const res = await axios.post(`${API_URL}/api/admin/seed`, {}, { headers: getAuthHeaders() });
+      const res = await axios.post(`${API_URL}/admin/seed`, {}, { headers: getAuthHeaders() });
       alert("Produits créés avec succès !");
     } catch (err: any) {
       alert("Erreur: " + err.message);
