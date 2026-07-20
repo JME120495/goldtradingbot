@@ -113,13 +113,22 @@ export class AdminService {
   }
 
   async seedProducts() {
-    const product = await this.prisma.product.create({
-      data: {
-        name: 'Gold Scalper MT5',
-        slug: 'gold-scalper-mt5',
-        description: 'Expert Advisor Gold Scalper (MT5)'
+    // 1. Seed JMEgold_scalper EA
+    const product = await this.prisma.product.upsert({
+      where: { slug: 'JMEGOLD_SCALPER EA' },
+      update: {
+        name: 'JMEgold_scalper EA',
+        description: 'Expert Advisor JME Gold Scalper (MT5)'
+      },
+      create: {
+        name: 'JMEgold_scalper EA',
+        slug: 'JMEGOLD_SCALPER EA',
+        description: 'Expert Advisor JME Gold Scalper (MT5)'
       }
     });
+
+    // Clear existing plans for this product to avoid duplicates during seed
+    await this.prisma.productPlan.deleteMany({ where: { productId: product.id } });
 
     await this.prisma.productPlan.createMany({
       data: [
