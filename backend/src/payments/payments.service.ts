@@ -21,8 +21,9 @@ export class PaymentsService {
     const prices = JSON.parse(plan.prices);
     const amount = prices[data.duration] || prices['monthly'];
 
-    // MOCK: Generate a unique transaction reference
-    const txRef = `GTB-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    // Générer une référence unique contenant les infos nécessaires
+    // Format: GTB_timestamp_productId_planId_duration
+    const txRef = `GTB_${Date.now()}_${data.productId}_${data.planId}_${data.duration}`;
 
     // 1. Create PENDING payment in DB
     const payment = await this.prisma.payment.create({
@@ -30,29 +31,58 @@ export class PaymentsService {
         userId,
         amount,
         currency: 'USD',
-        provider: 'FLUTTERWAVE',
+        provider: 'NOWPAYMENTS',
         providerTxId: txRef,
         status: 'PENDING',
       }
     });
 
-    // 2. Call Flutterwave API (Mocked logic)
-    // Return a mocked payment link passing metadata in URL for mock webhook to use
+    // 2. Call NowPayments API
     const frontendUrl = process.env.FRONTEND_URL;
     if (!frontendUrl) {
       throw new Error('FRONTEND_URL environment variable is required');
     }
+
+    const apiKey = process.env.NOWPAYMENTS_API_KEY;
+    if (!apiKey) throw new Error('NOWPAYMENTS_API_KEY is required');
+
+    // On utilise fetch (natif NodeJS 18+)
+    const response = await fetch('https://api.nowpayments.io/v1/invoice', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        price_amount: amount,
+        price_currency: 'usd',
+        order_id: txRef,
+        order_description: `Licence Robot - Plan ${plan.name} (${data.duration})`,
+        success_url: `${frontendUrl}/dashboard`,
+        cancel_url: frontendUrl,
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      this.logger.error(`NowPayments API error: ${errText}`);
+      throw new Error('Erreur lors de la création de la facture crypto');
+    }
+
+    const npData = await response.json();
+
     return {
-      paymentLink: `${frontendUrl}/checkout/mock-flutterwave?tx_ref=${txRef}&amount=${amount}&productId=${data.productId}&planId=${data.planId}&duration=${data.duration}`
+      paymentLink: npData.invoice_url
     };
   }
 
   async handleWebhook(payload: any) {
     this.logger.log(`Received Webhook: ${JSON.stringify(payload)}`);
     
-    // Check if payment was successful
-    if (payload.event === 'charge.completed' && payload.data.status === 'successful') {
-      const txRef = payload.data.tx_ref;
+    // NowPayments envoie payment_status
+    // Seuls 'finished' (paiement complet) et 'confirmed' sont considérés comme un succès final.
+    if (payload.payment_status === 'finished' || payload.payment_status === 'confirmed') {
+      const txRef = payload.order_id;
       
       const payment = await this.prisma.payment.findUnique({ where: { providerTxId: txRef } });
       if (!payment) return { status: 'ignored' };
@@ -69,13 +99,16 @@ export class PaymentsService {
         data: { status: 'COMPLETED' }
       });
 
-      // Create License
-      const meta = payload.data.meta;
-      if (meta && meta.productId && meta.planId) {
-        const plan = await this.prisma.productPlan.findUnique({ where: { id: meta.planId }});
+      // Extraire les infos de la référence (GTB_timestamp_productId_planId_duration)
+      const parts = txRef.split('_');
+      if (parts.length >= 5) {
+        const productId = parts[2];
+        const planId = parts[3];
+        const duration = parts[4];
+
+        const plan = await this.prisma.productPlan.findUnique({ where: { id: planId }});
         
         // Calculate expiration date based on duration
-        const duration = meta.duration || 'monthly';
         let days = 30;
         if (duration === 'weekly') days = 7;
         else if (duration === 'monthly') days = 30;
@@ -85,8 +118,8 @@ export class PaymentsService {
         await this.prisma.license.create({
           data: {
             userId: payment.userId,
-            productId: meta.productId,
-            planId: meta.planId,
+            productId: productId,
+            planId: planId,
             status: 'ACTIVE',
             lotAllowed: plan ? plan.lotAllowed : 0.01,
             expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000) 
