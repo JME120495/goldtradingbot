@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, TrendingUp, TrendingDown, Activity, AlertCircle, RefreshCw } from 'lucide-react';
@@ -56,7 +57,7 @@ export default function Mt5AccountDetails() {
   const fetchHistory = async () => {
     try {
       setLoading(true);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const token = typeof window !== 'undefined' ? Cookies.get('token') : null;
       const res = await axios.get(`${API_URL}/api/license/admin/history/${account}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });

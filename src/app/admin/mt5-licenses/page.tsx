@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
@@ -106,9 +107,8 @@ export default function AdminMt5Licenses() {
   const PAGE_SIZE = 50;
 
   const getAuthHeaders = () => {
-    // Try to get JWT token from localStorage or cookies
-    const token =
-      typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    // Try to get JWT token from Cookies
+    const token = typeof window !== 'undefined' ? Cookies.get('token') : null;
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
