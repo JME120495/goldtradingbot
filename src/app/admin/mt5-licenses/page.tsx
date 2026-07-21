@@ -128,7 +128,11 @@ export default function AdminMt5Licenses() {
       });
       setLicenses(res.data.licenses);
       setTotal(res.data.total);
-    } catch (err) {
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        window.location.href = '/login';
+        return;
+      }
       console.error('Error fetching MT5 licenses:', err);
     } finally {
       setLoading(false);
