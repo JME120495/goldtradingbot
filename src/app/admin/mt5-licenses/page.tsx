@@ -108,7 +108,7 @@ export default function AdminMt5Licenses() {
 
   const fetchEAs = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/admin/eas`, { headers: getAuthHeaders() });
+      const res = await axios.get(`${API_URL}/admin/eas`, { headers: getAuthHeaders() });
       setEaOptions(res.data);
     } catch (err) {
       console.error(err);
