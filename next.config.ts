@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
       {
         source: '/_/backend/:path*',
         destination: 'http://127.0.0.1:3001/:path*'
+      },
+      {
+        source: '/api/:path*',
+        destination: 'https://gold-trading-bot-backend.onrender.com/api/:path*'
       }
     ];
   }
