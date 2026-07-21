@@ -28,14 +28,6 @@ interface Mt5License {
   updatedAt: string;
 }
 
-const EA_OPTIONS = [
-  { value: 'JMEGOLD_SCALPER EA', label: 'JMEgold Scalper EA' },
-  { value: 'JMEGOLD_DUAL', label: 'JMEGOLD DUAL' },
-  { value: 'GOLD_SCALPER', label: 'Gold Scalper' },
-  { value: 'GOLDDOUBLESTOP', label: 'GoldDoubleStop' },
-  { value: 'ALL', label: 'ALL (tous les EA)' },
-];
-
 const PLAN_OPTIONS = ['Starter', 'Standard', 'Pro', 'VIP'];
 
 function statusBadge(status: string, expiryDate: string) {
@@ -97,6 +89,7 @@ function formatDate(dateStr: string) {
 
 export default function AdminMt5Licenses() {
   const [licenses, setLicenses] = useState<Mt5License[]>([]);
+  const [eaOptions, setEaOptions] = useState<{value: string, label: string}[]>([{ value: 'ALL', label: 'ALL (tous les EA)' }]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -112,6 +105,15 @@ export default function AdminMt5Licenses() {
     const token = typeof window !== 'undefined' ? Cookies.get('token') : null;
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
+
+  const fetchEAs = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/admin/eas`, { headers: getAuthHeaders() });
+      setEaOptions(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
 
   const fetchLicenses = useCallback(async () => {
     setLoading(true);
@@ -135,7 +137,8 @@ export default function AdminMt5Licenses() {
 
   useEffect(() => {
     fetchLicenses();
-  }, [fetchLicenses]);
+    fetchEAs();
+  }, [fetchLicenses, fetchEAs]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -365,7 +368,7 @@ export default function AdminMt5Licenses() {
                 defaultValue="JMEGOLD_DUAL"
                 className="w-full bg-black border border-white/20 rounded-lg px-4 py-2.5 text-white outline-none focus:border-[#D4AF37] transition-colors"
               >
-                {EA_OPTIONS.map((ea) => (
+                {eaOptions.map((ea) => (
                   <option key={ea.value} value={ea.value}>
                     {ea.label}
                   </option>

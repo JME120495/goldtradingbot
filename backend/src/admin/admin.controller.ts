@@ -10,6 +10,11 @@ export class AdminController {
     return this.adminService.getAffiliates();
   }
 
+  @Get('eas')
+  getEAs() {
+    return this.adminService.getEAs();
+  }
+
   @Patch('affiliates/:id/commission')
   updateAffiliateCommission(@Param('id') id: string, @Body('rate') rate: number) {
     return this.adminService.updateAffiliateCommission(id, rate);

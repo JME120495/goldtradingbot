@@ -1,9 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class AdminService {
   constructor(private prisma: PrismaService) {}
+
+  async getEAs() {
+    const filesDir = path.join(process.cwd(), 'files');
+    if (!fs.existsSync(filesDir)) return [{ value: 'ALL', label: 'ALL (tous les EA)' }];
+    
+    const files = fs.readdirSync(filesDir);
+    const eas = files
+      .filter(f => f.endsWith('.ex5'))
+      .map(f => {
+        const eaName = f.replace('.ex5', '');
+        return { value: eaName, label: eaName };
+      });
+      
+    // Always add 'ALL' at the end
+    eas.push({ value: 'ALL', label: 'ALL (tous les EA)' });
+    return eas;
+  }
 
   async getAffiliates() {
     const affiliates = await this.prisma.affiliate.findMany({
