@@ -29,6 +29,7 @@ interface Mt5License {
 }
 
 const EA_OPTIONS = [
+  { value: 'JMEGOLD_SCALPER EA', label: 'JMEgold Scalper EA' },
   { value: 'JMEGOLD_DUAL', label: 'JMEGOLD DUAL' },
   { value: 'GOLD_SCALPER', label: 'Gold Scalper' },
   { value: 'GOLDDOUBLESTOP', label: 'GoldDoubleStop' },
