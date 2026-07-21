@@ -22,21 +22,24 @@ export class DownloadsService {
     });
   }
 
-  async generateSignedUrl(userId: string, productSlug: string) {
-    const license = await this.prisma.license.findFirst({
-      where: {
-        userId,
-        product: { slug: productSlug },
-        status: 'ACTIVE',
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: new Date() } }
-        ]
-      }
-    });
+  async generateSignedUrl(userId: string, productSlug: string, role?: string) {
+    // Admins can download without a license
+    if (role !== 'ADMIN') {
+      const license = await this.prisma.license.findFirst({
+        where: {
+          userId,
+          product: { slug: productSlug },
+          status: 'ACTIVE',
+          OR: [
+            { expiresAt: null },
+            { expiresAt: { gt: new Date() } }
+          ]
+        }
+      });
 
-    if (!license) {
-      throw new UnauthorizedException('No active license found for this product.');
+      if (!license) {
+        throw new UnauthorizedException('No active license found for this product.');
+      }
     }
 
     // Generate a 15-minute token

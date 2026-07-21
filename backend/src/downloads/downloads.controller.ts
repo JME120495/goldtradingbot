@@ -16,7 +16,7 @@ export class DownloadsController {
   @UseGuards(AuthGuard('jwt'))
   @Post('generate-url')
   async generateUrl(@Request() req, @Body('product') product: string) {
-    return this.downloadsService.generateSignedUrl(req.user.userId, product);
+    return this.downloadsService.generateSignedUrl(req.user.userId, product, req.user.role);
   }
 
   @Get('file')
