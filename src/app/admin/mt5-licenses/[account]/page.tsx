@@ -83,9 +83,9 @@ export default function Mt5AccountDetails() {
     const winTrades = trades.filter((t) => t.profit > 0).length;
     const lossTrades = totalTrades - winTrades;
     const winRate = totalTrades > 0 ? (winTrades / totalTrades) * 100 : 0;
-    const totalProfit = trades.reduce((acc, t) => acc + t.profit, 0);
-    const totalCommission = trades.reduce((acc, t) => acc + t.commission, 0);
-    const totalSwap = trades.reduce((acc, t) => acc + t.swap, 0);
+    const totalProfit = trades.reduce((acc, t) => acc + Number(t.profit || 0), 0);
+    const totalCommission = trades.reduce((acc, t) => acc + Number(t.commission || 0), 0);
+    const totalSwap = trades.reduce((acc, t) => acc + Number(t.swap || 0), 0);
     const netProfit = totalProfit + totalCommission + totalSwap;
 
     return { totalTrades, winTrades, lossTrades, winRate, totalProfit, totalCommission, totalSwap, netProfit };
@@ -97,7 +97,7 @@ export default function Mt5AccountDetails() {
     const sortedTrades = [...trades].sort((a, b) => new Date(a.closeTime).getTime() - new Date(b.closeTime).getTime());
     
     return sortedTrades.map((t) => {
-      currentBalance += t.profit + t.commission + t.swap;
+      currentBalance += Number(t.profit || 0) + Number(t.commission || 0) + Number(t.swap || 0);
       return {
         date: new Date(t.closeTime).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
         profit: currentBalance,
