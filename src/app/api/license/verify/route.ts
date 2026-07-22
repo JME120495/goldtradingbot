@@ -1,9 +1,28 @@
 import { NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   try {
-    const data = await req.json();
+    const { searchParams } = new URL(req.url);
+    const data = {
+      account: searchParams.get('account'),
+      ea: searchParams.get('ea'),
+      broker: searchParams.get('broker'),
+      server: searchParams.get('server')
+    };
+    
+    // If account is present, try to proxy it as a POST to backend
+    if (data.account) {
+      return proxyToBackend(req, data);
+    }
+    
+    return NextResponse.json({ valid: false, message: 'GET request received but no account parameter' });
+  } catch (e: any) {
+    return NextResponse.json({ valid: false, message: e.message }, { status: 500 });
+  }
+}
 
+async function proxyToBackend(req: Request, data: any) {
+  try {
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL ||
       process.env.BACKEND_URL ||
@@ -24,7 +43,6 @@ export async function POST(req: Request) {
     });
 
     if (!response.ok) {
-      // Backend renvoie une erreur HTTP (502 Bad Gateway, 404, etc.)
       console.error(`Backend returned HTTP ${response.status} ${response.statusText}`);
       try {
         const errorData = await response.json();
@@ -43,6 +61,32 @@ export async function POST(req: Request) {
     console.error('Error proxying license verify request:', error);
     return NextResponse.json(
       { valid: false, message: `Erreur de connexion au serveur de licence. Cause: ${error.message || 'Inconnue'}` },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    let data;
+    const contentType = req.headers.get('content-type') || '';
+    if (contentType.includes('application/x-www-form-urlencoded')) {
+      const formData = await req.formData();
+      data = Object.fromEntries(formData);
+    } else {
+      const text = await req.text();
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch(e) {
+        data = {};
+      }
+    }
+
+    return proxyToBackend(req, data);
+  } catch (error: any) {
+    console.error('Error in POST parser:', error);
+    return NextResponse.json(
+      { valid: false, message: `Erreur interne: ${error.message}` },
       { status: 500 }
     );
   }
