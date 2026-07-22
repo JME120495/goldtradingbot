@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const rawBody = await req.text();
 
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL ||
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
         'Content-Type': 'application/json',
         'X-Forwarded-For': clientIp,
       },
-      body: JSON.stringify(body),
+      body: rawBody,
     });
 
     if (!response.ok) {

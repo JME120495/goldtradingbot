@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const rawBody = await req.text();
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'https://gold-trading-bot-backend.onrender.com';
     
     const response = await fetch(`${backendUrl}/api/telemetry/snapshot`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: rawBody,
     });
 
     if (!response.ok) {
