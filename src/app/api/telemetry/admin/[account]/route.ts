@@ -29,6 +29,7 @@ export async function GET(
     const data = await response.json();
     return NextResponse.json(data, { status: response.status });
   } catch (error: any) {
-    return NextResponse.json({ error: 'Erreur de connexion au serveur de télémétrie.' }, { status: 500 });
+    console.error('Telemetry admin proxy error:', error.message);
+    return NextResponse.json({ error: `Erreur de connexion au serveur de télémétrie. Cause: ${error.message || 'Inconnue'}` }, { status: 500 });
   }
 }

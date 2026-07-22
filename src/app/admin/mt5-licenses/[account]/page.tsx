@@ -65,7 +65,7 @@ export default function Mt5AccountDetails() {
     try {
       setLoading(true);
       const token = typeof window !== 'undefined' ? Cookies.get('token') : null;
-      const res = await axios.get(`${API_URL}/api/telemetry/admin/${account}`, {
+      const res = await axios.get(`/api/telemetry/admin/${account}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setStats(res.data.stats || []);
