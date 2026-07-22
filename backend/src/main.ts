@@ -3,7 +3,12 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   // Validate required environment variables
-  const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET', 'LICENSE_ADMIN_KEY', 'FRONTEND_URL'];
+  const requiredEnvVars = [
+    'DATABASE_URL', 
+    'JWT_SECRET', 
+    'LICENSE_ADMIN_KEY', 
+    'FRONTEND_URL'
+  ];
   for (const envVar of requiredEnvVars) {
     if (!process.env[envVar]) {
       throw new Error(`Missing required environment variable: ${envVar}`);
