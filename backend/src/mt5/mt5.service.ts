@@ -18,27 +18,30 @@ export class Mt5Service {
         accountNumber: String(data.account),
       },
       include: {
-        licenses: {
-          where: {
-            product: { slug: data.product },
-            status: 'ACTIVE',
-            OR: [
-              { expiresAt: null },
-              { expiresAt: { gt: new Date() } }
-            ]
-          },
-          include: { plan: true },
-          orderBy: { createdAt: 'desc' }
+        user: {
+          include: {
+            licenses: {
+              where: {
+                status: 'ACTIVE',
+                OR: [
+                  { expiresAt: null },
+                  { expiresAt: { gt: new Date() } }
+                ]
+              },
+              include: { plan: true },
+              orderBy: { createdAt: 'desc' }
+            }
+          }
         }
       }
     });
 
-    if (!account || account.licenses.length === 0) {
+    if (!account || !account.user || account.user.licenses.length === 0) {
       this.logger.warn(`License rejected for account ${data.account}`);
       return { active: false };
     }
 
-    const activeLicense = account.licenses[0];
+    const activeLicense = account.user.licenses[0];
     
     this.logger.log(`License valid. Plan: ${activeLicense.plan.name}, Lot: ${activeLicense.lotAllowed}`);
     

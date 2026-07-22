@@ -40,6 +40,45 @@ export class Mt5LicensesService {
       null;
 
     if (!lic) {
+      // Fallback: Check if there is a web TradingAccount + User License
+      const tradingAccount = await this.prisma.tradingAccount.findFirst({
+        where: { accountNumber: String(account) },
+        include: {
+          user: {
+            include: {
+              licenses: {
+                where: { status: 'ACTIVE' },
+                include: { plan: true },
+                orderBy: { createdAt: 'desc' }
+              }
+            }
+          }
+        }
+      });
+
+      if (tradingAccount && tradingAccount.user && tradingAccount.user.licenses.length > 0) {
+        // Find a valid unexpired license
+        const webLicense = tradingAccount.user.licenses.find(l => {
+          if (!l.expiresAt) return true;
+          return l.expiresAt > new Date();
+        });
+
+        if (webLicense) {
+          return {
+            valid: true,
+            plan: webLicense.plan.name,
+            lot: Number(webLicense.lotAllowed),
+            expiry: webLicense.expiresAt ? this.formatDate(webLicense.expiresAt) : null,
+            message: 'Licence valide.',
+          };
+        } else {
+          return {
+            valid: false,
+            message: 'Licence expirée. Renouvelez votre abonnement sur le site.',
+          };
+        }
+      }
+
       return {
         valid: false,
         message: 'Aucune licence trouvée pour ce compte.',
