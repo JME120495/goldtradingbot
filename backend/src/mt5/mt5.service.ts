@@ -11,10 +11,11 @@ export class Mt5Service {
     this.logger.log(`Checking license for account: ${data.account} / ${data.broker}`);
     
     // Find the trading account linked to the provided details
+    // We relax the strict broker match because MT5 Terminal often sends long company names (e.g. "Exness Technologies Ltd") 
+    // which don't match the short names from the frontend dropdown.
     const account = await this.prisma.tradingAccount.findFirst({
       where: {
-        accountNumber: data.account,
-        broker: data.broker,
+        accountNumber: String(data.account),
       },
       include: {
         licenses: {
