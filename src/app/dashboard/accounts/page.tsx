@@ -11,7 +11,7 @@ export default function AccountsPage() {
   const [error, setError] = useState('');
   
   const [accountNumber, setAccountNumber] = useState('');
-  const [broker, setBroker] = useState('');
+  const [broker, setBroker] = useState('Fusion Markets');
   const [server, setServer] = useState('');
 
   const fetchAccounts = async () => {
@@ -99,32 +99,14 @@ export default function AccountsPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">Broker Name</label>
-              <select 
-                required
-                value={broker}
-                onChange={e => setBroker(e.target.value)}
-                className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37]"
-              >
-                <option value="">Select your broker</option>
-                <option value="Fusion Markets">Fusion Markets</option>
-                <option value="Pepperstone">Pepperstone</option>
-                <option value="IC Markets">IC Markets</option>
-                <option value="Exness">Exness</option>
-                <option value="Other">Other</option>
-              </select>
+              <input 
+                type="text" 
+                disabled
+                value="Fusion Markets"
+                className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-gray-400 cursor-not-allowed"
+              />
+              <p className="text-xs text-[#D4AF37]/70 mt-2">Currently, we exclusively support Fusion Markets.</p>
             </div>
-            {broker === 'Other' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Server Name</label>
-                <input 
-                  type="text" 
-                  value={server}
-                  onChange={e => setServer(e.target.value)}
-                  className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37]"
-                  placeholder="e.g. Broker-Live01"
-                />
-              </div>
-            )}
             <button 
               type="submit" 
               disabled={submitting}
