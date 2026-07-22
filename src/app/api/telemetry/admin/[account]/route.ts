@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(req: Request, { params }: { params: { account: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ account: string }> }
+) {
   try {
+    const { account } = await params;
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'https://gold-trading-bot-backend.onrender.com';
     const authHeader = req.headers.get('authorization') || '';
     
-    const response = await fetch(`${backendUrl}/api/telemetry/admin/${params.account}`, {
+    const response = await fetch(`${backendUrl}/api/telemetry/admin/${account}`, {
       method: 'GET',
       headers: { 
         'Content-Type': 'application/json',
