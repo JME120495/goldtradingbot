@@ -164,15 +164,15 @@ export default function Mt5AccountDetails() {
           <div className="bg-[#0F1115] border border-white/10 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
               <p className="text-sm text-gray-400 mb-1">Solde Actuel</p>
-              <p className="text-2xl font-bold text-white">{latestStat?.balance ? latestStat.balance.toFixed(2) : '0.00'} $</p>
+              <p className="text-2xl font-bold text-white">{latestStat?.balance ? Number(latestStat.balance).toFixed(2) : '0.00'} $</p>
             </div>
             <div>
               <p className="text-sm text-gray-400 mb-1">Équité (Equity)</p>
-              <p className="text-2xl font-bold text-white">{latestStat?.equity ? latestStat.equity.toFixed(2) : '0.00'} $</p>
+              <p className="text-2xl font-bold text-white">{latestStat?.equity ? Number(latestStat.equity).toFixed(2) : '0.00'} $</p>
             </div>
             <div>
               <p className="text-sm text-gray-400 mb-1">Marge Libre</p>
-              <p className="text-2xl font-bold text-white">{latestStat?.freeMargin ? latestStat.freeMargin.toFixed(2) : '0.00'} $</p>
+              <p className="text-2xl font-bold text-white">{latestStat?.freeMargin ? Number(latestStat.freeMargin).toFixed(2) : '0.00'} $</p>
             </div>
             <div>
               <p className="text-sm text-gray-400 mb-1">Dernière Synchronisation</p>
@@ -267,14 +267,14 @@ export default function Mt5AccountDetails() {
                           {trade.type.replace('_', ' ')}
                         </span>
                       </td>
-                      <td className="p-4 text-gray-300">{trade.volume.toFixed(2)}</td>
-                      <td className="p-4 text-gray-400">{trade.openPrice.toFixed(2)}</td>
-                      <td className="p-4 text-gray-400">{trade.closePrice.toFixed(2)}</td>
+                      <td className="p-4 text-gray-300">{Number(trade.volume).toFixed(2)}</td>
+                      <td className="p-4 text-gray-400">{Number(trade.openPrice).toFixed(2)}</td>
+                      <td className="p-4 text-gray-400">{Number(trade.closePrice).toFixed(2)}</td>
                       <td className={`p-4 font-bold text-right whitespace-nowrap ${trade.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                        {trade.profit > 0 ? '+' : ''}{trade.profit.toFixed(2)} $
+                        {trade.profit > 0 ? '+' : ''}{Number(trade.profit).toFixed(2)} $
                       </td>
                       <td className="p-4 text-gray-500 text-xs text-right whitespace-nowrap">
-                        {trade.commission.toFixed(2)} / {trade.swap.toFixed(2)}
+                        {Number(trade.commission).toFixed(2)} / {Number(trade.swap).toFixed(2)}
                       </td>
                     </tr>
                   ))}
