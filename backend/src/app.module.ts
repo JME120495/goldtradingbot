@@ -15,6 +15,7 @@ import { AdminModule } from './admin/admin.module';
 import { TradingAccountsModule } from './trading-accounts/trading-accounts.module';
 import { Mt5LicensesModule } from './mt5-licenses/mt5-licenses.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { TelemetryModule } from './telemetry/telemetry.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
     AdminModule,
     TradingAccountsModule,
     Mt5LicensesModule,
+    TelemetryModule,
   ],
   controllers: [AppController],
   providers: [
