@@ -17,6 +17,16 @@ export class AuthService {
     if (existingUser) {
       throw new ConflictException('Email already in use');
     }
+
+    if (data.phone) {
+      const existingPhone = await this.prisma.user.findUnique({
+        where: { phone: data.phone },
+      });
+      if (existingPhone) {
+        throw new ConflictException('Phone number already in use');
+      }
+    }
+
     const hashedPassword = await argon2.hash(data.password);
     const user = await this.prisma.user.create({
       data: {
