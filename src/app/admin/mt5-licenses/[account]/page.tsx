@@ -43,16 +43,23 @@ interface AccountStat {
 
 export default function Mt5AccountDetails() {
   const params = useParams();
-  const account = params.account as string;
+  const account = params?.account as string;
 
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<AccountStat[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchHistory();
-  }, [account]);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && account) {
+      fetchHistory();
+    }
+  }, [account, mounted]);
 
   const fetchHistory = async () => {
     try {
@@ -107,6 +114,10 @@ export default function Mt5AccountDetails() {
     const now = new Date().getTime();
     return (now - updated) > 2 * 60 * 60 * 1000;
   }, [latestStat]);
+
+  if (!mounted) {
+    return null; // Prevents hydration mismatch with Recharts
+  }
 
   if (loading) {
     return (
