@@ -38,7 +38,7 @@ interface AccountStat {
   equity: number;
   margin: number;
   freeMargin: number;
-  updatedAt: string;
+  recordedAt: string;
 }
 
 export default function Mt5AccountDetails() {
@@ -68,10 +68,10 @@ export default function Mt5AccountDetails() {
       const res = await axios.get(`/api/telemetry/admin/${account}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      setStats(res.data.stats || []);
+      setStats(res.data.snapshots || res.data.stats || []);
       setTrades(res.data.trades || []);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erreur lors de la récupération des données.');
+      setError(err.response?.data?.error || err.response?.data?.message || 'Erreur lors de la récupération des données.');
     } finally {
       setLoading(false);
     }
@@ -110,7 +110,7 @@ export default function Mt5AccountDetails() {
   // Check if data is fresh (last 2 hours)
   const isDataStale = useMemo(() => {
     if (!latestStat) return true;
-    const updated = new Date(latestStat.updatedAt).getTime();
+    const updated = new Date(latestStat.recordedAt).getTime();
     const now = new Date().getTime();
     return (now - updated) > 2 * 60 * 60 * 1000;
   }, [latestStat]);
@@ -178,7 +178,7 @@ export default function Mt5AccountDetails() {
               <p className="text-sm text-gray-400 mb-1">Dernière Synchronisation</p>
               <div className="flex flex-col items-start gap-1">
                 <p className="text-sm font-semibold text-white">
-                  {latestStat?.updatedAt ? new Date(latestStat.updatedAt).toLocaleString('fr-FR') : 'Inconnue'}
+                  {latestStat?.recordedAt ? new Date(latestStat.recordedAt).toLocaleString('fr-FR') : 'Inconnue'}
                 </p>
                 {isDataStale && (
                   <span className="bg-orange-500/20 text-orange-400 text-xs px-2 py-0.5 rounded flex items-center gap-1 border border-orange-500/20 mt-1">
