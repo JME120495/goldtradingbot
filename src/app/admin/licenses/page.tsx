@@ -17,7 +17,7 @@ export default function AdminLicenses() {
 
   const fetchLicenses = async () => {
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/licenses`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/licenses`);
       setLicenses(res.data);
     } catch (err) {
       console.error(err);
@@ -28,7 +28,7 @@ export default function AdminLicenses() {
 
   const fetchPlans = async () => {
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/plans`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/plans`);
       setPlans(res.data);
     } catch (err) {
       console.error(err);
@@ -39,7 +39,7 @@ export default function AdminLicenses() {
     const newStatus = currentStatus === 'ACTIVE' ? 'CANCELLED' : 'ACTIVE';
     if(!confirm(`${newStatus === 'CANCELLED' ? 'Annuler' : 'Activer'} cette licence ?`)) return;
     try {
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/licenses/${id}/status`, { status: newStatus });
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/licenses/${id}/status`, { status: newStatus });
       fetchLicenses();
     } catch (err) {
       alert("Error updating status");
@@ -55,7 +55,7 @@ export default function AdminLicenses() {
     if (!email || !planId) return;
 
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/licenses`, { 
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/licenses`, { 
         email, 
         planId, 
         durationDays: parseInt(durationDays as string, 10) 

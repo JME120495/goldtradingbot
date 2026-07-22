@@ -32,7 +32,7 @@ export default function ProfilePage() {
     setLoading(true);
     try {
       const token = Cookies.get('token');
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
       
       const res = await axios.patch(`${API_URL}/users/password`, {
         currentPassword,

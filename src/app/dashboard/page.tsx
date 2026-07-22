@@ -17,7 +17,7 @@ export default function DashboardOverview() {
     const fetchUser = async () => {
       try {
         const token = Cookies.get('token');
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}`}` + '/users/me', {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/users/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(res.data);

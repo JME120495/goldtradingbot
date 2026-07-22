@@ -24,7 +24,7 @@ export default function DownloadsPage() {
   const fetchProducts = async () => {
     try {
       const token = Cookies.get('token');
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/downloads/products`, {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/downloads/products`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProducts(res.data);
@@ -41,13 +41,13 @@ export default function DownloadsPage() {
     try {
       const token = Cookies.get('token');
       // 1. Generate Signed URL
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/downloads/generate-url`, 
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/downloads/generate-url`, 
         { product: productSlug },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
       // 2. Redirect to download
-      const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${res.data.url}`;
+      const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || "/api"}${res.data.url}`;
       window.location.href = downloadUrl;
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error generating download link. Ensure you have an active license.');
