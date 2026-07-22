@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Mt5LicensesService } from '../mt5-licenses/mt5-licenses.service';
 
 @Injectable()
 export class TradingAccountsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private mt5LicensesService: Mt5LicensesService
+  ) {}
 
   async findAll(userId: string) {
     return this.prisma.tradingAccount.findMany({
@@ -31,7 +35,7 @@ export class TradingAccountsService {
       }
     }
 
-    return this.prisma.tradingAccount.create({
+    const newAccount = await this.prisma.tradingAccount.create({
       data: {
         userId,
         accountNumber: data.accountNumber,
@@ -39,6 +43,11 @@ export class TradingAccountsService {
         server: data.server,
       }
     });
+
+    // Synchronize to MT5 standalone table
+    await this.mt5LicensesService.syncUserToMt5Licenses(userId);
+
+    return newAccount;
   }
 
   async delete(userId: string, accountId: string) {
@@ -56,8 +65,13 @@ export class TradingAccountsService {
       data: { tradingAccountId: null }
     });
 
-    return this.prisma.tradingAccount.delete({
+    const deleted = await this.prisma.tradingAccount.delete({
       where: { id: accountId }
     });
+
+    // We leave the old MT5 licenses for now or we could suspend them. 
+    // Usually they are detached or can just be left since the web account is unlinked.
+
+    return deleted;
   }
 }

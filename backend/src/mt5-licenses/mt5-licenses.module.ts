@@ -5,5 +5,6 @@ import { Mt5LicensesController } from './mt5-licenses.controller';
 @Module({
   controllers: [Mt5LicensesController],
   providers: [Mt5LicensesService],
+  exports: [Mt5LicensesService],
 })
 export class Mt5LicensesModule {}

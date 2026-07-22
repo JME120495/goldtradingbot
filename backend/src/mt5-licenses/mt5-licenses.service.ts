@@ -13,6 +13,63 @@ export class Mt5LicensesService {
   //  Verify — called by the EA (public endpoint)
   //  Returns ONLY non-sensitive data: valid, plan, lot, expiry, message
   // ----------------------------------------------------------
+  async syncUserToMt5Licenses(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        tradingAccounts: true,
+        licenses: {
+          where: { status: 'ACTIVE' },
+          include: { plan: true, product: true },
+          orderBy: { createdAt: 'desc' }
+        }
+      }
+    });
+
+    if (!user) return;
+
+    for (const account of user.tradingAccounts) {
+      const webLicense = user.licenses.find(l => {
+        if (!l.expiresAt) return true;
+        return l.expiresAt > new Date();
+      });
+
+      if (webLicense) {
+        const eaName = webLicense.product.slug;
+        const accountNumber = BigInt(account.accountNumber);
+        
+        // If web license found, upsert an Mt5License to keep the robot working
+        await this.prisma.mt5License.upsert({
+          where: {
+            accountNumber_eaName: { accountNumber, eaName },
+          },
+          create: {
+            clientName: user.name || 'Client Web',
+            clientEmail: user.email,
+            accountNumber,
+            broker: account.broker,
+            server: account.server || '',
+            eaName,
+            plan: webLicense.plan.name,
+            lot: webLicense.lotAllowed,
+            status: 'active',
+            expiryDate: webLicense.expiresAt || new Date('2099-12-31'),
+          },
+          update: {
+            clientName: user.name || 'Client Web',
+            clientEmail: user.email,
+            broker: account.broker,
+            server: account.server || '',
+            plan: webLicense.plan.name,
+            lot: webLicense.lotAllowed,
+            status: 'active',
+            expiryDate: webLicense.expiresAt || new Date('2099-12-31'),
+          },
+        });
+      }
+    }
+  }
+
   async verifyLicense(
     account: number,
     broker: string | undefined,

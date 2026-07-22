@@ -1,5 +1,6 @@
 import { Injectable, Logger, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Mt5LicensesService } from '../mt5-licenses/mt5-licenses.service';
 
 @Injectable()
 export class PaymentsService {
@@ -8,7 +9,10 @@ export class PaymentsService {
   // Flutterwave secret from environment variable
   private readonly FLUTTERWAVE_SECRET = process.env.FLUTTERWAVE_SECRET;
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private mt5LicensesService: Mt5LicensesService
+  ) {}
 
   async initiatePayment(userId: string, data: { productId: string, planId: string, duration: string }) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
@@ -65,6 +69,9 @@ export class PaymentsService {
           expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000) 
         }
       });
+
+      // Synchronize to MT5 standalone table
+      await this.mt5LicensesService.syncUserToMt5Licenses(payment.userId);
 
       return {
         paymentLink: `${frontendUrl}/dashboard?payment=success_simulated`
@@ -155,6 +162,10 @@ export class PaymentsService {
             expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000) 
           }
         });
+        
+        // Synchronize to MT5 standalone table
+        await this.mt5LicensesService.syncUserToMt5Licenses(payment.userId);
+        
         this.logger.log(`License created for user ${payment.userId}`);
       }
     }
