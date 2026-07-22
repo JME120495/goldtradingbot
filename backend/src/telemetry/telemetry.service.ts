@@ -6,8 +6,15 @@ export class TelemetryService {
   constructor(private prisma: PrismaService) {}
 
   async processSnapshot(data: any) {
-    if (!data.account) {
-      throw new Error('Compte manquant.');
+    const { account, ea, balance, equity, margin, freeMargin } = data;
+    if (!account) throw new Error('Compte manquant.');
+    const accountBigInt = BigInt(account);
+
+    const license = await this.prisma.mt5License.findFirst({
+      where: { accountNumber: accountBigInt },
+    });
+    if (!license) {
+      throw new Error('Compte inconnu.');
     }
 
     // Enregistrer le snapshot
@@ -28,6 +35,14 @@ export class TelemetryService {
   async processDeal(data: any) {
     if (!data.ticket || !data.account) {
       throw new Error('Données du trade incomplètes (ticket et account requis).');
+    }
+    const accountBigInt = BigInt(data.account);
+
+    const license = await this.prisma.mt5License.findFirst({
+      where: { accountNumber: accountBigInt },
+    });
+    if (!license) {
+      throw new Error('Compte inconnu.');
     }
 
     // Enregistrer l'historique du trade
