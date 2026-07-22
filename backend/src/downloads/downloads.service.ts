@@ -60,15 +60,35 @@ export class DownloadsService {
         throw new UnauthorizedException('Invalid token type');
       }
 
-      const filename = `${payload.product}.ex5`;
-      const filePath = path.join(process.cwd(), 'files', filename);
+      let filename = `${payload.product}.ex5`;
+      let filePath = path.join(process.cwd(), 'files', filename);
+
+      if (!fs.existsSync(filePath)) {
+        const filesDir = path.join(process.cwd(), 'files');
+        if (fs.existsSync(filesDir)) {
+          const files = fs.readdirSync(filesDir).filter((f) => f.endsWith('.ex5'));
+          const prodLower = payload.product.toLowerCase();
+          const matched =
+            files.find(
+              (f) =>
+                f.toLowerCase() === `${prodLower}.ex5` ||
+                f.toLowerCase() === `${prodLower.replace(/ /g, '_')}.ex5` ||
+                f.toLowerCase() === `${prodLower.replace(/ ea$/i, '')}.ex5` ||
+                f.toLowerCase().startsWith(prodLower.split(' ')[0])
+            ) || (files.length > 0 ? files[0] : null);
+
+          if (matched) {
+            filePath = path.join(filesDir, matched);
+          }
+        }
+      }
 
       if (!fs.existsSync(filePath)) {
         throw new NotFoundException('EA file not found on server');
       }
 
       return { 
-        filename,
+        filename: path.basename(filePath),
         path: filePath
       };
     } catch (e) {
