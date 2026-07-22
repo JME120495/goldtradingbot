@@ -56,7 +56,7 @@ export class AuthService {
 
   private async generateTokens(userId: string, role: string) {
     const payload = { sub: userId, role };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '1d' });
     const refreshToken = this.jwtService.sign(
       { ...payload, type: 'refresh' },
       { expiresIn: '7d' },
@@ -100,7 +100,7 @@ export class AuthService {
     // Rotate refresh token: hash the new one and update the user
     const newPayload = { sub: user.id, role: user.role };
     const newAccessToken = this.jwtService.sign(newPayload, {
-      expiresIn: '15m',
+      expiresIn: '1d',
     });
     const newRefreshToken = this.jwtService.sign(
       { ...newPayload, type: 'refresh' },
