@@ -88,7 +88,7 @@ export default function DashboardOverview() {
                 {user?.licenses?.map((license: any) => (
                   <tr key={license.id} className="hover:bg-white/5">
                     <td className="p-4">
-                      <div className="font-bold text-[#D4AF37]">{license.product?.name || 'Gold Scalper MT5'}</div>
+                      <div className="font-bold text-[#D4AF37]">{license.product?.name || 'JMEgold_scalper EA'}</div>
                       <div className="text-sm text-gray-400">{license.plan?.name}</div>
                     </td>
                     <td className="p-4 font-mono">{license.plan?.lotAllowed || license.lotAllowed}</td>

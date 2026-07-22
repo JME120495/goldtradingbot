@@ -11,6 +11,7 @@ export class AppService {
 
   async getPlans() {
     return this.prisma.productPlan.findMany({
+      where: { product: { isActive: true } },
       include: { product: true }
     });
   }

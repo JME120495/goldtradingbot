@@ -13,6 +13,7 @@ export class DownloadsService {
 
   async getProducts() {
     return this.prisma.product.findMany({
+      where: { isActive: true },
       select: {
         id: true,
         name: true,
