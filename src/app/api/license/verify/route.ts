@@ -37,8 +37,8 @@ export async function POST(req: Request) {
       }
     }
 
-    const data = await response.json();
-    return NextResponse.json(data, { status: response.status });
+    const responseData = await response.json();
+    return NextResponse.json(responseData, { status: response.status });
   } catch (error: any) {
     console.error('Error proxying license verify request:', error);
     return NextResponse.json(
