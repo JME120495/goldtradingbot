@@ -295,6 +295,47 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-white/10 bg-[#0F1115]/50 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+            {/* Logo & Copyright */}
+            <div className="flex flex-col items-center md:items-start gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#AA8B2C] flex items-center justify-center">
+                  <span className="text-black font-bold text-xs leading-none">G</span>
+                </div>
+                <span className="font-bold text-sm tracking-tight text-gray-300">Gold Trading Bot</span>
+              </div>
+              <p className="text-xs text-gray-600">© {new Date().getFullYear()} Gold Trading Bot. Tous droits réservés.</p>
+            </div>
+
+            {/* Legal Links */}
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              <Link href="/terms" className="text-gray-500 hover:text-[#D4AF37] transition-colors">
+                Conditions Générales
+              </Link>
+              <Link href="/privacy" className="text-gray-500 hover:text-[#D4AF37] transition-colors">
+                Confidentialité
+              </Link>
+              <Link href="/risk" className="text-gray-500 hover:text-[#D4AF37] transition-colors">
+                Avertissement Risques
+              </Link>
+            </div>
+          </div>
+
+          {/* Risk Disclaimer */}
+          <div className="mt-8 pt-6 border-t border-white/5">
+            <p className="text-[11px] text-gray-600 text-center max-w-4xl mx-auto leading-relaxed">
+              ⚠️ Le trading sur le Forex et les métaux précieux (or / XAU/USD) comporte un risque élevé de perte en capital. 
+              Les performances passées ne garantissent pas les résultats futurs. Ce logiciel ne constitue pas un conseil 
+              en investissement. N&apos;investissez que des fonds que vous pouvez vous permettre de perdre.
+              {' '}<Link href="/risk" className="text-gray-500 hover:text-[#D4AF37] underline">En savoir plus</Link>.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

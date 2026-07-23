@@ -1,11 +1,15 @@
 import { Controller, Post, Get, Body, Query, UseGuards, Request, Res, UnauthorizedException } from '@nestjs/common';
 import { DownloadsService } from './downloads.service';
 import { AuthGuard } from '@nestjs/passport';
+import { PrismaService } from '../prisma/prisma.service';
 import type { Response } from 'express';
 
 @Controller('downloads')
 export class DownloadsController {
-  constructor(private readonly downloadsService: DownloadsService) {}
+  constructor(
+    private readonly downloadsService: DownloadsService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get('products')
@@ -28,3 +32,26 @@ export class DownloadsController {
     res.download(fileInfo.path, fileInfo.filename);
   }
 }
+
+@Controller('licenses')
+export class LicensesController {
+  constructor(private readonly prisma: PrismaService) {}
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('mine')
+  async getMyLicenses(@Request() req) {
+    return this.prisma.license.findMany({
+      where: { userId: req.user.userId },
+      select: {
+        id: true,
+        status: true,
+        expiresAt: true,
+        lotAllowed: true,
+        plan: { select: { name: true } },
+        product: { select: { slug: true, name: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+}
+
