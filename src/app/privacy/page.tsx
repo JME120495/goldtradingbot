@@ -1,7 +1,11 @@
 'use client';
 import Link from "next/link";
 
+import { useTranslations } from "next-intl";
+
 export default function PrivacyPage() {
+  const t = useTranslations('Privacy');
+  const tTerms = useTranslations('Terms');
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans">
       {/* Navigation */}
@@ -15,31 +19,31 @@ export default function PrivacyPage() {
               <span className="font-bold text-xl tracking-tight">Gold Trading Bot</span>
             </Link>
             <Link href="/" className="text-sm text-gray-400 hover:text-[#D4AF37] transition-colors">
-              ← Retour à l&apos;accueil
+              ← {tTerms('back_home')}
             </Link>
           </div>
         </div>
       </nav>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h1 className="text-4xl font-bold mb-2">Politique de Confidentialité</h1>
-        <p className="text-gray-500 text-sm mb-12">Dernière mise à jour : Juillet 2026</p>
+        <h1 className="text-4xl font-bold mb-2">{t('title')}</h1>
+        <p className="text-gray-500 text-sm mb-12">{t('last_updated')}</p>
 
         <div className="space-y-10 text-gray-300 leading-relaxed">
           {/* Section 1 */}
           <section>
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
               <span className="w-8 h-8 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-sm font-bold">1</span>
-              Données Collectées
+              {t('sec1_title')}
             </h2>
             <p>
-              Dans le cadre de l&apos;utilisation du Site et de nos services, nous collectons les données suivantes :
+              {t('sec1_p1')}
             </p>
             <ul className="list-disc list-inside mt-3 space-y-2 text-gray-400">
-              <li><strong className="text-white">Données d&apos;inscription :</strong> nom, adresse email, numéro de téléphone (optionnel).</li>
-              <li><strong className="text-white">Données de trading :</strong> numéro(s) de compte MT5, nom du courtier (broker).</li>
-              <li><strong className="text-white">Données de paiement :</strong> identifiant de transaction crypto. Nous ne stockons aucune clé privée ni information de portefeuille.</li>
-              <li><strong className="text-white">Données techniques :</strong> adresse IP, type de navigateur, pages visitées (à des fins d&apos;analyse et de sécurité).</li>
+              <li><strong className="text-white">{t('sec1_l1_title')}</strong>{t('sec1_l1_desc')}</li>
+              <li><strong className="text-white">{t('sec1_l2_title')}</strong>{t('sec1_l2_desc')}</li>
+              <li><strong className="text-white">{t('sec1_l3_title')}</strong>{t('sec1_l3_desc')}</li>
+              <li><strong className="text-white">{t('sec1_l4_title')}</strong>{t('sec1_l4_desc')}</li>
             </ul>
           </section>
 
@@ -47,21 +51,20 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
               <span className="w-8 h-8 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-sm font-bold">2</span>
-              Utilisation des Données
+              {t('sec2_title')}
             </h2>
-            <p>Vos données sont utilisées pour :</p>
+            <p>{t('sec2_p1')}</p>
             <ul className="list-disc list-inside mt-3 space-y-2 text-gray-400">
-              <li>Créer et gérer votre compte utilisateur.</li>
-              <li>Activer et valider votre licence d&apos;utilisation du Robot.</li>
-              <li>Traiter vos paiements et vous envoyer des confirmations.</li>
-              <li>Vous fournir un support technique.</li>
-              <li>Améliorer nos services et la sécurité du Site.</li>
+              <li>{t('sec2_l1')}</li>
+              <li>{t('sec2_l2')}</li>
+              <li>{t('sec2_l3')}</li>
+              <li>{t('sec2_l4')}</li>
+              <li>{t('sec2_l5')}</li>
             </ul>
             <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-xl p-4 mt-4">
-              <p className="text-[#D4AF37] font-semibold mb-1">🔒 Engagement</p>
+              <p className="text-[#D4AF37] font-semibold mb-1">🔒 {t('sec2_commitment')}</p>
               <p className="text-sm">
-                Nous ne vendons, ne louons et ne partageons jamais vos données personnelles avec des tiers 
-                à des fins commerciales ou publicitaires.
+                {t('sec2_commitment_desc')}
               </p>
             </div>
           </section>
@@ -70,17 +73,16 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
               <span className="w-8 h-8 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-sm font-bold">3</span>
-              Sécurité des Données
+              {t('sec3_title')}
             </h2>
             <p>
-              Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles appropriées 
-              pour protéger vos données contre tout accès non autorisé, altération, divulgation ou destruction :
+              {t('sec3_p1')}
             </p>
             <ul className="list-disc list-inside mt-3 space-y-2 text-gray-400">
-              <li>Chiffrement des mots de passe (hachage Argon2).</li>
-              <li>Connexions sécurisées via HTTPS/TLS.</li>
-              <li>Authentification par jetons JWT avec rotation automatique.</li>
-              <li>Accès restreint aux bases de données.</li>
+              <li>{t('sec3_l1')}</li>
+              <li>{t('sec3_l2')}</li>
+              <li>{t('sec3_l3')}</li>
+              <li>{t('sec3_l4')}</li>
             </ul>
           </section>
 
@@ -88,12 +90,10 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
               <span className="w-8 h-8 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-sm font-bold">4</span>
-              Cookies
+              {t('sec4_title')}
             </h2>
             <p>
-              Le Site utilise des cookies strictement nécessaires au fonctionnement du service 
-              (authentification, préférences de langue). Aucun cookie publicitaire ou de suivi 
-              tiers n&apos;est utilisé.
+              {t('sec4_p1')}
             </p>
           </section>
 
@@ -101,30 +101,29 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
               <span className="w-8 h-8 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-sm font-bold">5</span>
-              Vos Droits
+              {t('sec5_title')}
             </h2>
-            <p>Conformément aux réglementations en vigueur, vous disposez des droits suivants :</p>
+            <p>{t('sec5_p1')}</p>
             <div className="grid sm:grid-cols-2 gap-4 mt-4">
               <div className="bg-[#0F1115] border border-white/10 rounded-xl p-4">
-                <h4 className="text-white font-semibold mb-1">📋 Droit d&apos;accès</h4>
-                <p className="text-sm text-gray-400">Obtenir une copie de toutes les données que nous détenons à votre sujet.</p>
+                <h4 className="text-white font-semibold mb-1">📋 {t('sec5_b1_title')}</h4>
+                <p className="text-sm text-gray-400">{t('sec5_b1_desc')}</p>
               </div>
               <div className="bg-[#0F1115] border border-white/10 rounded-xl p-4">
-                <h4 className="text-white font-semibold mb-1">✏️ Droit de rectification</h4>
-                <p className="text-sm text-gray-400">Corriger toute information inexacte ou incomplète.</p>
+                <h4 className="text-white font-semibold mb-1">✏️ {t('sec5_b2_title')}</h4>
+                <p className="text-sm text-gray-400">{t('sec5_b2_desc')}</p>
               </div>
               <div className="bg-[#0F1115] border border-white/10 rounded-xl p-4">
-                <h4 className="text-white font-semibold mb-1">🗑️ Droit de suppression</h4>
-                <p className="text-sm text-gray-400">Demander la suppression de vos données personnelles.</p>
+                <h4 className="text-white font-semibold mb-1">🗑️ {t('sec5_b3_title')}</h4>
+                <p className="text-sm text-gray-400">{t('sec5_b3_desc')}</p>
               </div>
               <div className="bg-[#0F1115] border border-white/10 rounded-xl p-4">
-                <h4 className="text-white font-semibold mb-1">📦 Droit de portabilité</h4>
-                <p className="text-sm text-gray-400">Recevoir vos données dans un format lisible et structuré.</p>
+                <h4 className="text-white font-semibold mb-1">📦 {t('sec5_b4_title')}</h4>
+                <p className="text-sm text-gray-400">{t('sec5_b4_desc')}</p>
               </div>
             </div>
             <p className="mt-4 text-sm text-gray-400">
-              Pour exercer l&apos;un de ces droits, contactez-nous via le chat en direct sur le Site 
-              ou par email à notre adresse de support.
+              {t('sec5_p2')}
             </p>
           </section>
 
@@ -132,12 +131,10 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
               <span className="w-8 h-8 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-sm font-bold">6</span>
-              Conservation des Données
+              {t('sec6_title')}
             </h2>
             <p>
-              Vos données personnelles sont conservées pendant la durée de votre inscription sur le Site, 
-              puis pendant une durée maximale de 3 ans après la clôture de votre compte, conformément 
-              aux obligations légales et comptables.
+              {t('sec6_p1')}
             </p>
           </section>
 
@@ -145,21 +142,19 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
               <span className="w-8 h-8 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-sm font-bold">7</span>
-              Modifications
+              {t('sec7_title')}
             </h2>
             <p>
-              Nous nous réservons le droit de modifier cette politique de confidentialité à tout moment. 
-              Toute modification sera publiée sur cette page avec une date de mise à jour. 
-              En cas de changement substantiel, les utilisateurs seront informés via leur espace client.
+              {t('sec7_p1')}
             </p>
           </section>
         </div>
 
         {/* Footer Links */}
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-wrap gap-6 text-sm text-gray-500">
-          <Link href="/terms" className="hover:text-[#D4AF37] transition-colors">Conditions Générales de Vente</Link>
-          <Link href="/risk" className="hover:text-[#D4AF37] transition-colors">Avertissement sur les Risques</Link>
-          <Link href="/" className="hover:text-[#D4AF37] transition-colors">Accueil</Link>
+          <Link href="/terms" className="hover:text-[#D4AF37] transition-colors">{tTerms('title')}</Link>
+          <Link href="/risk" className="hover:text-[#D4AF37] transition-colors">{tTerms('footer_risk')}</Link>
+          <Link href="/" className="hover:text-[#D4AF37] transition-colors">{tTerms('footer_home')}</Link>
         </div>
       </div>
     </div>
