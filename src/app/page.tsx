@@ -308,19 +308,19 @@ export default function Home() {
                 </div>
                 <span className="font-bold text-sm tracking-tight text-gray-300">Gold Trading Bot</span>
               </div>
-              <p className="text-xs text-gray-600">© {new Date().getFullYear()} Gold Trading Bot. Tous droits réservés.</p>
+              <p className="text-xs text-gray-600">© {new Date().getFullYear()} Gold Trading Bot. {t('Footer.rights')}</p>
             </div>
 
             {/* Legal Links */}
             <div className="flex flex-wrap justify-center gap-6 text-sm">
               <Link href="/terms" className="text-gray-500 hover:text-[#D4AF37] transition-colors">
-                Conditions Générales
+                {t('Footer.terms')}
               </Link>
               <Link href="/privacy" className="text-gray-500 hover:text-[#D4AF37] transition-colors">
-                Confidentialité
+                {t('Footer.privacy')}
               </Link>
               <Link href="/risk" className="text-gray-500 hover:text-[#D4AF37] transition-colors">
-                Avertissement Risques
+                {t('Footer.risk')}
               </Link>
             </div>
           </div>
@@ -328,10 +328,8 @@ export default function Home() {
           {/* Risk Disclaimer */}
           <div className="mt-8 pt-6 border-t border-white/5">
             <p className="text-[11px] text-gray-600 text-center max-w-4xl mx-auto leading-relaxed">
-              ⚠️ Le trading sur le Forex et les métaux précieux (or / XAU/USD) comporte un risque élevé de perte en capital. 
-              Les performances passées ne garantissent pas les résultats futurs. Ce logiciel ne constitue pas un conseil 
-              en investissement. N&apos;investissez que des fonds que vous pouvez vous permettre de perdre.
-              {' '}<Link href="/risk" className="text-gray-500 hover:text-[#D4AF37] underline">En savoir plus</Link>.
+              {t('Footer.disclaimer')}
+              {' '}<Link href="/risk" className="text-gray-500 hover:text-[#D4AF37] underline">{t('Footer.learn_more')}</Link>.
             </p>
           </div>
         </div>

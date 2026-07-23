@@ -258,5 +258,13 @@
     "sec4_l4_bold": "responsables de las pérdidas financieras",
     "sec4_l4_suffix": " resultantes del uso del Robot.",
     "sec4_p2": "Al comprar y usar el Robot, usted reconoce haber leído, entendido y aceptado los riesgos descritos en este documento, y asume total responsabilidad por sus decisiones comerciales."
+  },
+  "Footer": {
+    "rights": "Todos los derechos reservados.",
+    "terms": "Términos y Condiciones",
+    "privacy": "Política de Privacidad",
+    "risk": "Advertencia de Riesgos",
+    "disclaimer": "⚠️ Operar en Forex y metales preciosos (oro / XAU/USD) conlleva un alto riesgo de pérdida de capital. Los rendimientos pasados no garantizan resultados futuros. Este software no constituye asesoramiento de inversión. Solo invierta fondos que pueda permitirse perder.",
+    "learn_more": "Saber más"
   }
 }

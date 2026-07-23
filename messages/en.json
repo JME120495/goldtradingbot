@@ -258,5 +258,13 @@
     "sec4_l4_bold": "not responsible for financial losses",
     "sec4_l4_suffix": " resulting from the use of the Robot.",
     "sec4_p2": "By purchasing and using the Robot, you acknowledge having read, understood, and accepted the risks described in this document, and you assume full responsibility for your trading decisions."
+  },
+  "Footer": {
+    "rights": "All rights reserved.",
+    "terms": "Terms and Conditions",
+    "privacy": "Privacy Policy",
+    "risk": "Risk Warning",
+    "disclaimer": "⚠️ Trading Forex and precious metals (gold / XAU/USD) carries a high risk of capital loss. Past performance does not guarantee future results. This software does not constitute investment advice. Only invest funds you can afford to lose.",
+    "learn_more": "Learn more"
   }
 }
