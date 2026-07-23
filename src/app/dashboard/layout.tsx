@@ -45,11 +45,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: t('downloads'), href: '/dashboard/downloads', icon: Download },
     { name: t('billing'), href: '/dashboard/billing', icon: CreditCard },
     { name: t('affiliates'), href: '/dashboard/affiliates', icon: Users },
-    { name: 'Profil', href: '/dashboard/profile', icon: User },
+    { name: t('profile', { fallback: 'Profile' }), href: '/dashboard/profile', icon: User },
   ];
 
   if (isAdmin) {
-    navItems.push({ name: 'Admin Panel', href: '/admin', icon: Users }); // Using Users icon as placeholder for Admin
+    navItems.push({ name: t('admin_panel', { fallback: 'Admin Panel' }), href: '/admin', icon: Users }); // Using Users icon as placeholder for Admin
   }
 
   return (
@@ -95,7 +95,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Mobile Header */}
         <header className="md:hidden h-20 border-b border-white/5 bg-[#0F1115] flex items-center justify-between px-4">
           <span className="font-bold text-[#D4AF37]">GOLD SCALPER</span>
-          <button onClick={handleLogout} className="text-sm text-gray-400">Logout</button>
+          <button onClick={handleLogout} className="text-sm text-gray-400">{t('logout')}</button>
         </header>
 
         <div className="flex-1 p-4 md:p-8 overflow-auto z-10">

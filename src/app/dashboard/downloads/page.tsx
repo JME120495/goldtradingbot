@@ -25,7 +25,10 @@ interface License {
 }
 
 
+import { useTranslations } from 'next-intl';
+
 export default function DownloadsPage() {
+  const t = useTranslations('DashboardDownloads');
   const [loading, setLoading] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
@@ -50,7 +53,7 @@ export default function DownloadsPage() {
       setProducts(productsRes.data);
       setLicenses(licensesRes.data);
     } catch (err: any) {
-      setError('Erreur lors du chargement des données.');
+      setError(t('err_load'));
     } finally {
       setLoadingProducts(false);
     }
@@ -78,12 +81,12 @@ export default function DownloadsPage() {
       );
 
       const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || "/api"}${res.data.url}`;
-      setSuccessMsg('Téléchargement lancé ! Si rien ne se passe, vérifiez vos téléchargements.');
+      setSuccessMsg(t('success_download'));
       window.location.href = downloadUrl;
     } catch (err: any) {
       setError(
         err.response?.data?.message ||
-        'Erreur lors de la génération du lien. Vérifiez que vous avez une licence active.'
+        t('err_download')
       );
     } finally {
       setLoading(false);
@@ -93,8 +96,8 @@ export default function DownloadsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Téléchargements</h1>
-        <p className="text-gray-400">Téléchargez la dernière version de votre Expert Advisor.</p>
+        <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
+        <p className="text-gray-400">{t('desc')}</p>
       </div>
 
       {error && (
@@ -138,12 +141,12 @@ export default function DownloadsPage() {
                   {hasLicense ? (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-semibold">
                       <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                      Licence Active
+                      {t('active_license')}
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                      Pas de licence
+                      {t('no_license')}
                     </span>
                   )}
                 </div>
@@ -156,12 +159,12 @@ export default function DownloadsPage() {
                 {hasLicense && activeLicense && (
                   <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-lg p-3 mb-4 text-sm">
                     <div className="flex justify-between text-gray-400">
-                      <span>Plan :</span>
+                      <span>{t('plan')}</span>
                       <span className="text-white font-semibold">{activeLicense.plan.name}</span>
                     </div>
                     {activeLicense.expiresAt && (
                       <div className="flex justify-between text-gray-400 mt-1">
-                        <span>Expire le :</span>
+                        <span>{t('expires')}</span>
                         <span className="text-white font-semibold">
                           {new Date(activeLicense.expiresAt).toLocaleDateString('fr-FR', {
                             day: 'numeric',
@@ -184,14 +187,14 @@ export default function DownloadsPage() {
                     {loading ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black" />
-                        Génération du lien...
+                        {t('generating')}
                       </>
                     ) : (
                       <>
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
-                        Télécharger l&apos;EA (.ex5)
+                        {t('download_btn')}
                       </>
                     )}
                   </button>
@@ -201,7 +204,7 @@ export default function DownloadsPage() {
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
                       </svg>
-                      Acheter une licence
+                      {t('buy_btn')}
                     </button>
                   </Link>
                 )}
@@ -210,7 +213,7 @@ export default function DownloadsPage() {
           })}
 
           {products.length === 0 && !error && (
-            <div className="text-gray-400 col-span-2">Aucun robot disponible.</div>
+            <div className="text-gray-400 col-span-2">{t('no_bots')}</div>
           )}
         </div>
       )}
@@ -221,28 +224,28 @@ export default function DownloadsPage() {
           <svg className="w-5 h-5 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Guide d&apos;installation rapide
+          {t('guide_title')}
         </h3>
         <ol className="space-y-3 text-sm text-gray-400">
           <li className="flex items-start gap-3">
             <span className="w-6 h-6 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-xs font-bold shrink-0 mt-0.5">1</span>
-            <span>Téléchargez le fichier <code className="text-[#D4AF37] bg-[#D4AF37]/10 px-1.5 py-0.5 rounded text-xs">.ex5</code> ci-dessus.</span>
+            <span>{t('step1')}</span>
           </li>
           <li className="flex items-start gap-3">
             <span className="w-6 h-6 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-xs font-bold shrink-0 mt-0.5">2</span>
-            <span>Ouvrez MetaTrader 5 et allez dans <strong className="text-white">Fichier → Ouvrir le dossier de données</strong>.</span>
+            <span>{t('step2')}</span>
           </li>
           <li className="flex items-start gap-3">
             <span className="w-6 h-6 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-xs font-bold shrink-0 mt-0.5">3</span>
-            <span>Placez le fichier dans le dossier <code className="text-[#D4AF37] bg-[#D4AF37]/10 px-1.5 py-0.5 rounded text-xs">MQL5/Experts</code>.</span>
+            <span>{t('step3')}</span>
           </li>
           <li className="flex items-start gap-3">
             <span className="w-6 h-6 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-xs font-bold shrink-0 mt-0.5">4</span>
-            <span>Allez dans <strong className="text-white">Outils → Options → Expert Advisors</strong> et autorisez le WebRequest pour l&apos;URL de votre licence.</span>
+            <span>{t('step4')}</span>
           </li>
           <li className="flex items-start gap-3">
             <span className="w-6 h-6 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-xs font-bold shrink-0 mt-0.5">5</span>
-            <span>Glissez l&apos;EA sur un graphique XAU/USD et activez le trading automatique. 🚀</span>
+            <span>{t('step5')}</span>
           </li>
         </ol>
       </div>
