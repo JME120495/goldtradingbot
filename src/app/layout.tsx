@@ -45,7 +45,7 @@ export default async function RootLayout({
               (function(){
                 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
                 s1.async=true;
-                s1.src='https://embed.tawk.to/YOUR_PROPERTY_ID/default';
+                s1.src='https://embed.tawk.to/6a61c64339cd571d47f5d518/1ju6usu4l';
                 s1.charset='UTF-8';
                 s1.setAttribute('crossorigin','*');
                 s0.parentNode.insertBefore(s1,s0);
