@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { countries } from "@/lib/countries";
 
 export default function RegisterPage() {
   const t = useTranslations('Auth');
@@ -15,7 +16,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [phoneCode, setPhoneCode] = useState('+237'); // Default to Cameroon
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [preferredCurrency, setPreferredCurrency] = useState('XAF');
+  const [preferredCurrency, setPreferredCurrency] = useState('USD');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -84,17 +85,9 @@ export default function RegisterPage() {
                 onChange={e => setPhoneCode(e.target.value)}
                 className="bg-black border border-white/10 rounded-xl px-2 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors w-1/3"
               >
-                <option value="+237">🇨🇲 +237</option>
-                <option value="+225">🇨🇮 +225</option>
-                <option value="+221">🇸🇳 +221</option>
-                <option value="+228">🇹🇬 +228</option>
-                <option value="+241">🇬🇦 +241</option>
-                <option value="+242">🇨🇬 +242</option>
-                <option value="+243">🇨🇩 +243</option>
-                <option value="+33">🇫🇷 +33</option>
-                <option value="+1">🇺🇸 +1</option>
-                <option value="+44">🇬🇧 +44</option>
-                <option value="+971">🇦🇪 +971</option>
+                {countries.map((country, index) => (
+                  <option key={index} value={country.code}>{country.label}</option>
+                ))}
               </select>
               <input 
                 type="tel" 
@@ -114,10 +107,7 @@ export default function RegisterPage() {
               onChange={e => setPreferredCurrency(e.target.value)}
               className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
             >
-              <option value="XAF">FCFA (CEMAC - XAF)</option>
-              <option value="XOF">FCFA (UEMOA - XOF)</option>
               <option value="USD">US Dollar (USD)</option>
-              <option value="EUR">Euro (EUR)</option>
             </select>
           </div>
 
