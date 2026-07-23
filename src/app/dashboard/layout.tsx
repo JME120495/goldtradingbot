@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { Home, Key, Download, CreditCard, LogOut, Users, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -77,7 +78,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             );
           })}
         </nav>
-        <div className="p-4 border-t border-white/5">
+        <div className="p-4 border-t border-white/5 space-y-4">
+          <div className="px-4">
+            <LanguageSwitcher />
+          </div>
           <button 
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 w-full text-left text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors"
@@ -95,7 +99,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Mobile Header */}
         <header className="md:hidden h-20 border-b border-white/5 bg-[#0F1115] flex items-center justify-between px-4">
           <span className="font-bold text-[#D4AF37]">GOLD SCALPER</span>
-          <button onClick={handleLogout} className="text-sm text-gray-400">{t('logout')}</button>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher />
+            <button onClick={handleLogout} className="text-sm text-gray-400">{t('logout')}</button>
+          </div>
         </header>
 
         <div className="flex-1 p-4 md:p-8 overflow-auto z-10">

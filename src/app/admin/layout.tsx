@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -48,9 +49,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <main className="flex-1 overflow-y-auto">
         <header className="h-20 border-b border-white/10 flex items-center px-8 justify-between bg-[#0F1115]/80 backdrop-blur-md sticky top-0 z-10">
           <h2 className="text-xl font-bold">{t('admin_panel')}</h2>
-          <Link href="/dashboard" className="text-sm text-gray-400 hover:text-white">
-            {t('back_to_client')}
-          </Link>
+          <div className="flex items-center gap-6">
+            <LanguageSwitcher />
+            <Link href="/dashboard" className="text-sm text-gray-400 hover:text-white">
+              {t('back_to_client')}
+            </Link>
+          </div>
         </header>
         <div className="p-8 max-w-7xl mx-auto">
           {children}

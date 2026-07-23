@@ -4,32 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { setUserLocale } from "@/services/locale";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-function LanguageSwitcher() {
-  const t = useTranslations('Language');
-  const [loading, setLoading] = useState(false);
-
-  const switchLocale = async (locale: string) => {
-    setLoading(true);
-    await setUserLocale(locale);
-    window.location.reload();
-  };
-
-  return (
-    <div className="flex gap-2">
-      {['en', 'fr', 'es', 'pt', 'ar'].map((lang) => (
-        <button 
-          key={lang}
-          onClick={() => switchLocale(lang)}
-          disabled={loading}
-          className="text-xs text-gray-400 hover:text-[#D4AF37] uppercase font-bold"
-        >
-          {lang}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 export default function Home() {
   const t = useTranslations();
