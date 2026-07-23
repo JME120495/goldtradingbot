@@ -168,4 +168,24 @@ export class AdminService {
 
     return { success: true, message: 'Products seeded successfully' };
   }
+
+  async getWithdrawals() {
+    return this.prisma.withdrawalRequest.findMany({
+      include: {
+        affiliate: {
+          include: {
+            user: { select: { name: true, email: true } }
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  async updateWithdrawalStatus(id: string, status: string, txHash?: string) {
+    return this.prisma.withdrawalRequest.update({
+      where: { id },
+      data: { status, txHash }
+    });
+  }
 }

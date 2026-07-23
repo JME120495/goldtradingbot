@@ -117,11 +117,13 @@ model Affiliate {
   commissionRate Float    @default(10.0)
   clicks         Int      @default(0)
   status         String   @default("PENDING")
+  walletAddress  String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   sales          AffiliateSale[]
   referredUsers  User[] @relation("UserReferredBy")
+  withdrawals    WithdrawalRequest[]
 }
 
 model AffiliateSale {
@@ -132,6 +134,17 @@ model AffiliateSale {
   commission  Float
   isRenewal   Boolean   @default(false)
   createdAt   DateTime  @default(now())
+}
+
+model WithdrawalRequest {
+  id          String    @id @default(uuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+  amount      Float
+  status      String    @default("PENDING") // PENDING, COMPLETED, REJECTED
+  txHash      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model SupportTicket {

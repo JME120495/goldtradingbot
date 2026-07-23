@@ -59,4 +59,18 @@ export class AdminController {
   seedProducts() {
     return this.adminService.seedProducts();
   }
+
+  @Get('withdrawals')
+  getWithdrawals() {
+    return this.adminService.getWithdrawals();
+  }
+
+  @Patch('withdrawals/:id/status')
+  updateWithdrawalStatus(
+    @Param('id') id: string,
+    @Body('status') status: string,
+    @Body('txHash') txHash?: string
+  ) {
+    return this.adminService.updateWithdrawalStatus(id, status, txHash);
+  }
 }

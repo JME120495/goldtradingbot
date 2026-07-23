@@ -76,7 +76,7 @@ export class PaymentsService {
       // Handle Affiliate Commission
       const purchasingUser = await this.prisma.user.findUnique({ where: { id: payment.userId } });
       if (purchasingUser?.referredById) {
-        const commissionRate = plan.name.toLowerCase().includes('starter') ? 0.15 : 0.10;
+        const commissionRate = data.duration === 'weekly' ? 0.15 : 0.10;
         const commission = amount * commissionRate;
         await this.prisma.affiliateSale.create({
           data: {
@@ -184,7 +184,7 @@ export class PaymentsService {
         // Handle Affiliate Commission
         const purchasingUser = await this.prisma.user.findUnique({ where: { id: payment.userId } });
         if (purchasingUser?.referredById && plan) {
-          const commissionRate = plan.name.toLowerCase().includes('starter') ? 0.15 : 0.10;
+          const commissionRate = duration === 'weekly' ? 0.15 : 0.10;
           const commission = payment.amount * commissionRate;
           await this.prisma.affiliateSale.create({
             data: {
