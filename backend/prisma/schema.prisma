@@ -25,6 +25,8 @@ model User {
   payments        Payment[]
   supportTickets  SupportTicket[]
   affiliateData   Affiliate?
+  referredById    String?
+  referredBy      Affiliate?     @relation("UserReferredBy", fields: [referredById], references: [id])
 }
 
 model Product {
@@ -118,7 +120,8 @@ model Affiliate {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  sales AffiliateSale[]
+  sales          AffiliateSale[]
+  referredUsers  User[] @relation("UserReferredBy")
 }
 
 model AffiliateSale {

@@ -37,6 +37,19 @@ export class AuthService {
         preferredCurrency: data.preferredCurrency || 'USD',
       },
     });
+
+    if (data.refcode) {
+      const affiliate = await this.prisma.affiliate.findUnique({
+        where: { code: data.refcode },
+      });
+      if (affiliate) {
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { referredById: affiliate.id },
+        });
+      }
+    }
+
     return this.generateTokens(user.id, user.role);
   }
 

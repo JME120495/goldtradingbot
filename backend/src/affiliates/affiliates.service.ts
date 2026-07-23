@@ -15,6 +15,7 @@ export class AffiliatesService {
       data: {
         userId,
         code,
+        status: 'ACTIVE',
       }
     });
   }
@@ -22,34 +23,34 @@ export class AffiliatesService {
   async getStats(userId: string) {
     const affiliate = await this.prisma.affiliate.findUnique({
       where: { userId },
-      include: { sales: true }
+      include: { 
+        sales: true,
+        referredUsers: {
+          select: {
+            name: true,
+            email: true,
+            createdAt: true,
+          }
+        }
+      }
     });
 
     if (!affiliate) throw new NotFoundException('Not an affiliate');
 
     const totalSales = affiliate.sales.length;
-    let tier = 'Bronze';
-    let commissionRate = 0.10;
-
-    if (totalSales >= 50) {
-      tier = 'Gold';
-      commissionRate = 0.30;
-    } else if (totalSales >= 10) {
-      tier = 'Silver';
-      commissionRate = 0.20;
-    }
-
     const totalEarned = affiliate.sales.reduce((sum, sale) => sum + sale.commission, 0);
 
     return {
-      code: affiliate.code,
-      clicks: affiliate.clicks,
+      affiliate: {
+        code: affiliate.code,
+        clicks: affiliate.clicks,
+        status: affiliate.status,
+        commissionRate: affiliate.commissionRate,
+      },
       totalSales,
-      tier,
-      commissionRate,
       totalEarned,
-      status: affiliate.status,
-      salesHistory: affiliate.sales
+      salesHistory: affiliate.sales,
+      referredUsers: affiliate.referredUsers
     };
   }
 }

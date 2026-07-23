@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { countries } from "@/lib/countries";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const t = useTranslations('Auth');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -20,6 +20,8 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const refcode = searchParams?.get('refcode');
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +34,8 @@ export default function RegisterPage() {
         email, 
         password,
         phone: fullPhone,
-        preferredCurrency
+        preferredCurrency,
+        refcode
       });
       Cookies.set('token', res.data.access_token, { expires: 1 });
       router.push('/dashboard');
@@ -132,5 +135,13 @@ export default function RegisterPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#050505] flex items-center justify-center text-white">Loading...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }

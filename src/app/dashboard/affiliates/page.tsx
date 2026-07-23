@@ -83,7 +83,7 @@ export default function AffiliatesDashboard() {
           <div className="bg-[#0F1115] border border-white/10 p-6 rounded-2xl flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold uppercase tracking-wider text-[#D4AF37]">PARTNER</h2>
-              <p className="opacity-80">You earn {stats.affiliate.commissionRate * 100}% on all sales</p>
+              <p className="opacity-80">Vous gagnez des commissions sur les achats de vos filleuls (15% sur Starter, 10% sur les autres).</p>
             </div>
             <div className="text-right">
               <p className="text-sm opacity-80 mb-1">{t('your_affiliate_link')}</p>
@@ -116,6 +116,34 @@ export default function AffiliatesDashboard() {
                 <div className="text-2xl font-bold text-[#D4AF37]">${(stats.totalEarned || 0).toFixed(2)}</div>
               </div>
             </div>
+          </div>
+
+          <div className="mt-12 bg-[#0F1115] border border-white/10 p-6 rounded-2xl">
+            <h3 className="text-xl font-bold mb-6 text-[#D4AF37]">Utilisateurs parrainés</h3>
+            {stats.referredUsers && stats.referredUsers.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-white/10 text-gray-400">
+                      <th className="pb-3 font-medium">Nom</th>
+                      <th className="pb-3 font-medium">Email</th>
+                      <th className="pb-3 font-medium">Date d'inscription</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stats.referredUsers.map((u: any, idx: number) => (
+                      <tr key={idx} className="border-b border-white/5">
+                        <td className="py-4">{u.name || '-'}</td>
+                        <td className="py-4 text-gray-400">{u.email}</td>
+                        <td className="py-4 text-gray-400">{new Date(u.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-gray-400 text-center py-8">Vous n'avez parrainé personne pour le moment.</p>
+            )}
           </div>
         </>
       )}
