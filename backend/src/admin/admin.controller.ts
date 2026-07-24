@@ -73,4 +73,9 @@ export class AdminController {
   ) {
     return this.adminService.updateWithdrawalStatus(id, status, txHash);
   }
+
+  @Get('analytics')
+  getAnalytics() {
+    return this.adminService.getAnalytics();
+  }
 }

@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Mt5LicensesService } from '../mt5-licenses/mt5-licenses.service';
+import { TelegramService } from '../telegram/telegram.service';
 
 @Injectable()
 export class PaymentsService {
@@ -11,7 +12,8 @@ export class PaymentsService {
 
   constructor(
     private prisma: PrismaService,
-    private mt5LicensesService: Mt5LicensesService
+    private mt5LicensesService: Mt5LicensesService,
+    private telegram: TelegramService
   ) {}
 
   async initiatePayment(userId: string, data: { productId: string, planId: string, duration: string }) {
@@ -87,6 +89,8 @@ export class PaymentsService {
           }
         });
       }
+
+      this.telegram.sendMessage(`💰 <b>Nouvelle Vente ! (Mode Test)</b>\n\n<b>Plan:</b> ${plan.name} (${data.duration})\n<b>Montant:</b> $${amount}\n<b>Client ID:</b> ${payment.userId}`);
 
       return {
         paymentLink: `${frontendUrl}/dashboard?payment=success_simulated`
@@ -196,6 +200,8 @@ export class PaymentsService {
           });
         }
         this.logger.log(`License created for user ${payment.userId}`);
+
+        this.telegram.sendMessage(`💰 <b>Nouvelle Vente !</b>\n\n<b>Plan:</b> ${plan?.name || 'Inconnu'} (${duration})\n<b>Montant:</b> $${payment.amount}\n<b>Client ID:</b> ${payment.userId}\n<b>TxID:</b> ${txRef}`);
       }
     }
     

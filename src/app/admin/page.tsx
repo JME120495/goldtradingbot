@@ -2,91 +2,107 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-
-interface Plan {
-  id: string;
-  name: string;
-  lotAllowed: number;
-  prices: string; // JSON
-  productId: string;
-}
+import Cookies from 'js-cookie';
+import { useTranslations } from 'next-intl';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Users, CreditCard, Activity, DollarSign } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const [plans, setPlans] = useState<Plan[]>([]);
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations('Admin');
 
   useEffect(() => {
-    const fetchPlans = async () => {
+    const fetchAnalytics = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/plans');
-        setPlans(res.data);
+        const token = Cookies.get('token');
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/admin/analytics`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setStats(res.data);
       } catch (err) {
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    fetchPlans();
+    fetchAnalytics();
   }, []);
+
+  if (loading || !stats) {
+    return <div className="p-8 text-gray-400">Chargement des analytiques...</div>;
+  }
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+      <h1 className="text-3xl font-bold flex items-center gap-3">
+        <Activity className="text-[#D4AF37]" />
+        Tableau de Bord
+      </h1>
 
-      <div className="grid grid-cols-3 gap-6">
-        <div className="bg-[#0F1115] border border-white/10 p-6 rounded-2xl">
-          <h3 className="text-gray-400 mb-2">Total Plans</h3>
-          <div className="text-4xl font-bold text-[#D4AF37]">{plans.length}</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-[#0F1115] border border-white/10 p-6 rounded-2xl flex items-center justify-between">
+          <div>
+            <h3 className="text-gray-400 mb-1">Revenu Total</h3>
+            <div className="text-3xl font-bold text-[#D4AF37]">
+              ${stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+          </div>
+          <div className="w-12 h-12 bg-[#D4AF37]/10 rounded-full flex items-center justify-center">
+            <DollarSign className="text-[#D4AF37]" />
+          </div>
         </div>
-        <div className="bg-[#0F1115] border border-white/10 p-6 rounded-2xl">
-          <h3 className="text-gray-400 mb-2">Total Revenue (Mock)</h3>
-          <div className="text-4xl font-bold text-white">$12,450</div>
+
+        <div className="bg-[#0F1115] border border-white/10 p-6 rounded-2xl flex items-center justify-between">
+          <div>
+            <h3 className="text-gray-400 mb-1">Utilisateurs</h3>
+            <div className="text-3xl font-bold text-white">{stats.totalUsers}</div>
+          </div>
+          <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center">
+            <Users className="text-blue-500" />
+          </div>
         </div>
-        <div className="bg-[#0F1115] border border-white/10 p-6 rounded-2xl">
-          <h3 className="text-gray-400 mb-2">Active Clients (Mock)</h3>
-          <div className="text-4xl font-bold text-white">142</div>
+
+        <div className="bg-[#0F1115] border border-white/10 p-6 rounded-2xl flex items-center justify-between">
+          <div>
+            <h3 className="text-gray-400 mb-1">Licences Actives</h3>
+            <div className="text-3xl font-bold text-white">{stats.activeLicenses}</div>
+          </div>
+          <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center">
+            <Activity className="text-green-500" />
+          </div>
+        </div>
+
+        <div className="bg-[#0F1115] border border-white/10 p-6 rounded-2xl flex items-center justify-between">
+          <div>
+            <h3 className="text-gray-400 mb-1">Total Ventes</h3>
+            <div className="text-3xl font-bold text-white">{stats.totalSales}</div>
+          </div>
+          <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center">
+            <CreditCard className="text-purple-500" />
+          </div>
         </div>
       </div>
 
-      <div className="bg-[#0F1115] border border-white/10 rounded-2xl overflow-hidden">
-        <div className="p-6 border-b border-white/10 flex justify-between items-center">
-          <h2 className="text-xl font-bold">Plan Configurations</h2>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-white/5 border-b border-white/10">
-              <tr>
-                <th className="p-4 font-medium text-gray-400">Plan Name</th>
-                <th className="p-4 font-medium text-gray-400">Lot Limit</th>
-                <th className="p-4 font-medium text-gray-400">Weekly Price</th>
-                <th className="p-4 font-medium text-gray-400">Monthly Price</th>
-                <th className="p-4 font-medium text-gray-400">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/10">
-              {loading ? (
-                <tr>
-                  <td colSpan={5} className="p-4 text-center text-gray-500">Loading plans...</td>
-                </tr>
-              ) : plans.map((plan) => {
-                let prices: any = {};
-                try { prices = JSON.parse(plan.prices); } catch {}
-                
-                return (
-                  <tr key={plan.id} className="hover:bg-white/5">
-                    <td className="p-4 font-medium text-[#D4AF37]">{plan.name}</td>
-                    <td className="p-4">{plan.lotAllowed.toFixed(2)}</td>
-                    <td className="p-4">${prices.weekly || 0}</td>
-                    <td className="p-4">${prices.monthly || 0}</td>
-                    <td className="p-4">
-                      <button className="text-sm text-blue-400 hover:text-blue-300 mr-4">Edit</button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      <div className="bg-[#0F1115] border border-white/10 p-6 rounded-2xl">
+        <h2 className="text-xl font-bold mb-6">Revenus sur les 6 derniers mois</h2>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={stats.revenueData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+              <XAxis dataKey="name" stroke="#ffffff50" />
+              <YAxis stroke="#ffffff50" tickFormatter={(value) => `$${value}`} />
+              <Tooltip 
+                cursor={{ fill: '#ffffff05' }}
+                contentStyle={{ backgroundColor: '#1A1D24', borderColor: '#ffffff20', borderRadius: '8px' }}
+                formatter={(value: any) => {
+                  const numValue = typeof value === 'number' ? value : Number(value);
+                  return [`$${(numValue || 0).toFixed(2)}`, 'Revenu'];
+                }}
+              />
+              <Bar dataKey="revenue" fill="#D4AF37" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>

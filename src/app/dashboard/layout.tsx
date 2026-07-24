@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
-import { Home, Key, Download, CreditCard, LogOut, Users, User } from 'lucide-react';
+import { Home, Key, Download, CreditCard, LogOut, Users, User, LifeBuoy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
@@ -47,6 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: t('billing'), href: '/dashboard/billing', icon: CreditCard },
     { name: t('affiliates'), href: '/dashboard/affiliates', icon: Users },
     { name: t('profile', { fallback: 'Profile' }), href: '/dashboard/profile', icon: User },
+    { name: t('support', { fallback: 'Support' }), href: '/dashboard/support', icon: LifeBuoy },
   ];
 
   if (isAdmin) {

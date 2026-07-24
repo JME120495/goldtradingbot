@@ -15,6 +15,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: t('licenses'), href: '/admin/licenses' },
     { name: t('mt5_licenses'), href: '/admin/mt5-licenses' },
     { name: 'Retraits', href: '/admin/withdrawals' },
+    { name: 'Support', href: '/admin/support' },
   ];
 
   return (

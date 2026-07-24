@@ -188,4 +188,40 @@ export class AdminService {
       data: { status, txHash }
     });
   }
+
+  async getAnalytics() {
+    const totalUsers = await this.prisma.user.count();
+    const activeLicenses = await this.prisma.license.count({ where: { status: 'ACTIVE' } });
+    const totalSales = await this.prisma.payment.count({ where: { status: 'COMPLETED' } });
+    const revenueResult = await this.prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: { status: 'COMPLETED' }
+    });
+    
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const payments = await this.prisma.payment.findMany({
+      where: { status: 'COMPLETED', createdAt: { gte: sixMonthsAgo } },
+      select: { amount: true, createdAt: true }
+    });
+
+    const monthlyRevenue: Record<string, number> = {};
+    payments.forEach(p => {
+      const month = p.createdAt.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
+      monthlyRevenue[month] = (monthlyRevenue[month] || 0) + p.amount;
+    });
+
+    const revenueData = Object.keys(monthlyRevenue).map(key => ({
+      name: key,
+      revenue: monthlyRevenue[key]
+    }));
+
+    return {
+      totalUsers,
+      activeLicenses,
+      totalSales,
+      totalRevenue: revenueResult._sum.amount || 0,
+      revenueData
+    };
+  }
 }
