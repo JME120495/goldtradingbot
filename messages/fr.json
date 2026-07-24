@@ -9,19 +9,19 @@
   },
   "Hero": {
     "subtitle": "Expert Advisor MT5",
-    "title1": "Trading d'Or Automatisé",
-    "title2": "Avec Précision.",
-    "description": "Maximisez vos profits avec notre Gold Scalper MT5 de qualité institutionnelle. Entièrement automatisé, backtesté et optimisé pour XAUUSD.",
+    "title1": "Générez des Revenus Passifs",
+    "title2": "Sur l'Or. Sans Stress.",
+    "description": "Fini les nuits blanches devant les graphiques et les comptes cramés. Laissez notre algorithme de niveau institutionnel scalper l'Or pour vous, 24h/24, avec un contrôle strict du risque.",
     "start_trial": "Essai Gratuit",
     "view_pricing": "Voir les Tarifs"
   },
   "Features": {
     "f1_title": "Scalping Haute Fréquence",
     "f1_desc": "Exécute des transactions en millisecondes en tirant parti des micro-mouvements sur le marché de l'or.",
-    "f2_title": "Contrôle de Licence Sécurisé",
-    "f2_desc": "Chaque EA MT5 est lié à votre compte et vérifié en temps réel par nos serveurs de licences.",
-    "f3_title": "Gestion des Risques Automatisée",
-    "f3_desc": "Tailles de lots strictes et limites de drawdown imposées par le serveur pour protéger votre capital."
+    "f2_title": "100% Mains Libres & Passif",
+    "f2_desc": "Installez-le en 5 minutes. Le robot analyse, entre, gère la position et sécurise les profits de manière totalement autonome.",
+    "f3_title": "Stratégie Anti-Krach",
+    "f3_desc": "Stop-Loss invisibles et gestion des risques institutionnelle. Le robot est programmé pour protéger votre capital avant tout."
   },
   "Recommendations": {
     "title": "Recommandations pour un Setup Optimal",
@@ -35,8 +35,8 @@
     "session_desc": "Il est préférable d'utiliser ce bot à l'ouverture du marché de New York pour profiter de la volatilité."
   },
   "Pricing": {
-    "title": "Tarification Simple et Transparente",
-    "subtitle": "Choisissez le plan adapté à votre capital. Sans frais cachés. Annulable à tout moment.",
+    "title": "Rejoignez l'Élite des Traders Rentables",
+    "subtitle": "Choisissez le plan adapté à votre capital. Support 24/7. Annulable à tout moment. Rentabilisé en quelques trades.",
     "weekly": "Hebdo",
     "monthly": "Mensuel",
     "semi_annual": "6 Mois",
@@ -123,9 +123,9 @@
     "admin_panel": "Panneau Admin"
   },
   "Performance": {
-    "title": "Des performances testées, une approche axée sur la régularité",
-    "p1": "Notre Expert Advisor a été développé et testé avec un objectif clair : rechercher des performances régulières tout en appliquant une gestion rigoureuse du risque.",
-    "p2": "Lors de nos tests internes et dans les conditions de marché observées, notre stratégie a fréquemment généré des résultats équivalents ou supérieurs à 20 USD par jour sur les configurations recommandées.",
+    "title": "Des Profits Réguliers. Un Drawdown Maîtrisé.",
+    "p1": "La plupart des robots finissent par exploser votre compte au premier gros mouvement de marché. Pas le nôtre. JME Gold Scalper a été pensé avec une seule obsession : la préservation de votre capital.",
+    "p2": "Grâce à des algorithmes de suivi de tendance ultra-réactifs, visez une rentabilité stable (ex: 20$ à 50$ par jour selon le capital) sans jamais transpirer devant vos écrans.",
     "disclaimer": "Ces résultats sont fournis à titre indicatif et ne constituent pas une garantie de performance. Les marchés financiers comportent des risques, et les résultats peuvent varier en fonction du capital, des conditions de marché, du broker, de l'exécution des ordres et des paramètres utilisés."
   },
   "Terms": {
