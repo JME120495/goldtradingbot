@@ -102,13 +102,20 @@ export default function AccountsPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">{t('broker_name')}</label>
-              <input 
-                type="text" 
-                disabled
-                value="Fusion Markets"
-                className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-gray-400 cursor-not-allowed"
-              />
-              <p className="text-xs text-[#D4AF37]/70 mt-2">{t('broker_note')}</p>
+              <select
+                required
+                value={broker}
+                onChange={e => setBroker(e.target.value)}
+                className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37]"
+              >
+                <option value="Fusion Markets">Fusion Markets</option>
+                <option value="IC Markets">IC Markets</option>
+                <option value="XM">XM</option>
+                <option value="Exness">Exness</option>
+                <option value="FBS">FBS</option>
+                <option value="Weltrade">Weltrade</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-2">{t('broker_note')}</p>
             </div>
             <button 
               type="submit" 

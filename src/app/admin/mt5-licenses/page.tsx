@@ -369,7 +369,7 @@ export default function AdminMt5Licenses() {
               <select
                 name="ea_name"
                 required
-                defaultValue="JMEGOLD_DUAL"
+                defaultValue="GOLD_SCALPER"
                 className="w-full bg-black border border-white/20 rounded-lg px-4 py-2.5 text-white outline-none focus:border-[#D4AF37] transition-colors"
               >
                 {eaOptions.map((ea) => (
