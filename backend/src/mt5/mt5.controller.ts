@@ -1,9 +1,7 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { Mt5Service } from './mt5.service';
 import { Mt5LicenseCheckDto, Mt5HeartbeatDto } from './dto/mt5.dto';
-import { EaSecretGuard } from '../auth/ea-secret.guard';
 
-@UseGuards(EaSecretGuard)
 @Controller('mt5')
 export class Mt5Controller {
   constructor(private readonly mt5Service: Mt5Service) {}

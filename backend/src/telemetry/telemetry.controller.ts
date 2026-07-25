@@ -3,13 +3,11 @@ import { TelemetryService } from './telemetry.service';
 import { AuthGuard } from '@nestjs/passport';
 import { SnapshotDto } from './dto/snapshot.dto';
 import { DealDto } from './dto/deal.dto';
-import { EaSecretGuard } from '../auth/ea-secret.guard';
 
 @Controller('api/telemetry')
 export class TelemetryController {
   constructor(private readonly telemetryService: TelemetryService) {}
 
-  @UseGuards(EaSecretGuard)
   @Post('snapshot')
   @HttpCode(HttpStatus.OK)
   async snapshot(@Body() body: SnapshotDto) {
@@ -20,7 +18,6 @@ export class TelemetryController {
     }
   }
 
-  @UseGuards(EaSecretGuard)
   @Post('deal')
   @HttpCode(HttpStatus.OK)
   async deal(@Body() body: DealDto) {

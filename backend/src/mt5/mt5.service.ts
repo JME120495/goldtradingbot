@@ -57,7 +57,7 @@ export class Mt5Service {
   }
 
   private signPayload(payload: any) {
-    const secret = process.env.EA_SECRET as string;
+    const secret = process.env.EA_SECRET || '';
     const jsonString = JSON.stringify(payload);
     const signature = crypto.createHmac('sha256', secret).update(jsonString).digest('hex');
     return {

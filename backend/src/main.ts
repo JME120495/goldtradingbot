@@ -12,7 +12,6 @@ async function bootstrap() {
     'JWT_SECRET', 
     'LICENSE_ADMIN_KEY', 
     'FRONTEND_URL',
-    'EA_SECRET',
     'NOWPAYMENTS_IPN_SECRET',
     'ENCRYPTION_KEY'
   ];
