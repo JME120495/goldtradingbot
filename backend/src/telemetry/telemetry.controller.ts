@@ -1,14 +1,18 @@
 import { Controller, Post, Get, Body, Param, UseGuards, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
 import { TelemetryService } from './telemetry.service';
 import { AuthGuard } from '@nestjs/passport';
+import { SnapshotDto } from './dto/snapshot.dto';
+import { DealDto } from './dto/deal.dto';
+import { EaSecretGuard } from '../auth/ea-secret.guard';
 
 @Controller('api/telemetry')
 export class TelemetryController {
   constructor(private readonly telemetryService: TelemetryService) {}
 
+  @UseGuards(EaSecretGuard)
   @Post('snapshot')
   @HttpCode(HttpStatus.OK)
-  async snapshot(@Body() body: any) {
+  async snapshot(@Body() body: SnapshotDto) {
     try {
       return await this.telemetryService.processSnapshot(body);
     } catch (e: any) {
@@ -16,9 +20,10 @@ export class TelemetryController {
     }
   }
 
+  @UseGuards(EaSecretGuard)
   @Post('deal')
   @HttpCode(HttpStatus.OK)
-  async deal(@Body() body: any) {
+  async deal(@Body() body: DealDto) {
     try {
       return await this.telemetryService.processDeal(body);
     } catch (e: any) {

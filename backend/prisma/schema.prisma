@@ -16,15 +16,22 @@ model User {
   passwordHash      String?
   phone             String?  @unique
   preferredCurrency String   @default("USD")
-  refreshTokenHash  String? // hashed refresh token for rotation
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  refreshTokenHash     String? // hashed refresh token for rotation
+  twoFactorSecret      String?
+  backupCodes          String[] // Hashed backup codes
+  twoFactorTempSecret  String?  // Random secret to make temp token single-use
+  isTwoFactorEnabled   Boolean  @default(false)
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   licenses        License[]
   tradingAccounts TradingAccount[]
   payments        Payment[]
   supportTickets  SupportTicket[]
   affiliateData   Affiliate?
+  downloadTokens  DownloadToken[]
   referredById    String?
   referredBy      Affiliate?     @relation("UserReferredBy", fields: [referredById], references: [id])
 }
@@ -90,6 +97,24 @@ model TradingAccount {
   licenses License[]
 
   @@unique([accountNumber, broker])
+}
+
+model File {
+  id        String   @id @default(uuid())
+  filename  String
+  url       String
+  createdAt DateTime @default(now())
+}
+
+model DownloadToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  used      Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Payment {

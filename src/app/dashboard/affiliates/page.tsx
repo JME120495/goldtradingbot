@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
@@ -19,10 +19,7 @@ export default function AffiliatesDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = Cookies.get('token');
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/affiliates/stats', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/affiliates/stats');
         setStats(res.data);
         if (res.data?.affiliate?.walletAddress) {
           setWalletAddress(res.data.affiliate.walletAddress);
@@ -41,10 +38,7 @@ export default function AffiliatesDashboard() {
 
   const joinAffiliateProgram = async () => {
     try {
-      const token = Cookies.get('token');
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/affiliates/join', {}, {
-         headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/affiliates/join', {});
       window.location.reload();
     } catch(e) {
       alert('Error joining program');
@@ -61,10 +55,7 @@ export default function AffiliatesDashboard() {
   const handleUpdateWallet = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = Cookies.get('token');
-      await axios.put(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/affiliates/wallet`, { walletAddress }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.put(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/affiliates/wallet`, { walletAddress });
       alert('Adresse de portefeuille mise à jour avec succès !');
     } catch (err) {
       alert('Erreur lors de la mise à jour du portefeuille.');
@@ -86,10 +77,7 @@ export default function AffiliatesDashboard() {
 
     setSubmittingWithdraw(true);
     try {
-      const token = Cookies.get('token');
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/affiliates/withdraw`, { amount }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/affiliates/withdraw`, { amount });
       alert('Demande de retrait envoyée !');
       window.location.reload();
     } catch (err: any) {

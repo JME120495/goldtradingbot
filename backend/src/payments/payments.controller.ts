@@ -1,6 +1,7 @@
 import { Controller, Post, Body, UseGuards, Request, Headers } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { AuthGuard } from '@nestjs/passport';
+import { InitiatePaymentDto } from './dto/initiate-payment.dto';
 
 @Controller('payments')
 export class PaymentsController {
@@ -8,13 +9,13 @@ export class PaymentsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('initiate')
-  async initiate(@Request() req, @Body() body: { productId: string, planId: string, duration: string }) {
+  async initiate(@Request() req, @Body() body: InitiatePaymentDto) {
     return this.paymentsService.initiatePayment(req.user.userId, body);
   }
 
   // Webhook is public (called by NowPayments server)
   @Post('webhook')
-  async webhook(@Body() body: any, @Headers('x-nowpayments-sig') hash: string) {
+  async webhook(@Body() body: Record<string, any>, @Headers('x-nowpayments-sig') hash: string) {
     const secret = process.env.NOWPAYMENTS_IPN_SECRET;
     if (!secret) {
       throw new Error('NOWPAYMENTS_IPN_SECRET not defined');

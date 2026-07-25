@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class Mt5Service {
@@ -38,18 +39,30 @@ export class Mt5Service {
 
     if (!account || !account.user || account.user.licenses.length === 0) {
       this.logger.warn(`License rejected for account ${data.account}`);
-      return { active: false };
+      return this.signPayload({ active: false });
     }
 
     const activeLicense = account.user.licenses[0];
     
     this.logger.log(`License valid. Plan: ${activeLicense.plan.name}, Lot: ${activeLicense.lotAllowed}`);
     
-    return {
+    const payload = {
       active: true,
       plan: activeLicense.plan.name,
       lot: activeLicense.lotAllowed,
       expiresAt: activeLicense.expiresAt ? activeLicense.expiresAt.toISOString().split('T')[0] : null
+    };
+
+    return this.signPayload(payload);
+  }
+
+  private signPayload(payload: any) {
+    const secret = process.env.EA_SECRET as string;
+    const jsonString = JSON.stringify(payload);
+    const signature = crypto.createHmac('sha256', secret).update(jsonString).digest('hex');
+    return {
+      payload,
+      signature
     };
   }
 

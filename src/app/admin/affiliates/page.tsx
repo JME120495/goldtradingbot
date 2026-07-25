@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import { useTranslations } from 'next-intl';
 
 export default function AdminAffiliates() {
@@ -15,7 +15,7 @@ export default function AdminAffiliates() {
 
   const fetchAffiliates = async () => {
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/admin/affiliates');
+      const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/admin/affiliates');
       setAffiliates(res.data);
     } catch (err) {
       console.error(err);
@@ -26,7 +26,7 @@ export default function AdminAffiliates() {
 
   const updateRate = async (id: string, rate: number) => {
     try {
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}/admin/affiliates/${id}/commission`, { rate });
+      await api.patch(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}/admin/affiliates/${id}/commission`, { rate });
       fetchAffiliates();
     } catch (err) {
       alert("Error updating rate");
@@ -35,7 +35,7 @@ export default function AdminAffiliates() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}/admin/affiliates/${id}/status`, { status });
+      await api.patch(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}/admin/affiliates/${id}/status`, { status });
       fetchAffiliates();
     } catch (err) {
       alert("Error updating status");
@@ -45,7 +45,7 @@ export default function AdminAffiliates() {
   const deleteAffiliate = async (id: string) => {
     if(!confirm(t('confirm_delete_affiliate'))) return;
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}/admin/affiliates/${id}`);
+      await api.delete(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}/admin/affiliates/${id}`);
       fetchAffiliates();
     } catch (err) {
       alert("Error deleting affiliate");
@@ -59,7 +59,7 @@ export default function AdminAffiliates() {
     if (!email) return;
 
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/affiliates`, { email });
+      await api.post(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/affiliates`, { email });
       fetchAffiliates();
       (e.target as HTMLFormElement).reset();
       alert('Affiliate added successfully');

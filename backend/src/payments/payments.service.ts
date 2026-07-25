@@ -149,6 +149,19 @@ export class PaymentsService {
         return { status: 'already_processed' };
       }
 
+      // VÉRIFICATION DU MONTANT (Double Check de Sécurité)
+      const expectedAmount = payment.amount;
+      const receivedAmount = payload.price_amount; // Le montant en USD enregistré par NowPayments
+
+      if (receivedAmount < expectedAmount) {
+        this.logger.error(`Alerte de sécurité : Montant payé insuffisant. Attendu : ${expectedAmount}, Reçu : ${receivedAmount}`);
+        await this.prisma.payment.update({
+          where: { id: payment.id },
+          data: { status: 'AMOUNT_MISMATCH' }
+        });
+        return { status: 'amount_mismatch' };
+      }
+
       // Update Payment Status
       await this.prisma.payment.update({
         where: { id: payment.id },
@@ -202,6 +215,33 @@ export class PaymentsService {
         this.logger.log(`License created for user ${payment.userId}`);
 
         this.telegram.sendMessage(`💰 <b>Nouvelle Vente !</b>\n\n<b>Plan:</b> ${plan?.name || 'Inconnu'} (${duration})\n<b>Montant:</b> $${payment.amount}\n<b>Client ID:</b> ${payment.userId}\n<b>TxID:</b> ${txRef}`);
+      }
+    } else if (payload.payment_status === 'partially_paid') {
+      const txRef = payload.order_id;
+      const payment = await this.prisma.payment.findUnique({ where: { providerTxId: txRef } });
+      if (payment) {
+        await this.prisma.payment.update({
+          where: { id: payment.id },
+          data: { status: 'PARTIALLY_PAID' }
+        });
+      }
+    } else if (payload.payment_status === 'refunded') {
+      const txRef = payload.order_id;
+      const payment = await this.prisma.payment.findUnique({ where: { providerTxId: txRef } });
+      if (payment) {
+        await this.prisma.payment.update({
+          where: { id: payment.id },
+          data: { status: 'REFUNDED' }
+        });
+      }
+    } else if (payload.payment_status === 'failed' || payload.payment_status === 'expired') {
+      const txRef = payload.order_id;
+      const payment = await this.prisma.payment.findUnique({ where: { providerTxId: txRef } });
+      if (payment) {
+        await this.prisma.payment.update({
+          where: { id: payment.id },
+          data: { status: 'FAILED' }
+        });
       }
     }
     

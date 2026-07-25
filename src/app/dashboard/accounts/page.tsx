@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import Cookies from 'js-cookie';
 
 import { useTranslations } from 'next-intl';
@@ -19,10 +19,7 @@ export default function AccountsPage() {
 
   const fetchAccounts = async () => {
     try {
-      const token = Cookies.get('token');
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/trading-accounts', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/trading-accounts');
       setAccounts(res.data);
     } catch (err) {
       console.error(err);
@@ -43,13 +40,10 @@ export default function AccountsPage() {
     setError('');
     
     try {
-      const token = Cookies.get('token');
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/trading-accounts', {
+      await api.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/trading-accounts', {
         accountNumber,
         broker,
         server
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       
       setAccountNumber('');
@@ -67,10 +61,7 @@ export default function AccountsPage() {
     if (!confirm(t('confirm_delete'))) return;
     
     try {
-      const token = Cookies.get('token');
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}/trading-accounts/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}/trading-accounts/${id}`);
       await fetchAccounts();
     } catch (err) {
       console.error(err);

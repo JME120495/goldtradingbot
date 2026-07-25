@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import Cookies from 'js-cookie';
 
 interface Plan {
@@ -24,7 +24,7 @@ export default function BillingPage() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/plans');
+        const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/plans');
         setPlans(res.data);
       } catch (err) {
         console.error(err);
@@ -38,14 +38,12 @@ export default function BillingPage() {
     setLoading(true);
     setError('');
     try {
-      const token = Cookies.get('token');
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/payments/initiate', 
+      const res = await api.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/payments/initiate', 
         { 
           productId: plan.productId,
           planId: plan.id,
           duration: duration
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        }
       );
       
       // Redirect to Flutterwave checkout page

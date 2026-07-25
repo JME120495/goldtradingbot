@@ -1,7 +1,7 @@
 'use client';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, Suspense } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 
 function MockCheckout() {
   const searchParams = useSearchParams();
@@ -28,7 +28,7 @@ function MockCheckout() {
       };
       
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      await axios.post(`${apiUrl}/payments/webhook`, payload);
+      await api.post(`${apiUrl}/payments/webhook`, payload);
       
       alert(`Paiement simulé avec succès (${status})`);
       router.push('/dashboard/downloads');

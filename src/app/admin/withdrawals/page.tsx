@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
 
@@ -17,9 +17,7 @@ export default function AdminWithdrawalsPage() {
   const fetchWithdrawals = async () => {
     try {
       const token = Cookies.get('adminToken') || Cookies.get('token');
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/withdrawals`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/withdrawals`);
       setWithdrawals(res.data);
     } catch (err) {
       console.error(err);
@@ -39,11 +37,9 @@ export default function AdminWithdrawalsPage() {
         }
       }
 
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/withdrawals/${id}/status`, {
+      await api.patch(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/withdrawals/${id}/status`, {
         status,
         txHash
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       
       alert('Statut mis à jour');

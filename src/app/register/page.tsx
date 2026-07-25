@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import axios from 'axios';
+import api, { setAccessToken } from '@/lib/api';
 import Cookies from 'js-cookie';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -29,7 +29,7 @@ function RegisterForm() {
     try {
       const fullPhone = `${phoneCode}${phoneNumber}`;
       const API_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`;
-      const res = await axios.post(`${API_URL}/auth/register`, { 
+      const res = await api.post(`${API_URL}/auth/register`, { 
         name, 
         email, 
         password,
@@ -37,7 +37,7 @@ function RegisterForm() {
         preferredCurrency,
         refcode
       });
-      Cookies.set('token', res.data.access_token, { expires: 1 });
+      setAccessToken(res.data.access_token);
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed. Network error or server unreachable.');

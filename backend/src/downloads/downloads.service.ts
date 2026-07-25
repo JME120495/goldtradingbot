@@ -43,11 +43,21 @@ export class DownloadsService {
       }
     }
 
-    // Generate a 15-minute token
+    // Generate a 15-minute JWT with unique jti (token string itself)
+    const rawToken = require('crypto').randomBytes(32).toString('hex');
     const token = this.jwtService.sign(
-      { sub: userId, product: productSlug, type: 'download' },
+      { sub: userId, product: productSlug, type: 'download', jti: rawToken },
       { expiresIn: '15m' }
     );
+
+    // Store token in DB
+    await this.prisma.downloadToken.create({
+      data: {
+        token: rawToken,
+        userId: userId,
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000)
+      }
+    });
 
     return {
       url: `/downloads/file?token=${token}`
@@ -57,9 +67,24 @@ export class DownloadsService {
   async getFile(token: string) {
     try {
       const payload = this.jwtService.verify(token);
-      if (payload.type !== 'download') {
+      if (payload.type !== 'download' || !payload.jti) {
         throw new UnauthorizedException('Invalid token type');
       }
+
+      // Check if token exists and is not used
+      const dbToken = await this.prisma.downloadToken.findUnique({
+        where: { token: payload.jti }
+      });
+
+      if (!dbToken || dbToken.used || dbToken.expiresAt < new Date()) {
+        throw new UnauthorizedException('This download link has expired or has already been used.');
+      }
+
+      // Mark as used
+      await this.prisma.downloadToken.update({
+        where: { token: payload.jti },
+        data: { used: true }
+      });
 
       let filename = `${payload.product}.ex5`;
       let filePath = path.join(process.cwd(), 'files', filename);

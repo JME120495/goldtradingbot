@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -108,7 +108,7 @@ export default function AdminMt5Licenses() {
 
   const fetchEAs = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/admin/eas`, { headers: getAuthHeaders() });
+      const res = await api.get(`${API_URL}/admin/eas`, { headers: getAuthHeaders() });
       setEaOptions(res.data);
     } catch (err) {
       console.error(err);
@@ -118,7 +118,7 @@ export default function AdminMt5Licenses() {
   const fetchLicenses = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/api/license/admin/list`, {
+      const res = await api.get(`${API_URL}/api/license/admin/list`, {
         params: {
           limit: PAGE_SIZE,
           offset: page * PAGE_SIZE,
@@ -163,7 +163,7 @@ export default function AdminMt5Licenses() {
     if (!confirm(confirmMsg)) return;
 
     try {
-      await axios.post(
+      await api.post(
         `${API_URL}/api/license/admin/${action}`,
         {
           account_number: lic.accountNumber,
@@ -196,7 +196,7 @@ export default function AdminMt5Licenses() {
     };
 
     try {
-      await axios.post(`${API_URL}/api/license/admin/create`, payload, {
+      await api.post(`${API_URL}/api/license/admin/create`, payload, {
         headers: getAuthHeaders(),
       });
       (e.target as HTMLFormElement).reset();
@@ -230,7 +230,7 @@ export default function AdminMt5Licenses() {
   const handleSeed = async () => {
     try {
       if (!window.confirm("Créer les produits dans la base de données ?")) return;
-      const res = await axios.post(`${API_URL}/admin/seed`, {}, { headers: getAuthHeaders() });
+      const res = await api.post(`${API_URL}/admin/seed`, {}, { headers: getAuthHeaders() });
       alert("Produits créés avec succès !");
     } catch (err: any) {
       alert("Erreur: " + err.message);

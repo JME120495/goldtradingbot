@@ -216,12 +216,47 @@ export class AdminService {
       revenue: monthlyRevenue[key]
     }));
 
+    // --- NEW: MT5 Analytics ---
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const mt5EquityAgg = await this.prisma.mt5AccountStat.aggregate({
+      _sum: { equity: true }
+    });
+    const totalMt5Equity = Number(mt5EquityAgg._sum.equity || 0);
+
+    const activeMt5Accounts24h = await this.prisma.mt5License.count({
+      where: { lastCheckAt: { gte: yesterday } }
+    });
+
+    const recentMt5Trades = await this.prisma.mt5TradeHistory.findMany({
+      where: { openTime: { gte: sevenDaysAgo } },
+      select: { openTime: true, profit: true }
+    });
+
+    const tradesByDay: Record<string, number> = {};
+    recentMt5Trades.forEach(t => {
+      const day = t.openTime.toLocaleDateString('fr-FR', { weekday: 'short' });
+      tradesByDay[day] = (tradesByDay[day] || 0) + Number(t.profit);
+    });
+
+    const mt5ProfitData = Object.keys(tradesByDay).map(day => ({
+      name: day,
+      profit: tradesByDay[day]
+    }));
+
     return {
       totalUsers,
       activeLicenses,
       totalSales,
       totalRevenue: revenueResult._sum.amount || 0,
-      revenueData
+      revenueData,
+      totalMt5Equity,
+      activeMt5Accounts24h,
+      mt5ProfitData
     };
   }
 }

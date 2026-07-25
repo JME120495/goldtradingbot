@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
 
@@ -42,12 +42,9 @@ export default function DownloadsPage() {
 
   const fetchData = async () => {
     try {
-      const token = Cookies.get('token');
-      const headers = { Authorization: `Bearer ${token}` };
-
       const [productsRes, licensesRes] = await Promise.all([
-        axios.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/downloads/products`, { headers }),
-        axios.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/licenses/mine`, { headers }).catch(() => ({ data: [] })),
+        api.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/downloads/products`),
+        api.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/licenses/mine`).catch(() => ({ data: [] })),
       ]);
 
       setProducts(productsRes.data);
@@ -73,11 +70,9 @@ export default function DownloadsPage() {
     setError('');
     setSuccessMsg('');
     try {
-      const token = Cookies.get('token');
-      const res = await axios.post(
+      const res = await api.post(
         `${process.env.NEXT_PUBLIC_API_URL || "/api"}/downloads/generate-url`,
-        { product: productSlug },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { product: productSlug }
       );
 
       const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || "/api"}${res.data.url}`;

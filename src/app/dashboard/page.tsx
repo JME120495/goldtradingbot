@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import api from '@/lib/api';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -16,10 +16,7 @@ export default function DashboardOverview() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = Cookies.get('token');
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/users/me', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/users/me');
         setUser(res.data);
       } catch (err) {
         console.error(err);
@@ -40,7 +37,27 @@ export default function DashboardOverview() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">{t('welcome')}, {user?.name || user?.email}</h1>
-        <p className="text-gray-400">ID: {user?.id}</p>
+        <div className="flex items-center gap-4">
+          <p className="text-gray-400">ID: {user?.id}</p>
+          {process.env.NODE_ENV === 'development' && (
+            <button 
+              onClick={() => {
+                import('@/lib/api').then(({ default: api }) => {
+                  console.log("Sending 3 concurrent requests to force 401 queue test...");
+                  Promise.all([
+                    api.get('/users/me'),
+                    api.get('/users/me'),
+                    api.get('/users/me')
+                  ]).then(() => alert("Succès : Les 3 requêtes ont été traitées !"))
+                  .catch(err => console.error(err));
+                });
+              }}
+              className="px-3 py-1 bg-red-500/20 text-red-500 text-xs font-bold rounded"
+            >
+              TEST 401 QUEUE
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">

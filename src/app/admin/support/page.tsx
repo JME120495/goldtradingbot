@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import Cookies from 'js-cookie';
 import { Ticket, CheckCircle, XCircle } from 'lucide-react';
 
@@ -14,10 +14,7 @@ export default function AdminSupportPage() {
 
   const fetchTickets = async () => {
     try {
-      const token = Cookies.get('token');
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/support/admin`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/support/admin`);
       setTickets(res.data);
     } catch (err) {
       console.error(err);
@@ -28,10 +25,8 @@ export default function AdminSupportPage() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      const token = Cookies.get('token');
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/support/admin/${id}/status`, 
-        { status },
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.patch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/support/admin/${id}/status`, 
+        { status }
       );
       fetchTickets();
     } catch (err) {

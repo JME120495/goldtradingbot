@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -65,7 +65,7 @@ export default function Mt5AccountDetails() {
     try {
       setLoading(true);
       const token = typeof window !== 'undefined' ? Cookies.get('token') : null;
-      const res = await axios.get(`/api/telemetry/admin/${account}`, {
+      const res = await api.get(`/api/telemetry/admin/${account}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setStats(res.data.snapshots || res.data.stats || []);
