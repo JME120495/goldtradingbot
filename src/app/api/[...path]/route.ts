@@ -40,7 +40,7 @@ async function handleProxy(req: Request, pathArray: string[]) {
   try {
     const cleanBackendUrl = getRealBackendUrl();
     const pathStr = pathArray.join('/');
-    const targetUrl = `${cleanBackendUrl}/${pathStr}`;
+    let targetUrl = `${cleanBackendUrl}/${pathStr}`;
     
     // Anti-loop protection in case NEXT_PUBLIC_API_URL = '/api'
     if (targetUrl.includes('/api/api/')) {
@@ -73,8 +73,6 @@ async function handleProxy(req: Request, pathArray: string[]) {
     if (bodyData) {
       headers['Content-Type'] = 'application/json';
     }
-
-    let targetUrl = `${cleanBackendUrl}/${pathStr}`;
     
     let response = await fetch(targetUrl, {
       method: req.method,
