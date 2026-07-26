@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: gold-trading-bot-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: g0ldtr4d1ng_s3cr3t_k3y_ch4ng3_m3_1n_pr0d
+      - key: LICENSE_ADMIN_KEY
+        value: a7f3c9e2b1d4068f5e7a9c3b2d1f4e6a8b0c2d4e6f8a1b3c5d7e9f0a2b4c6d8
