@@ -70,9 +70,36 @@ export class AuthService {
     if (!user || !user.passwordHash) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const isPasswordValid = await argon2.verify(user.passwordHash, data.password);
+    
+    let isPasswordValid = false;
+    let needsMigration = false;
+    
+    // Check if the hash format is bcrypt (starts with $2)
+    if (user.passwordHash.startsWith('$2')) {
+      const bcrypt = require('bcryptjs');
+      isPasswordValid = await bcrypt.compare(data.password, user.passwordHash);
+      if (isPasswordValid) {
+        needsMigration = true;
+      }
+    } else {
+      isPasswordValid = await argon2.verify(user.passwordHash, data.password);
+    }
+    
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+    
+    if (needsMigration) {
+      const newHash = await argon2.hash(data.password, {
+        type: argon2.argon2id,
+        memoryCost: 65536,
+        timeCost: 3,
+        parallelism: 4,
+      });
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { passwordHash: newHash },
+      });
     }
 
     if (!user.isTwoFactorEnabled && user.role === 'ADMIN') {
