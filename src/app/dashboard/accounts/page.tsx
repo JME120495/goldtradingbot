@@ -19,7 +19,7 @@ export default function AccountsPage() {
 
   const fetchAccounts = async () => {
     try {
-      const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/trading-accounts');
+      const res = await api.get('/trading-accounts');
       setAccounts(res.data);
     } catch (err) {
       console.error(err);
@@ -40,7 +40,7 @@ export default function AccountsPage() {
     setError('');
     
     try {
-      await api.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/trading-accounts', {
+      await api.post('/trading-accounts', {
         accountNumber,
         broker,
         server
@@ -61,7 +61,7 @@ export default function AccountsPage() {
     if (!confirm(t('confirm_delete'))) return;
     
     try {
-      await api.delete(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}/trading-accounts/${id}`);
+      await api.delete(`/trading-accounts/${id}`);
       await fetchAccounts();
     } catch (err) {
       console.error(err);

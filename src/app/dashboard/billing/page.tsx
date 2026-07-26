@@ -24,7 +24,7 @@ export default function BillingPage() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/plans');
+        const res = await api.get('/plans');
         setPlans(res.data);
       } catch (err) {
         console.error(err);
@@ -38,7 +38,7 @@ export default function BillingPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await api.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/payments/initiate', 
+      const res = await api.post('/payments/initiate', 
         { 
           productId: plan.productId,
           planId: plan.id,
@@ -54,10 +54,10 @@ export default function BillingPage() {
     }
   };
 
-  const getPrice = (pricesStr: string) => {
+  const getPrice = (pricesStr: any) => {
     try {
-      const p = JSON.parse(pricesStr);
-      return p[duration];
+      const p = typeof pricesStr === 'string' ? JSON.parse(pricesStr) : pricesStr;
+      return p ? (p[duration] ?? 0) : 0;
     } catch {
       return 0;
     }

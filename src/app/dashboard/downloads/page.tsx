@@ -71,7 +71,7 @@ export default function DownloadsPage() {
     setSuccessMsg('');
     try {
       const res = await api.post(
-        `${process.env.NEXT_PUBLIC_API_URL || "/api"}/downloads/generate-url`,
+        '/downloads/generate-url',
         { product: productSlug }
       );
 

@@ -53,9 +53,7 @@ export default function ProfilePage() {
 
     setLoading(true);
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
-      
-      const res = await api.patch(`${API_URL}/users/password`, {
+      const res = await api.patch('/users/password', {
         currentPassword,
         newPassword
       });

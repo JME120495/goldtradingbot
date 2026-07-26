@@ -5,7 +5,6 @@ services:
     rootDir: backend
     buildCommand: npm install && npm run build
     startCommand: npm run start:prod
-    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
@@ -13,3 +12,19 @@ services:
         value: g0ldtr4d1ng_s3cr3t_k3y_ch4ng3_m3_1n_pr0d
       - key: LICENSE_ADMIN_KEY
         value: a7f3c9e2b1d4068f5e7a9c3b2d1f4e6a8b0c2d4e6f8a1b3c5d7e9f0a2b4c6d8
+      - key: NOWPAYMENTS_API_KEY
+        value: PPTNZE0-59VMSHS-KMFMXDM-MAMN33E
+      - key: NOWPAYMENTS_IPN_SECRET
+        value: WwHbIU3G2EtcRD68igGjQpOiL9i6EIJX
+      - key: FRONTEND_URL
+        sync: false
+      - key: BACKEND_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false

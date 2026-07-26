@@ -102,6 +102,21 @@ export class PaymentsService {
       throw new InternalServerErrorException('FRONTEND_URL environment variable is required');
     }
 
+    const backendUrl = process.env.BACKEND_URL;
+    
+    const invoicePayload: Record<string, any> = {
+      price_amount: amount,
+      price_currency: 'usd',
+      order_id: txRef,
+      order_description: `Licence Robot - Plan ${plan.name} (${data.duration})`,
+      success_url: `${frontendUrl}/dashboard?payment=success`,
+      cancel_url: `${frontendUrl}/dashboard?payment=cancelled`,
+    };
+
+    if (backendUrl) {
+      invoicePayload.ipn_callback_url = `${backendUrl.replace(/\/$/, '')}/payments/webhook`;
+    }
+
     // On utilise fetch (natif NodeJS 18+)
     const response = await fetch('https://api.nowpayments.io/v1/invoice', {
       method: 'POST',
@@ -109,14 +124,7 @@ export class PaymentsService {
         'x-api-key': apiKey,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        price_amount: amount,
-        price_currency: 'usd',
-        order_id: txRef,
-        order_description: `Licence Robot - Plan ${plan.name} (${data.duration})`,
-        success_url: `${frontendUrl}/dashboard`,
-        cancel_url: frontendUrl,
-      })
+      body: JSON.stringify(invoicePayload)
     });
 
     if (!response.ok) {

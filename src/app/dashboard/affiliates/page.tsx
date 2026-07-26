@@ -19,7 +19,7 @@ export default function AffiliatesDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/affiliates/stats');
+        const res = await api.get('/affiliates/stats');
         setStats(res.data);
         if (res.data?.affiliate?.walletAddress) {
           setWalletAddress(res.data.affiliate.walletAddress);
@@ -38,7 +38,7 @@ export default function AffiliatesDashboard() {
 
   const joinAffiliateProgram = async () => {
     try {
-      await api.post(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/affiliates/join', {});
+      await api.post('/affiliates/join', {});
       window.location.reload();
     } catch(e) {
       alert('Error joining program');

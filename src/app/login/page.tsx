@@ -25,8 +25,6 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`;
-      
       if (step === 'login') {
         const res = await api.post('/auth/login', { email, password });
         if (res.data.setup2faRequired) {

@@ -16,7 +16,7 @@ export default function DashboardOverview() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`}` + '/users/me');
+        const res = await api.get('/users/me');
         setUser(res.data);
       } catch (err) {
         console.error(err);
