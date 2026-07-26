@@ -68,6 +68,7 @@ export class AuthService {
       where: { email: data.email },
     });
     if (!user || !user.passwordHash) {
+      console.log(`[DEBUG LOGIN] User not found or no password hash for email: ${data.email}`);
       throw new UnauthorizedException('Invalid credentials');
     }
     
@@ -81,15 +82,19 @@ export class AuthService {
       if (isPasswordValid) {
         needsMigration = true;
       }
+      console.log(`[DEBUG LOGIN] Bcrypt check for ${data.email} - isPasswordValid: ${isPasswordValid}`);
     } else {
       isPasswordValid = await argon2.verify(user.passwordHash, data.password);
+      console.log(`[DEBUG LOGIN] Argon2 check for ${data.email} - isPasswordValid: ${isPasswordValid}`);
     }
     
     if (!isPasswordValid) {
+      console.log(`[DEBUG LOGIN] Password invalid for ${data.email}, throwing UnauthorizedException.`);
       throw new UnauthorizedException('Invalid credentials');
     }
     
     if (needsMigration) {
+      console.log(`[DEBUG LOGIN] Migrating password hash for ${data.email}...`);
       const newHash = await argon2.hash(data.password, {
         type: argon2.argon2id,
         memoryCost: 65536,
@@ -103,26 +108,41 @@ export class AuthService {
     }
 
     if (!user.isTwoFactorEnabled && user.role === 'ADMIN') {
-      // Mandatory setup for ADMIN
-      const tempSecret = require('crypto').randomBytes(16).toString('hex');
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: { twoFactorTempSecret: tempSecret },
-      });
-      const tempToken = this.jwtService.sign({ sub: user.id, type: 'setup_2fa', sec: tempSecret }, { expiresIn: '15m' });
-      return { setup2faRequired: true, temp_token: tempToken };
+      console.log(`[DEBUG LOGIN] Mandatory 2FA setup triggered for ADMIN: ${data.email}`);
+      try {
+        // Mandatory setup for ADMIN
+        const tempSecret = require('crypto').randomBytes(16).toString('hex');
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { twoFactorTempSecret: tempSecret },
+        });
+        const tempToken = this.jwtService.sign({ sub: user.id, type: 'setup_2fa', sec: tempSecret }, { expiresIn: '15m' });
+        console.log(`[DEBUG LOGIN] Successfully generated setup token for ${data.email}`);
+        return { setup2faRequired: true, temp_token: tempToken };
+      } catch (error) {
+        console.error(`[DEBUG LOGIN ERROR] Error during ADMIN 2FA setup block:`, error);
+        throw error;
+      }
     }
 
     if (user.isTwoFactorEnabled) {
-      const tempSecret = require('crypto').randomBytes(16).toString('hex');
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: { twoFactorTempSecret: tempSecret },
-      });
-      const tempToken = this.jwtService.sign({ sub: user.id, type: '2fa', sec: tempSecret }, { expiresIn: '2m' });
-      return { twoFactorRequired: true, temp_token: tempToken };
+      console.log(`[DEBUG LOGIN] 2FA required for user: ${data.email}`);
+      try {
+        const tempSecret = require('crypto').randomBytes(16).toString('hex');
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { twoFactorTempSecret: tempSecret },
+        });
+        const tempToken = this.jwtService.sign({ sub: user.id, type: '2fa', sec: tempSecret }, { expiresIn: '2m' });
+        console.log(`[DEBUG LOGIN] Successfully generated 2FA token for ${data.email}`);
+        return { twoFactorRequired: true, temp_token: tempToken };
+      } catch (error) {
+        console.error(`[DEBUG LOGIN ERROR] Error during 2FA block:`, error);
+        throw error;
+      }
     }
 
+    console.log(`[DEBUG LOGIN] Standard login successful for ${data.email}`);
     return this.generateTokens(user.id, user.role);
   }
 
