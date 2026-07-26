@@ -48,7 +48,7 @@ export default function LoginPage() {
         setAccessToken(res.data.access_token);
         setStep('backup-codes');
       } else {
-        const res = await api.post('/auth/login/2fa', { tempToken, code: twoFactorCode });
+        const res = await api.post('/auth/login/2fa', { temp_token: tempToken, code: twoFactorCode });
         setAccessToken(res.data.access_token);
         router.push('/dashboard');
       }
