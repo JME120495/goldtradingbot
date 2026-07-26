@@ -95,14 +95,22 @@ async function handleProxy(req: Request, pathArray: string[]) {
 
     const contentType = response.headers.get('content-type');
     let responseData;
+    let nextResponse: NextResponse;
     
     if (contentType && contentType.includes('application/json')) {
       responseData = await response.json();
-      return NextResponse.json(responseData, { status: response.status });
+      nextResponse = NextResponse.json(responseData, { status: response.status });
     } else {
       responseData = await response.text();
-      return new NextResponse(responseData, { status: response.status });
+      nextResponse = new NextResponse(responseData, { status: response.status });
     }
+
+    const setCookie = response.headers.get('set-cookie');
+    if (setCookie) {
+      nextResponse.headers.set('set-cookie', setCookie);
+    }
+
+    return nextResponse;
   } catch (error: any) {
     console.error('Error proxying request:', error);
     return NextResponse.json(

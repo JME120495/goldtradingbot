@@ -40,16 +40,25 @@ export default function LoginPage() {
           setStep('2fa');
         } else {
           setAccessToken(res.data.access_token);
+          if (res.data.access_token) {
+            Cookies.set('token', res.data.access_token, { expires: 7 });
+          }
           router.push('/dashboard');
         }
       } else if (step === 'setup-2fa') {
         const res = await api.post('/auth/setup-2fa/turn-on', { temp_token: tempToken, code: twoFactorCode });
         setBackupCodes(res.data.backupCodes);
         setAccessToken(res.data.access_token);
+        if (res.data.access_token) {
+          Cookies.set('token', res.data.access_token, { expires: 7 });
+        }
         setStep('backup-codes');
       } else {
         const res = await api.post('/auth/login/2fa', { temp_token: tempToken, code: twoFactorCode });
         setAccessToken(res.data.access_token);
+        if (res.data.access_token) {
+          Cookies.set('token', res.data.access_token, { expires: 7 });
+        }
         router.push('/dashboard');
       }
     } catch (err: any) {
