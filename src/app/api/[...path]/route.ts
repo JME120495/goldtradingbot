@@ -20,19 +20,20 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ path:
   return handleProxy(req, resolvedParams.path);
 }
 
+function getRealBackendUrl(): string {
+  let url = process.env.BACKEND_URL;
+  if (!url || url.startsWith('/api') || url.includes('vercel.app')) {
+    url = process.env.NODE_ENV === 'development'
+      ? 'http://127.0.0.1:3001'
+      : 'https://gold-trading-bot-backend.onrender.com';
+  }
+  return url.replace(/\/$/, '');
+}
+
 async function handleProxy(req: Request, pathArray: string[]) {
   try {
-    const backendUrl =
-      process.env.BACKEND_URL ||
-      process.env.NEXT_PUBLIC_API_URL ||
-      'https://gold-trading-bot-backend.onrender.com';
-      
-    // Strip trailing slash if present
-    const cleanBackendUrl = backendUrl.replace(/\/$/, '');
+    const cleanBackendUrl = getRealBackendUrl();
     const pathStr = pathArray.join('/');
-    
-    // Si c'est déjà une route api/..., on la respecte (les routes gérées via fichiers route.ts le feront avant d'arriver ici)
-    // Mais pour ce catch-all, on redirige tout vers le backend tel quel, sauf si process.env.NEXT_PUBLIC_API_URL pointait déjà vers /api
     const targetUrl = `${cleanBackendUrl}/${pathStr}`;
     
     // Anti-loop protection in case NEXT_PUBLIC_API_URL = '/api'

@@ -1,9 +1,19 @@
 import { NextResponse } from 'next/server';
 
+function getRealBackendUrl(): string {
+  let url = process.env.BACKEND_URL;
+  if (!url || url.startsWith('/api') || url.includes('vercel.app')) {
+    url = process.env.NODE_ENV === 'development'
+      ? 'http://127.0.0.1:3001'
+      : 'https://gold-trading-bot-backend.onrender.com';
+  }
+  return url.replace(/\/$/, '');
+}
+
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'https://gold-trading-bot-backend.onrender.com';
+    const backendUrl = getRealBackendUrl();
     
     const response = await fetch(`${backendUrl}/api/telemetry/snapshot`, {
       method: 'POST',

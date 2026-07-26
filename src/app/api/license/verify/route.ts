@@ -21,12 +21,19 @@ export async function GET(req: Request) {
   }
 }
 
+function getRealBackendUrl(): string {
+  let url = process.env.BACKEND_URL;
+  if (!url || url.startsWith('/api') || url.includes('vercel.app')) {
+    url = process.env.NODE_ENV === 'development'
+      ? 'http://127.0.0.1:3001'
+      : 'https://gold-trading-bot-backend.onrender.com';
+  }
+  return url.replace(/\/$/, '');
+}
+
 async function proxyToBackend(req: Request, data: any) {
   try {
-    const backendUrl =
-      process.env.NEXT_PUBLIC_API_URL ||
-      process.env.BACKEND_URL ||
-      'https://gold-trading-bot-backend.onrender.com';
+    const backendUrl = getRealBackendUrl();
 
     const clientIp =
       req.headers.get('x-forwarded-for') ||
