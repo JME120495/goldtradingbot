@@ -68,11 +68,26 @@ async function handleProxy(req: Request, pathArray: string[]) {
       headers['Content-Type'] = 'application/json';
     }
 
-    const response = await fetch(targetUrl, {
+    let targetUrl = `${cleanBackendUrl}/${pathStr}`;
+    
+    let response = await fetch(targetUrl, {
       method: req.method,
       headers,
       body: bodyData ? JSON.stringify(bodyData) : undefined,
     });
+
+    // If initial attempt returns 404 and pathStr doesn't start with api/, retry with /api/ prefix
+    if (response.status === 404 && !pathStr.startsWith('api/')) {
+      const fallbackUrl = `${cleanBackendUrl}/api/${pathStr}`;
+      const fallbackRes = await fetch(fallbackUrl, {
+        method: req.method,
+        headers,
+        body: bodyData ? JSON.stringify(bodyData) : undefined,
+      });
+      if (fallbackRes.status !== 404) {
+        response = fallbackRes;
+      }
+    }
 
     const contentType = response.headers.get('content-type');
     let responseData;
