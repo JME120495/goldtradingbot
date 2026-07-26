@@ -87,6 +87,8 @@
     "email": "البريد الإلكتروني",
     "password": "كلمة المرور",
     "signin": "تسجيل الدخول",
+    "login_button": "تسجيل الدخول",
+    "invalid_credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
     "no_account": "ليس لديك حساب؟",
     "create_account": "إنشاء حساب",
     "register_title": "إنشاء حساب",

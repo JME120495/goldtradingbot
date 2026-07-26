@@ -87,6 +87,8 @@
     "email": "Endereço de E-mail",
     "password": "Senha",
     "signin": "Entrar",
+    "login_button": "Entrar",
+    "invalid_credentials": "E-mail ou senha incorretos",
     "no_account": "Não tem uma conta?",
     "create_account": "Criar uma",
     "register_title": "Criar conta",

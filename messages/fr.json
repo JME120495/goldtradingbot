@@ -87,6 +87,8 @@
     "email": "Adresse Email",
     "password": "Mot de passe",
     "signin": "Se connecter",
+    "login_button": "Se connecter",
+    "invalid_credentials": "Email ou mot de passe incorrect",
     "no_account": "Pas encore de compte ?",
     "create_account": "Créer un compte",
     "register_title": "Créer un compte",
