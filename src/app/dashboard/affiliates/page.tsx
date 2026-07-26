@@ -55,7 +55,7 @@ export default function AffiliatesDashboard() {
   const handleUpdateWallet = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.put(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/affiliates/wallet`, { walletAddress });
+      await api.put('/affiliates/wallet', { walletAddress });
       alert('Adresse de portefeuille mise à jour avec succès !');
     } catch (err) {
       alert('Erreur lors de la mise à jour du portefeuille.');
@@ -77,7 +77,7 @@ export default function AffiliatesDashboard() {
 
     setSubmittingWithdraw(true);
     try {
-      await api.post(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/affiliates/withdraw`, { amount });
+      await api.post('/affiliates/withdraw', { amount });
       alert('Demande de retrait envoyée !');
       window.location.reload();
     } catch (err: any) {

@@ -43,8 +43,8 @@ export default function DownloadsPage() {
   const fetchData = async () => {
     try {
       const [productsRes, licensesRes] = await Promise.all([
-        api.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/downloads/products`),
-        api.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/licenses/mine`).catch(() => ({ data: [] })),
+        api.get('/downloads/products'),
+        api.get('/licenses/mine').catch(() => ({ data: [] })),
       ]);
 
       setProducts(productsRes.data);

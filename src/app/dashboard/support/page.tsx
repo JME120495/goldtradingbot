@@ -20,7 +20,7 @@ export default function SupportPage() {
 
   const fetchTickets = async () => {
     try {
-      const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/support`);
+      const res = await api.get('/support');
       setTickets(res.data);
     } catch (err) {
       console.error(err);
@@ -34,7 +34,7 @@ export default function SupportPage() {
     if (!subject || !message) return;
     setSubmitting(true);
     try {
-      await api.post(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/support`, 
+      await api.post('/support', 
         { subject, message }
       );
       setShowModal(false);

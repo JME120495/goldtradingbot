@@ -15,7 +15,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/admin/analytics`);
+        const res = await api.get('/admin/analytics');
         setStats(res.data);
       } catch (err) {
         console.error(err);

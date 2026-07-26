@@ -59,7 +59,7 @@ export default function AdminAffiliates() {
     if (!email) return;
 
     try {
-      await api.post(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/affiliates`, { email });
+      await api.post('/admin/affiliates', { email });
       fetchAffiliates();
       (e.target as HTMLFormElement).reset();
       alert('Affiliate added successfully');

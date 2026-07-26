@@ -16,8 +16,6 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
 interface Trade {
   ticket: number;
   symbol: string;
@@ -65,7 +63,7 @@ export default function Mt5AccountDetails() {
     try {
       setLoading(true);
       const token = typeof window !== 'undefined' ? Cookies.get('token') : null;
-      const res = await api.get(`/api/telemetry/admin/${account}`, {
+      const res = await api.get(`/telemetry/admin/${account}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setStats(res.data.snapshots || res.data.stats || []);

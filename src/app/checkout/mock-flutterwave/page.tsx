@@ -27,8 +27,7 @@ function MockCheckout() {
         }
       };
       
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      await api.post(`${apiUrl}/payments/webhook`, payload);
+      await api.post('/payments/webhook', payload);
       
       alert(`Paiement simulé avec succès (${status})`);
       router.push('/dashboard/downloads');

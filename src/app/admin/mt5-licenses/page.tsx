@@ -6,8 +6,6 @@ import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
 interface Mt5License {
   id: number;
   clientName: string;
@@ -108,7 +106,7 @@ export default function AdminMt5Licenses() {
 
   const fetchEAs = useCallback(async () => {
     try {
-      const res = await api.get(`${API_URL}/admin/eas`, { headers: getAuthHeaders() });
+      const res = await api.get('/admin/eas', { headers: getAuthHeaders() });
       setEaOptions(res.data);
     } catch (err) {
       console.error(err);
@@ -118,7 +116,7 @@ export default function AdminMt5Licenses() {
   const fetchLicenses = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get(`${API_URL}/api/license/admin/list`, {
+      const res = await api.get('/license/admin/list', {
         params: {
           limit: PAGE_SIZE,
           offset: page * PAGE_SIZE,
@@ -164,7 +162,7 @@ export default function AdminMt5Licenses() {
 
     try {
       await api.post(
-        `${API_URL}/api/license/admin/${action}`,
+        `/license/admin/${action}`,
         {
           account_number: lic.accountNumber,
           ea_name: lic.eaName,
@@ -196,7 +194,7 @@ export default function AdminMt5Licenses() {
     };
 
     try {
-      await api.post(`${API_URL}/api/license/admin/create`, payload, {
+      await api.post('/license/admin/create', payload, {
         headers: getAuthHeaders(),
       });
       (e.target as HTMLFormElement).reset();
@@ -230,7 +228,7 @@ export default function AdminMt5Licenses() {
   const handleSeed = async () => {
     try {
       if (!window.confirm("Créer les produits dans la base de données ?")) return;
-      const res = await api.post(`${API_URL}/admin/seed`, {}, { headers: getAuthHeaders() });
+      const res = await api.post('/admin/seed', {}, { headers: getAuthHeaders() });
       alert("Produits créés avec succès !");
     } catch (err: any) {
       alert("Erreur: " + err.message);

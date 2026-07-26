@@ -14,7 +14,7 @@ export default function AdminSupportPage() {
 
   const fetchTickets = async () => {
     try {
-      const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/support/admin`);
+      const res = await api.get('/support/admin');
       setTickets(res.data);
     } catch (err) {
       console.error(err);
@@ -25,7 +25,7 @@ export default function AdminSupportPage() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      await api.patch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/support/admin/${id}/status`, 
+      await api.patch('/support/admin/${id}/status', 
         { status }
       );
       fetchTickets();

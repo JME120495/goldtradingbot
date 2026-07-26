@@ -17,7 +17,7 @@ export default function AdminLicenses() {
 
   const fetchLicenses = async () => {
     try {
-      const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/licenses`);
+      const res = await api.get('/admin/licenses');
       setLicenses(res.data);
     } catch (err) {
       console.error(err);
@@ -28,7 +28,7 @@ export default function AdminLicenses() {
 
   const fetchPlans = async () => {
     try {
-      const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/plans`);
+      const res = await api.get('/admin/plans');
       setPlans(res.data);
     } catch (err) {
       console.error(err);
@@ -39,7 +39,7 @@ export default function AdminLicenses() {
     const newStatus = currentStatus === 'ACTIVE' ? 'CANCELLED' : 'ACTIVE';
     if(!confirm(`${newStatus === 'CANCELLED' ? 'Annuler' : 'Activer'} cette licence ?`)) return;
     try {
-      await api.patch(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/licenses/${id}/status`, { status: newStatus });
+      await api.patch('/admin/licenses/${id}/status', { status: newStatus });
       fetchLicenses();
     } catch (err) {
       alert("Error updating status");
@@ -55,7 +55,7 @@ export default function AdminLicenses() {
     if (!email || !planId) return;
 
     try {
-      await api.post(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/licenses`, { 
+      await api.post('/admin/licenses', { 
         email, 
         planId, 
         durationDays: parseInt(durationDays as string, 10) 

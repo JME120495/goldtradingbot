@@ -17,7 +17,7 @@ export default function AdminWithdrawalsPage() {
   const fetchWithdrawals = async () => {
     try {
       const token = Cookies.get('adminToken') || Cookies.get('token');
-      const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/withdrawals`);
+      const res = await api.get('/admin/withdrawals');
       setWithdrawals(res.data);
     } catch (err) {
       console.error(err);
@@ -37,7 +37,7 @@ export default function AdminWithdrawalsPage() {
         }
       }
 
-      await api.patch(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/admin/withdrawals/${id}/status`, {
+      await api.patch('/admin/withdrawals/${id}/status', {
         status,
         txHash
       });
