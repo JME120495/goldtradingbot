@@ -24,6 +24,12 @@ export async function GET(req: Request) {
 function getRealBackendUrl(): string {
   let url = process.env.BACKEND_URL;
   if (!url || url.startsWith('/api') || url.includes('vercel.app')) {
+    if (process.env.NODE_ENV === 'production') {
+      console.warn(
+        '⚠️ [WARNING] process.env.BACKEND_URL is NOT set in Vercel Environment Variables! ' +
+        'Using fallback URL. Please set BACKEND_URL in Vercel Settings to your exact Render service URL.'
+      );
+    }
     url = process.env.NODE_ENV === 'development'
       ? 'http://127.0.0.1:3001'
       : 'https://gold-trading-bot-backend.onrender.com';
