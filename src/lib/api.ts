@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Instance Axios configurée pour envoyer les cookies HttpOnly automatiquement
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
+  baseURL: '/api',
   withCredentials: true,
 });
 
