@@ -35,7 +35,7 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: LoginDto, @Res({ passthrough: true }) res: Response) {
     const tokens = await this.authService.login(body) as any;
-    if (tokens.twoFactorRequired) {
+    if (tokens.twoFactorRequired || tokens.setup2faRequired) {
       return tokens;
     }
     res.cookie('refreshToken', tokens.refresh_token, {
