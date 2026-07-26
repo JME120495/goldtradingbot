@@ -28,11 +28,11 @@ export default function LoginPage() {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`;
       
       if (step === 'login') {
-        const res = await api.post(`${API_URL}/auth/login`, { email, password });
+        const res = await api.post('/auth/login', { email, password });
         if (res.data.setup2faRequired) {
           setTempToken(res.data.temp_token);
           // fetch qr code immediately
-          const qrRes = await api.post(`${API_URL}/auth/setup-2fa/generate`, { temp_token: res.data.temp_token });
+          const qrRes = await api.post('/auth/setup-2fa/generate', { temp_token: res.data.temp_token });
           setQrCodeUrl(qrRes.data.qrCodeUrl);
           setStep('setup-2fa');
         } else if (res.data.twoFactorRequired) {
@@ -43,12 +43,12 @@ export default function LoginPage() {
           router.push('/dashboard');
         }
       } else if (step === 'setup-2fa') {
-        const res = await api.post(`${API_URL}/auth/setup-2fa/turn-on`, { temp_token: tempToken, code: twoFactorCode });
+        const res = await api.post('/auth/setup-2fa/turn-on', { temp_token: tempToken, code: twoFactorCode });
         setBackupCodes(res.data.backupCodes);
         setAccessToken(res.data.access_token);
         setStep('backup-codes');
       } else {
-        const res = await api.post(`${API_URL}/auth/login/2fa`, { tempToken, code: twoFactorCode });
+        const res = await api.post('/auth/login/2fa', { tempToken, code: twoFactorCode });
         setAccessToken(res.data.access_token);
         router.push('/dashboard');
       }

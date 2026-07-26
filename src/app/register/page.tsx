@@ -28,8 +28,7 @@ function RegisterForm() {
     setLoading(true);
     try {
       const fullPhone = `${phoneCode}${phoneNumber}`;
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_API_URL || "/api"}`;
-      const res = await api.post(`${API_URL}/auth/register`, { 
+      const res = await api.post('/auth/register', { 
         name, 
         email, 
         password,
