@@ -53,7 +53,13 @@ export default function LoginPage() {
         router.push('/dashboard');
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || t('invalid_credentials'));
+      if (err?.response?.status === 401) {
+        setError(t('invalid_credentials'));
+      } else if (err?.response?.data?.error === 'API Gateway Error' || err?.response?.status === 500) {
+        setError('Le serveur backend est en cours de démarrage ou indisponible. Veuillez réessayer dans quelques secondes.');
+      } else {
+        setError(err?.response?.data?.message || err?.message || t('invalid_credentials'));
+      }
     } finally {
       setLoading(false);
     }
