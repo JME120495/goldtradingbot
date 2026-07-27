@@ -94,6 +94,7 @@ export default function AdminMt5Licenses() {
   const [page, setPage] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const t = useTranslations('Admin');
 
   const PAGE_SIZE = 50;
@@ -209,6 +210,52 @@ export default function AdminMt5Licenses() {
       );
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === licenses.length && licenses.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(licenses.map((lic) => lic.id));
+    }
+  };
+
+  const toggleSelect = (id: number) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds((prev) => prev.filter((selId) => selId !== id));
+    } else {
+      setSelectedIds((prev) => [...prev, id]);
+    }
+  };
+
+  const deleteLicense = async (lic: Mt5License) => {
+    if (!confirm(`Voulez-vous vraiment supprimer la licence du compte ${lic.accountNumber} ? Cette action est irréversible.`)) return;
+    try {
+      await api.delete(`/license/admin/delete/${lic.id}`, { headers: getAuthHeaders() });
+      setSelectedIds((prev) => prev.filter((id) => id !== lic.id));
+      fetchLicenses();
+    } catch (err) {
+      alert("Erreur lors de la suppression de la licence.");
+    }
+  };
+
+  const handleBulkAction = async (action: 'delete' | 'suspend' | 'reactivate') => {
+    if (selectedIds.length === 0) return;
+    
+    let msg = '';
+    if (action === 'delete') msg = `Voulez-vous vraiment supprimer les ${selectedIds.length} licences sélectionnées ?`;
+    else if (action === 'suspend') msg = `Suspendre les ${selectedIds.length} licences sélectionnées ?`;
+    else msg = `Réactiver les ${selectedIds.length} licences sélectionnées ?`;
+    
+    if (!confirm(msg)) return;
+
+    try {
+      await api.post('/license/admin/bulk-action', { ids: selectedIds, action }, { headers: getAuthHeaders() });
+      setSelectedIds([]);
+      fetchLicenses();
+    } catch (err) {
+      alert(`Erreur lors de l'action en masse (${action})`);
     }
   };
 
@@ -462,12 +509,48 @@ export default function AdminMt5Licenses() {
         )}
       </form>
 
+      {selectedIds.length > 0 && (
+        <div className="bg-[#0F1115] border border-white/10 p-4 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+          <span className="text-white font-medium">
+            {selectedIds.length} licence(s) sélectionnée(s)
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleBulkAction('reactivate')}
+              className="px-4 py-2 bg-emerald-500/10 text-emerald-400 font-semibold rounded-lg hover:bg-emerald-500/20 transition-colors"
+            >
+              Réactiver la sélection
+            </button>
+            <button
+              onClick={() => handleBulkAction('suspend')}
+              className="px-4 py-2 bg-amber-500/10 text-amber-400 font-semibold rounded-lg hover:bg-amber-500/20 transition-colors"
+            >
+              Suspendre la sélection
+            </button>
+            <button
+              onClick={() => handleBulkAction('delete')}
+              className="px-4 py-2 bg-red-500/10 text-red-400 font-semibold rounded-lg hover:bg-red-500/20 transition-colors"
+            >
+              Supprimer la sélection
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Licenses Table */}
       <div className="bg-[#0F1115] border border-white/10 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-white/5 border-b border-white/10">
               <tr>
+                <th className="p-4 w-12">
+                  <input
+                    type="checkbox"
+                    checked={licenses.length > 0 && selectedIds.length === licenses.length}
+                    onChange={toggleSelectAll}
+                    className="rounded border-white/20 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]"
+                  />
+                </th>
                 <th className="p-4 text-gray-400 font-medium whitespace-nowrap">
                   Client
                 </th>
@@ -523,6 +606,14 @@ export default function AdminMt5Licenses() {
                     className="hover:bg-white/5 transition-colors"
                   >
                     <td className="p-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(lic.id)}
+                        onChange={() => toggleSelect(lic.id)}
+                        className="rounded border-white/20 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]"
+                      />
+                    </td>
+                    <td className="p-4">
                       <div className="font-medium text-white">
                         {lic.clientName}
                       </div>
@@ -573,6 +664,12 @@ export default function AdminMt5Licenses() {
                         }`}
                       >
                         {lic.status === 'active' ? 'Suspendre' : 'Réactiver'}
+                      </button>
+                      <button
+                        onClick={() => deleteLicense(lic)}
+                        className="font-semibold text-sm text-red-400 hover:text-red-300 transition-colors whitespace-nowrap"
+                      >
+                        Supprimer
                       </button>
                     </td>
                   </tr>

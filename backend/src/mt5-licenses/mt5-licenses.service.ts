@@ -270,6 +270,46 @@ export class Mt5LicensesService {
   }
 
   // ----------------------------------------------------------
+  //  Admin — Delete
+  // ----------------------------------------------------------
+  async deleteLicense(id: number) {
+    try {
+      await this.prisma.mt5License.delete({
+        where: { id },
+      });
+      return { success: true };
+    } catch {
+      return { success: false };
+    }
+  }
+
+  // ----------------------------------------------------------
+  //  Admin — Bulk Actions
+  // ----------------------------------------------------------
+  async bulkActionMt5Licenses(ids: number[], action: 'delete' | 'suspend' | 'reactivate') {
+    try {
+      if (action === 'delete') {
+        await this.prisma.mt5License.deleteMany({
+          where: { id: { in: ids } },
+        });
+      } else if (action === 'suspend') {
+        await this.prisma.mt5License.updateMany({
+          where: { id: { in: ids } },
+          data: { status: 'suspended' },
+        });
+      } else if (action === 'reactivate') {
+        await this.prisma.mt5License.updateMany({
+          where: { id: { in: ids } },
+          data: { status: 'active' },
+        });
+      }
+      return { success: true };
+    } catch {
+      return { success: false };
+    }
+  }
+
+  // ----------------------------------------------------------
   //  Admin — List (paginated, with optional search)
   // ----------------------------------------------------------
   async listLicenses(limit: number, offset: number, search?: string) {

@@ -8,6 +8,7 @@ export default function AdminLicenses() {
   const [licenses, setLicenses] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const t = useTranslations('Admin');
 
   useEffect(() => {
@@ -39,10 +40,56 @@ export default function AdminLicenses() {
     const newStatus = currentStatus === 'ACTIVE' ? 'CANCELLED' : 'ACTIVE';
     if(!confirm(`${newStatus === 'CANCELLED' ? 'Annuler' : 'Activer'} cette licence ?`)) return;
     try {
-      await api.patch('/admin/licenses/${id}/status', { status: newStatus });
+      await api.patch(`/admin/licenses/${id}/status`, { status: newStatus });
       fetchLicenses();
     } catch (err) {
-      alert("Error updating status");
+      alert("Erreur lors de la mise à jour du statut");
+    }
+  };
+
+  const deleteLicense = async (id: string) => {
+    if(!confirm("Voulez-vous vraiment supprimer cette licence ? Cette action est irréversible.")) return;
+    try {
+      await api.delete(`/admin/licenses/${id}`);
+      setSelectedIds(prev => prev.filter(selId => selId !== id));
+      fetchLicenses();
+    } catch (err) {
+      alert("Erreur lors de la suppression");
+    }
+  };
+
+  const handleBulkAction = async (action: 'delete' | 'activate' | 'cancel') => {
+    if (selectedIds.length === 0) return;
+    
+    let msg = '';
+    if (action === 'delete') msg = `Voulez-vous vraiment supprimer les ${selectedIds.length} licences sélectionnées ?`;
+    else if (action === 'activate') msg = `Activer les ${selectedIds.length} licences sélectionnées ?`;
+    else msg = `Annuler les ${selectedIds.length} licences sélectionnées ?`;
+    
+    if (!confirm(msg)) return;
+
+    try {
+      await api.post('/admin/licenses/bulk-action', { ids: selectedIds, action });
+      setSelectedIds([]);
+      fetchLicenses();
+    } catch (err) {
+      alert(`Erreur lors de l'action en masse (${action})`);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === licenses.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(licenses.map(lic => lic.id));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds(prev => prev.filter(selId => selId !== id));
+    } else {
+      setSelectedIds(prev => [...prev, id]);
     }
   };
 
@@ -103,11 +150,47 @@ export default function AdminLicenses() {
           </button>
         </form>
       </div>
+
+      {selectedIds.length > 0 && (
+        <div className="bg-[#0F1115] border border-white/10 p-4 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+          <span className="text-white font-medium">
+            {selectedIds.length} licence(s) sélectionnée(s)
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleBulkAction('activate')}
+              className="px-4 py-2 bg-green-500/10 text-green-400 font-semibold rounded-lg hover:bg-green-500/20 transition-colors"
+            >
+              Activer la sélection
+            </button>
+            <button
+              onClick={() => handleBulkAction('cancel')}
+              className="px-4 py-2 bg-amber-500/10 text-amber-400 font-semibold rounded-lg hover:bg-amber-500/20 transition-colors"
+            >
+              Annuler la sélection
+            </button>
+            <button
+              onClick={() => handleBulkAction('delete')}
+              className="px-4 py-2 bg-red-500/10 text-red-400 font-semibold rounded-lg hover:bg-red-500/20 transition-colors"
+            >
+              Supprimer la sélection
+            </button>
+          </div>
+        </div>
+      )}
       
       <div className="bg-[#0F1115] border border-white/10 rounded-2xl overflow-hidden">
         <table className="w-full text-left text-sm">
           <thead className="bg-white/5 border-b border-white/10">
             <tr>
+              <th className="p-4 w-12">
+                <input
+                  type="checkbox"
+                  checked={licenses.length > 0 && selectedIds.length === licenses.length}
+                  onChange={toggleSelectAll}
+                  className="rounded border-white/20 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]"
+                />
+              </th>
               <th className="p-4 text-gray-400">{t('user')}</th>
               <th className="p-4 text-gray-400">{t('plan')}</th>
               <th className="p-4 text-gray-400">{t('lot_allowed')}</th>
@@ -118,9 +201,17 @@ export default function AdminLicenses() {
           </thead>
           <tbody className="divide-y divide-white/10">
             {loading ? (
-              <tr><td colSpan={6} className="p-4 text-center">{t('loading')}</td></tr>
+              <tr><td colSpan={7} className="p-4 text-center">{t('loading')}</td></tr>
             ) : licenses.map((lic) => (
               <tr key={lic.id} className="hover:bg-white/5">
+                <td className="p-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(lic.id)}
+                    onChange={() => toggleSelect(lic.id)}
+                    className="rounded border-white/20 bg-black/50 text-[#D4AF37] focus:ring-[#D4AF37]"
+                  />
+                </td>
                 <td className="p-4">{lic.user?.name || lic.user?.email}</td>
                 <td className="p-4">{lic.plan?.name}</td>
                 <td className="p-4">{lic.plan?.lotAllowed}</td>
@@ -130,12 +221,18 @@ export default function AdminLicenses() {
                     {lic.status === 'CANCELLED' ? 'ANNULÉ' : lic.status}
                   </span>
                 </td>
-                <td className="p-4">
+                <td className="p-4 flex gap-4">
                   <button 
                     onClick={() => toggleStatus(lic.id, lic.status)} 
-                    className={`font-semibold ${lic.status === 'ACTIVE' ? 'text-red-400 hover:text-red-300' : 'text-green-400 hover:text-green-300'}`}
+                    className={`font-semibold ${lic.status === 'ACTIVE' ? 'text-amber-400 hover:text-amber-300' : 'text-green-400 hover:text-green-300'}`}
                   >
                     {lic.status === 'ACTIVE' ? 'Annuler' : 'Activer'}
+                  </button>
+                  <button 
+                    onClick={() => deleteLicense(lic.id)} 
+                    className="font-semibold text-red-400 hover:text-red-300"
+                  >
+                    Supprimer
                   </button>
                 </td>
               </tr>

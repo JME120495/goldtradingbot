@@ -48,6 +48,16 @@ export class AdminController {
     return this.adminService.updateLicenseStatus(id, status);
   }
 
+  @Delete('licenses/:id')
+  deleteLicense(@Param('id') id: string) {
+    return this.adminService.deleteLicense(id);
+  }
+
+  @Post('licenses/bulk-action')
+  bulkActionLicenses(@Body() body: { ids: string[], action: 'delete' | 'activate' | 'cancel' }) {
+    return this.adminService.bulkActionLicenses(body.ids, body.action);
+  }
+
   @Post('licenses')
   createLicense(@Body() body: { email: string, planId: string, durationDays: number }) {
     return this.adminService.createLicenseManually(body.email, body.planId, body.durationDays);

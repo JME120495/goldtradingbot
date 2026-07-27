@@ -96,6 +96,40 @@ export class AdminService {
     });
   }
 
+  async deleteLicense(id: string) {
+    // Nullify payment relations first to avoid foreign key constraints
+    await this.prisma.payment.updateMany({
+      where: { licenseId: id },
+      data: { licenseId: null }
+    });
+    return this.prisma.license.delete({
+      where: { id }
+    });
+  }
+
+  async bulkActionLicenses(ids: string[], action: 'delete' | 'activate' | 'cancel') {
+    if (action === 'delete') {
+      await this.prisma.payment.updateMany({
+        where: { licenseId: { in: ids } },
+        data: { licenseId: null }
+      });
+      return this.prisma.license.deleteMany({
+        where: { id: { in: ids } }
+      });
+    } else if (action === 'activate') {
+      return this.prisma.license.updateMany({
+        where: { id: { in: ids } },
+        data: { status: 'ACTIVE' }
+      });
+    } else if (action === 'cancel') {
+      return this.prisma.license.updateMany({
+        where: { id: { in: ids } },
+        data: { status: 'CANCELLED' }
+      });
+    }
+    throw new Error('Invalid action');
+  }
+
   async createLicenseManually(email: string, planId: string, durationDays: number) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) {

@@ -9,6 +9,8 @@ import {
   HttpStatus,
   UseGuards,
   BadRequestException,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Throttle } from '@nestjs/throttler';
@@ -98,6 +100,29 @@ export class Mt5LicensesController {
       body.account_number,
       body.ea_name,
     );
+  }
+
+  @Delete('admin/delete/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  async deleteLicense(@Param('id') id: string) {
+    const licenseId = parseInt(id, 10);
+    if (isNaN(licenseId)) {
+      throw new BadRequestException('ID invalide.');
+    }
+    return this.mt5LicensesService.deleteLicense(licenseId);
+  }
+
+  @Post('admin/bulk-action')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  async bulkAction(
+    @Body() body: { ids: number[]; action: 'delete' | 'suspend' | 'reactivate' },
+  ) {
+    if (!body.ids || !Array.isArray(body.ids) || !body.action) {
+      throw new BadRequestException('Paramètres invalides.');
+    }
+    return this.mt5LicensesService.bulkActionMt5Licenses(body.ids, body.action);
   }
 
   @Get('admin/list')
