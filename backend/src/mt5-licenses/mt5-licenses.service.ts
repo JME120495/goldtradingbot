@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMt5LicenseDto } from './dto/create-mt5-license.dto';
 import { SyncHistoryDto } from './dto/sync-history.dto';
@@ -121,17 +122,25 @@ export class Mt5LicensesService {
         });
 
         if (webLicense) {
+          const payload = {
+            active: true,
+            plan: webLicense.plan.name,
+            lot: Number(webLicense.lotAllowed),
+            expiresAt: webLicense.expiresAt ? this.formatDate(webLicense.expiresAt) : null,
+          };
           return {
             valid: true,
             plan: webLicense.plan.name,
             lot: Number(webLicense.lotAllowed),
             expiry: webLicense.expiresAt ? this.formatDate(webLicense.expiresAt) : null,
             message: 'Licence valide.',
+            ...this.signPayload(payload)
           };
         } else {
           return {
             valid: false,
             message: 'Licence expirée. Renouvelez votre abonnement sur le site.',
+            ...this.signPayload({ active: false })
           };
         }
       }
@@ -139,6 +148,7 @@ export class Mt5LicensesService {
       return {
         valid: false,
         message: 'Aucune licence trouvée pour ce compte.',
+        ...this.signPayload({ active: false })
       };
     }
 
@@ -164,10 +174,15 @@ export class Mt5LicensesService {
       return {
         valid: false,
         message: 'Licence suspendue. Contactez le support.',
+        ...this.signPayload({ active: false })
       };
     }
     if (lic.status === 'cancelled') {
-      return { valid: false, message: 'Licence annulée.' };
+      return { 
+        valid: false, 
+        message: 'Licence annulée.',
+        ...this.signPayload({ active: false })
+      };
     }
     if (lic.status === 'expired' || isExpired) {
       return {
@@ -175,8 +190,16 @@ export class Mt5LicensesService {
         plan: lic.plan,
         expiry: this.formatDate(lic.expiryDate),
         message: 'Licence expirée. Renouvelez votre abonnement.',
+        ...this.signPayload({ active: false })
       };
     }
+
+    const payload = {
+      active: true,
+      plan: lic.plan,
+      lot: Number(lic.lot),
+      expiresAt: this.formatDate(lic.expiryDate)
+    };
 
     return {
       valid: true,
@@ -184,6 +207,7 @@ export class Mt5LicensesService {
       lot: Number(lic.lot),
       expiry: this.formatDate(lic.expiryDate),
       message: 'Licence valide.',
+      ...this.signPayload(payload)
     };
   }
 
@@ -349,6 +373,16 @@ export class Mt5LicensesService {
   // ----------------------------------------------------------
   //  Helpers
   // ----------------------------------------------------------
+
+  private signPayload(payload: any) {
+    const secret = process.env.EA_SECRET || '';
+    const jsonString = JSON.stringify(payload);
+    const signature = crypto.createHmac('sha256', secret).update(jsonString).digest('hex');
+    return {
+      payload,
+      signature
+    };
+  }
 
   /** Serialize BigInt and Decimal fields to JSON-safe types */
   private serializeLicense(license: any) {
