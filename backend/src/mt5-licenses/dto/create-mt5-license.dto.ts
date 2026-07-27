@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsNumber, IsDateString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateMt5LicenseDto {
   @IsString()
@@ -11,6 +12,7 @@ export class CreateMt5LicenseDto {
   @IsString()
   client_whatsapp?: string;
 
+  @Type(() => Number)
   @IsNumber()
   account_number: number;
 
@@ -29,6 +31,7 @@ export class CreateMt5LicenseDto {
   @IsString()
   plan: string;
 
+  @Type(() => Number)
   @IsNumber()
   lot: number;
 

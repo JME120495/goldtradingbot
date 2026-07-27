@@ -37,6 +37,7 @@ export class Mt5TradeDto {
 }
 
 export class SyncHistoryDto {
+  @Type(() => Number)
   @IsNumber()
   account: number;
 

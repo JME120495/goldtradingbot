@@ -1,6 +1,8 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class VerifyLicenseDto {
+  @Type(() => Number)
   @IsNumber()
   account: number;
 
