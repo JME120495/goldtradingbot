@@ -6,11 +6,11 @@ import { useLocale } from "next-intl";
 import { ChevronDown } from "lucide-react";
 
 const languages = [
-  { code: 'en', flag: '🇬🇧', label: 'English' },
-  { code: 'fr', flag: '🇫🇷', label: 'Français' },
-  { code: 'es', flag: '🇪🇸', label: 'Español' },
-  { code: 'pt', flag: '🇵🇹', label: 'Português' },
-  { code: 'ar', flag: '🇸🇦', label: 'العربية' },
+  { code: 'en', flagCode: 'gb', label: 'English' },
+  { code: 'fr', flagCode: 'fr', label: 'Français' },
+  { code: 'es', flagCode: 'es', label: 'Español' },
+  { code: 'pt', flagCode: 'pt', label: 'Português' },
+  { code: 'ar', flagCode: 'sa', label: 'العربية' },
 ];
 
 export default function LanguageSwitcher() {
@@ -43,9 +43,13 @@ export default function LanguageSwitcher() {
       <button 
         onClick={() => setIsOpen(!isOpen)}
         disabled={loading}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 transition-colors text-sm font-medium"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 transition-colors text-sm font-medium"
       >
-        <span className="text-base">{currentLang.flag}</span>
+        <img 
+          src={`https://flagcdn.com/w20/${currentLang.flagCode}.png`} 
+          alt={currentLang.label}
+          className="w-5 h-auto rounded-[2px]" 
+        />
         <ChevronDown size={14} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
@@ -59,7 +63,11 @@ export default function LanguageSwitcher() {
                 currentLocale === lang.code ? 'text-[#D4AF37] bg-white/5 font-semibold' : 'text-gray-300'
               }`}
             >
-              <span className="text-base">{lang.flag}</span>
+              <img 
+                src={`https://flagcdn.com/w20/${lang.flagCode}.png`} 
+                alt={lang.label}
+                className="w-5 h-auto rounded-[2px]" 
+              />
               <span>{lang.label}</span>
             </button>
           ))}
