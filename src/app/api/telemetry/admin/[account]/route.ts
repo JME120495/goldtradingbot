@@ -6,7 +6,7 @@ export async function GET(
 ) {
   try {
     const { account } = await params;
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'https://gold-trading-bot-backend.onrender.com';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'https://goldtradingbot.onrender.com';
     const authHeader = req.headers.get('authorization') || '';
     
     const response = await fetch(`${backendUrl}/api/telemetry/admin/${account}`, {

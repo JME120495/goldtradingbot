@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL ||
       process.env.BACKEND_URL ||
-      'https://gold-trading-bot-backend.onrender.com';
+      'https://goldtradingbot.onrender.com';
 
     const clientIp =
       req.headers.get('x-forwarded-for') ||

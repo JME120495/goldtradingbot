@@ -5,7 +5,7 @@ function getRealBackendUrl(): string {
   if (!url || url.startsWith('/api') || url.includes('vercel.app')) {
     url = process.env.NODE_ENV === 'development'
       ? 'http://127.0.0.1:3001'
-      : 'https://gold-trading-bot-backend.onrender.com';
+      : 'https://goldtradingbot.onrender.com';
   }
   return url.replace(/\/$/, '');
 }
