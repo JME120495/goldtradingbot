@@ -15,6 +15,8 @@ export default function AccountsPage() {
   
   const [accountNumber, setAccountNumber] = useState('');
   const [broker, setBroker] = useState('Fusion Markets');
+  const [isCustomBroker, setIsCustomBroker] = useState(false);
+  const [password, setPassword] = useState('');
   const [server, setServer] = useState('');
 
   const fetchAccounts = async () => {
@@ -40,16 +42,19 @@ export default function AccountsPage() {
     setError('');
     
     try {
-      await api.post('/trading-accounts', {
+      const res = await api.post('/trading-accounts', {
         accountNumber,
         broker,
+        password,
         server
       });
       
+      setAccounts([...accounts, res.data.account]);
       setAccountNumber('');
-      setBroker('');
+      setBroker('Fusion Markets');
+      setIsCustomBroker(false);
+      setPassword('');
       setServer('');
-      await fetchAccounts();
     } catch (err: any) {
       setError(err.response?.data?.message || t('err_adding'));
     } finally {
@@ -95,8 +100,16 @@ export default function AccountsPage() {
               <label className="block text-sm font-medium text-gray-400 mb-2">{t('broker_name')}</label>
               <select
                 required
-                value={broker}
-                onChange={e => setBroker(e.target.value)}
+                value={isCustomBroker ? 'other' : broker}
+                onChange={e => {
+                  if (e.target.value === 'other') {
+                    setIsCustomBroker(true);
+                    setBroker('');
+                  } else {
+                    setIsCustomBroker(false);
+                    setBroker(e.target.value);
+                  }
+                }}
                 className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37]"
               >
                 <option value="Fusion Markets">Fusion Markets</option>
@@ -105,7 +118,18 @@ export default function AccountsPage() {
                 <option value="Exness">Exness</option>
                 <option value="FBS">FBS</option>
                 <option value="Weltrade">Weltrade</option>
+                <option value="other">Autre (Saisir manuellement)</option>
               </select>
+              {isCustomBroker && (
+                <input 
+                  type="text" 
+                  required
+                  value={broker}
+                  onChange={e => setBroker(e.target.value)}
+                  className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] mt-3"
+                  placeholder="Nom de votre broker"
+                />
+              )}
               <p className="text-xs text-gray-500 mt-2">{t('broker_note')}</p>
             </div>
             <button 
