@@ -197,10 +197,20 @@ export class AuthController {
         twoFactorTempSecret: null
       }
     });
-    
+
     // Automatically log the user in
     const tokens = await this.authService.generateTokens(user.id, user.role);
 
     return { success: true, backupCodes: plainBackupCodes, access_token: tokens.access_token, refresh_token: tokens.refresh_token };
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() body: { email: string }) {
+    return this.authService.forgotPassword(body.email);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() body: { token: string; newPassword: string }) {
+    return this.authService.resetPassword(body.token, body.newPassword);
   }
 }

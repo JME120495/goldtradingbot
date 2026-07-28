@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { TwoFactorAuthService } from './twoFactorAuth.service';
+import { MailService } from '../mail/mail.service';
+import { randomBytes } from 'crypto';
 
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -13,6 +15,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private twoFactorAuthService: TwoFactorAuthService,
+    private mailService: MailService,
   ) {}
 
   async register(data: RegisterDto) {
@@ -59,6 +62,9 @@ export class AuthService {
         });
       }
     }
+
+    // Fire and forget welcome email
+    this.mailService.sendWelcomeEmail(user.email, user.name || '').catch(err => console.error(err));
 
     return this.generateTokens(user.id, user.role);
   }
@@ -297,5 +303,59 @@ export class AuthService {
       where: { id: userId },
       data: { refreshTokenHash: null },
     });
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      // Return a success message anyway to prevent email enumeration
+      return { message: 'If that email exists, a reset link has been sent.' };
+    }
+
+    const resetToken = randomBytes(32).toString('hex');
+    const resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        resetPasswordToken: resetToken,
+        resetPasswordExpires,
+      },
+    });
+
+    await this.mailService.sendPasswordResetEmail(user.email, resetToken);
+
+    return { message: 'If that email exists, a reset link has been sent.' };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpires: { gt: new Date() },
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid or expired reset token');
+    }
+
+    const hashedPassword = await argon2.hash(newPassword, {
+      type: argon2.argon2id,
+      memoryCost: 65536,
+      timeCost: 3,
+      parallelism: 4,
+    });
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+      },
+    });
+
+    return { message: 'Password has been successfully reset' };
   }
 }

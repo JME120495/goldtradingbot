@@ -17,6 +17,7 @@ import { Mt5LicensesModule } from './mt5-licenses/mt5-licenses.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { TelemetryModule } from './telemetry/telemetry.module';
 import { SupportModule } from './support/support.module';
+import { MailModule } from './mail/mail.module';
 import { TelegramModule } from './telegram/telegram.module';
 
 @Module({
@@ -39,6 +40,7 @@ import { TelegramModule } from './telegram/telegram.module';
     Mt5LicensesModule,
     TelemetryModule,
     SupportModule,
+    MailModule,
     TelegramModule,
   ],
   controllers: [AppController],

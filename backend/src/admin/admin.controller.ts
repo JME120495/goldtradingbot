@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Delete, Param, Body, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Param, Body, Post, Put, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from '../auth/admin.guard';
@@ -7,6 +7,20 @@ import { AdminGuard } from '../auth/admin.guard';
 @Controller('admin')
 export class AdminController {
   constructor(private adminService: AdminService) {}
+
+  @Get('users')
+  getUsers() {
+    return this.adminService.getUsers();
+  }
+
+  @Put('users/:id/ban')
+  async toggleBanUser(@Param('id') id: string) {
+    try {
+      return await this.adminService.toggleBanUser(id);
+    } catch (error: any) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 
   @Get('affiliates')
   getAffiliates() {

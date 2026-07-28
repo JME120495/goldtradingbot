@@ -47,7 +47,7 @@ export default function AffiliatesDashboard() {
 
   const copyLink = () => {
     if (stats?.affiliate?.code) {
-      navigator.clipboard.writeText(`https://goldtradingbot.com/?refcode=${stats.affiliate.code}`);
+      navigator.clipboard.writeText(`https://goldtradingboot.shop/?refcode=${stats.affiliate.code}`);
       alert('Referral link copied!');
     }
   };
@@ -126,7 +126,7 @@ export default function AffiliatesDashboard() {
             <div className="text-right">
               <p className="text-sm opacity-80 mb-1">{t('your_affiliate_link')}</p>
               <div className="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-lg border border-white/10">
-                <span className="font-mono text-[#D4AF37]">goldtradingbot.com/?refcode={stats.affiliate.code}</span>
+                <span className="font-mono text-[#D4AF37]">goldtradingboot.shop/?refcode={stats.affiliate.code}</span>
                 <button onClick={copyLink} className="hover:text-white transition-colors"><Copy size={16}/></button>
               </div>
             </div>

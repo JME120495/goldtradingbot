@@ -1,6 +1,6 @@
 -- ============================================================
 --  Schéma PostgreSQL — Licences MT5 (Gold Trading Bot)
---  À exécuter une seule fois sur ta base goldtradingbot.com
+--  À exécuter une seule fois sur ta base goldtradingboot.shop
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS mt5_licenses (

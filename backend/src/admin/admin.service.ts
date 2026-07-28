@@ -7,6 +7,47 @@ import * as path from 'path';
 export class AdminService {
   constructor(private prisma: PrismaService) {}
 
+  async getUsers() {
+    const users = await this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        isBanned: true,
+        licenses: { select: { id: true } },
+        tradingAccounts: { select: { id: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    
+    return users.map(user => ({
+      ...user,
+      licensesCount: user.licenses.length,
+      tradingAccountsCount: user.tradingAccounts.length,
+      // Remove the raw arrays to keep response clean
+      licenses: undefined,
+      tradingAccounts: undefined
+    }));
+  }
+
+  async toggleBanUser(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new Error('User not found');
+    
+    // Un admin ne peut pas se bannir lui-même ou bannir un autre admin
+    if (user.role === 'ADMIN') {
+      throw new Error('Cannot ban an administrator');
+    }
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { isBanned: !user.isBanned },
+      select: { id: true, isBanned: true }
+    });
+  }
+
   async getEAs() {
     const filesDir = path.join(process.cwd(), 'files');
     if (!fs.existsSync(filesDir)) return [{ value: 'ALL', label: 'ALL (tous les EA)' }];

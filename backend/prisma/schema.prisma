@@ -23,6 +23,7 @@ model User {
   isTwoFactorEnabled   Boolean  @default(false)
   resetPasswordToken   String?
   resetPasswordExpires DateTime?
+  isBanned             Boolean  @default(false)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
