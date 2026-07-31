@@ -10,6 +10,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 export default function Home() {
   const t = useTranslations();
   const [duration, setDuration] = useState<'weekly' | 'monthly' | 'semi_annual' | 'yearly'>('monthly');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const plans = [
     {
@@ -64,7 +65,7 @@ export default function Home() {
               <Link href="#pricing" className="hover:text-[#D4AF37] transition-colors">{t('Navigation.pricing')}</Link>
               <Link href="/faq" className="hover:text-[#D4AF37] transition-colors">{t('Navigation.faq')}</Link>
             </div>
-            <div className="flex gap-4 items-center">
+            <div className="hidden md:flex gap-4 items-center">
               <LanguageSwitcher />
               <Link href="/login">
                 <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/5 border-0">{t('Navigation.login')}</Button>
@@ -73,8 +74,37 @@ export default function Home() {
                 <Button className="bg-[#D4AF37] text-black hover:bg-[#AA8B2C] font-semibold border-0">{t('Navigation.get_started')}</Button>
               </Link>
             </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden flex items-center gap-2">
+              <LanguageSwitcher />
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-gray-400 hover:text-white"
+              >
+                {isMobileMenuOpen ? (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                ) : (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+                )}
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-[#0F1115] border-b border-white/10 px-4 pt-2 pb-4 space-y-1 shadow-xl">
+            <Link href="#features" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/5">{t('Navigation.features')}</Link>
+            <Link href="#how-it-works" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/5">{t('Navigation.how_it_works')}</Link>
+            <Link href="#pricing" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/5">{t('Navigation.pricing')}</Link>
+            <Link href="/faq" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/5">{t('Navigation.faq')}</Link>
+            <div className="pt-4 pb-2 border-t border-white/10 space-y-2 mt-2">
+              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="block w-full text-center px-4 py-2 text-gray-300 hover:text-white bg-white/5 rounded-md font-medium">{t('Navigation.login')}</Link>
+              <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="block w-full text-center px-4 py-2 bg-[#D4AF37] text-black hover:bg-[#AA8B2C] rounded-md font-bold">{t('Navigation.get_started')}</Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
