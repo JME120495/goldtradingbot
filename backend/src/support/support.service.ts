@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TelegramService } from '../telegram/telegram.service';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class SupportService {
   constructor(
     private prisma: PrismaService,
     private telegram: TelegramService,
+    private discord: DiscordService,
   ) {}
 
   async createTicket(userId: string, data: { subject: string, message: string }) {
@@ -21,6 +23,7 @@ export class SupportService {
     });
 
     this.telegram.sendMessage(`🎫 <b>Nouveau Ticket de Support</b>\n\n<b>Client:</b> ${ticket.user.name || ticket.user.email}\n<b>Sujet:</b> ${ticket.subject}\n<b>Message:</b>\n${ticket.message}`);
+    this.discord.sendMessage(`🎫 **Nouveau Ticket de Support**\n\n**Client:** ${ticket.user.name || ticket.user.email}\n**Sujet:** ${ticket.subject}\n**Message:**\n${ticket.message}`);
 
     return ticket;
   }

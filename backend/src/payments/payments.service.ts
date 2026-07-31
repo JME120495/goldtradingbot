@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException, InternalServerErrorException } f
 import { PrismaService } from '../prisma/prisma.service';
 import { Mt5LicensesService } from '../mt5-licenses/mt5-licenses.service';
 import { TelegramService } from '../telegram/telegram.service';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class PaymentsService {
@@ -13,7 +14,8 @@ export class PaymentsService {
   constructor(
     private prisma: PrismaService,
     private mt5LicensesService: Mt5LicensesService,
-    private telegram: TelegramService
+    private telegram: TelegramService,
+    private discord: DiscordService
   ) {}
 
   async initiatePayment(userId: string, data: { productId: string, planId: string, duration: string }) {
@@ -91,6 +93,7 @@ export class PaymentsService {
       }
 
       this.telegram.sendMessage(`💰 <b>Nouvelle Vente ! (Mode Test)</b>\n\n<b>Plan:</b> ${plan.name} (${data.duration})\n<b>Montant:</b> $${amount}\n<b>Client ID:</b> ${payment.userId}`);
+      this.discord.sendMessage(`💰 **Nouvelle Vente ! (Mode Test)**\n\n**Plan:** ${plan.name} (${data.duration})\n**Montant:** $${amount}\n**Client ID:** ${payment.userId}`);
 
       return {
         paymentLink: `${frontendUrl}/dashboard?payment=success_simulated`
@@ -223,6 +226,7 @@ export class PaymentsService {
         this.logger.log(`License created for user ${payment.userId}`);
 
         this.telegram.sendMessage(`💰 <b>Nouvelle Vente !</b>\n\n<b>Plan:</b> ${plan?.name || 'Inconnu'} (${duration})\n<b>Montant:</b> $${payment.amount}\n<b>Client ID:</b> ${payment.userId}\n<b>TxID:</b> ${txRef}`);
+        this.discord.sendMessage(`💰 **Nouvelle Vente !**\n\n**Plan:** ${plan?.name || 'Inconnu'} (${duration})\n**Montant:** $${payment.amount}\n**Client ID:** ${payment.userId}\n**TxID:** ${txRef}`);
       }
     } else if (payload.payment_status === 'partially_paid') {
       const txRef = payload.order_id;

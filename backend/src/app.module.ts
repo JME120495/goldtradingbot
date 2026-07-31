@@ -19,6 +19,7 @@ import { TelemetryModule } from './telemetry/telemetry.module';
 import { SupportModule } from './support/support.module';
 import { MailModule } from './mail/mail.module';
 import { TelegramModule } from './telegram/telegram.module';
+import { DiscordModule } from './discord/discord.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { TelegramModule } from './telegram/telegram.module';
     SupportModule,
     MailModule,
     TelegramModule,
+    DiscordModule,
   ],
   controllers: [AppController],
   providers: [
