@@ -70,9 +70,9 @@ async function handleProxy(req: Request, pathArray: string[]) {
       'X-Forwarded-For': clientIp,
     };
     
-    const contentType = req.headers.get('content-type');
-    if (contentType) {
-      headers['Content-Type'] = contentType;
+    const reqContentType = req.headers.get('content-type');
+    if (reqContentType) {
+      headers['Content-Type'] = reqContentType;
     }
 
     const authHeader = req.headers.get('authorization');
