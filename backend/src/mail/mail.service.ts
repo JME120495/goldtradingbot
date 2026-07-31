@@ -56,10 +56,33 @@ export class MailService {
         this.logger.debug(`Reset Link: ${resetLink}`);
         return;
       }
-      const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log(`Password reset email sent to ${to}: ${info.messageId}`);
-    } catch (error) {
-      this.logger.error(`Failed to send password reset email to ${to}`, error.stack);
+      
+      if (process.env.SMTP_HOST?.includes('brevo')) {
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'accept': 'application/json',
+            'api-key': process.env.SMTP_PASS || '',
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            sender: { name: "Gold Trading Bot", email: process.env.SMTP_USER },
+            to: [{ email: to }],
+            subject: mailOptions.subject,
+            htmlContent: mailOptions.html
+          })
+        });
+        if (!response.ok) {
+           const errText = await response.text();
+           throw new Error(`Brevo API Error: ${errText}`);
+        }
+        this.logger.log(`Password reset email sent via API to ${to}`);
+      } else {
+        const info = await this.transporter.sendMail(mailOptions);
+        this.logger.log(`Password reset email sent to ${to}: ${info.messageId}`);
+      }
+    } catch (error: any) {
+      this.logger.error(`Failed to send password reset email to ${to}`, error.stack || error);
       throw new Error('Failed to send email');
     }
   }
@@ -87,10 +110,33 @@ export class MailService {
         this.logger.warn(`Email system not fully configured. Simulated welcome email to ${to}`);
         return;
       }
-      const info = await this.transporter.sendMail(mailOptions);
-      this.logger.log(`Welcome email sent to ${to}: ${info.messageId}`);
-    } catch (error) {
-      this.logger.error(`Failed to send welcome email to ${to}`, error.stack);
+
+      if (process.env.SMTP_HOST?.includes('brevo')) {
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'accept': 'application/json',
+            'api-key': process.env.SMTP_PASS || '',
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            sender: { name: "Gold Trading Bot", email: process.env.SMTP_USER },
+            to: [{ email: to }],
+            subject: mailOptions.subject,
+            htmlContent: mailOptions.html
+          })
+        });
+        if (!response.ok) {
+           const errText = await response.text();
+           throw new Error(`Brevo API Error: ${errText}`);
+        }
+        this.logger.log(`Welcome email sent via API to ${to}`);
+      } else {
+        const info = await this.transporter.sendMail(mailOptions);
+        this.logger.log(`Welcome email sent to ${to}: ${info.messageId}`);
+      }
+    } catch (error: any) {
+      this.logger.error(`Failed to send welcome email to ${to}`, error.stack || error);
     }
   }
 }
