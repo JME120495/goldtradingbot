@@ -57,10 +57,10 @@ async function handleProxy(req: Request, pathArray: string[]) {
       req.headers.get('x-real-ip') ||
       '';
 
-    let bodyData;
+    let bodyBuffer;
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       try {
-        bodyData = await req.json();
+        bodyBuffer = await req.arrayBuffer();
       } catch (e) {
         // Body may be empty
       }
@@ -70,19 +70,20 @@ async function handleProxy(req: Request, pathArray: string[]) {
       'X-Forwarded-For': clientIp,
     };
     
+    const contentType = req.headers.get('content-type');
+    if (contentType) {
+      headers['Content-Type'] = contentType;
+    }
+
     const authHeader = req.headers.get('authorization');
     if (authHeader) {
       headers['Authorization'] = authHeader;
     }
     
-    if (bodyData) {
-      headers['Content-Type'] = 'application/json';
-    }
-    
     let response = await fetch(targetUrl, {
       method: req.method,
       headers,
-      body: bodyData ? JSON.stringify(bodyData) : undefined,
+      body: bodyBuffer || undefined,
     });
 
     // If initial attempt returns 404 and pathStr doesn't start with api/, retry with /api/ prefix
@@ -91,7 +92,7 @@ async function handleProxy(req: Request, pathArray: string[]) {
       const fallbackRes = await fetch(fallbackUrl, {
         method: req.method,
         headers,
-        body: bodyData ? JSON.stringify(bodyData) : undefined,
+        body: bodyBuffer || undefined,
       });
       if (fallbackRes.status !== 404) {
         response = fallbackRes;
