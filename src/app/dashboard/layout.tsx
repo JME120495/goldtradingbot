@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
-import { Home, Key, Download, CreditCard, LogOut, Users, User, LifeBuoy } from 'lucide-react';
+import { Home, Key, Download, CreditCard, LogOut, Users, User, LifeBuoy, Menu, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
@@ -15,6 +15,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const t = useTranslations('Dashboard');
 
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -98,13 +99,54 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-[#D4AF37]/5 to-transparent pointer-events-none" />
         
         {/* Mobile Header */}
-        <header className="md:hidden h-20 border-b border-white/5 bg-[#0F1115] flex items-center justify-between px-4">
-          <span className="font-bold text-[#D4AF37]">GOLD SCALPER</span>
+        <header className="md:hidden h-20 border-b border-white/5 bg-[#0F1115] flex items-center justify-between px-4 sticky top-0 z-50">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 -ml-2 text-gray-400 hover:text-white focus:outline-none"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            <span className="font-bold text-[#D4AF37]">GOLD SCALPER</span>
+          </div>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
-            <button onClick={handleLogout} className="text-sm text-gray-400">{t('logout')}</button>
           </div>
         </header>
+
+        {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden fixed inset-0 z-40 bg-[#0F1115] pt-20 flex flex-col overflow-y-auto shadow-2xl">
+            <nav className="flex-1 px-4 py-8 space-y-2">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
+                const Icon = item.icon;
+                return (
+                  <Link 
+                    key={item.name} 
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                      isActive ? 'bg-[#D4AF37]/10 text-[#D4AF37]' : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <Icon size={20} />
+                    <span className="font-medium">{item.name}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+            <div className="p-4 border-t border-white/5 mb-8">
+              <button 
+                onClick={handleLogout}
+                className="flex items-center gap-3 px-4 py-3 w-full text-left text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors"
+              >
+                <LogOut size={20} />
+                <span className="font-medium">{t('logout')}</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="flex-1 p-4 md:p-8 overflow-auto z-10">
           {children}
