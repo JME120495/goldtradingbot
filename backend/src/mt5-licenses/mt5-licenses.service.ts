@@ -82,18 +82,23 @@ export class Mt5LicensesService {
 
     // Find license for this account, either specific to the EA or 'ALL'.
     // Prioritise exact EA match over 'ALL'.
+    // Fetch all licenses for this account number
     const licenses = await this.prisma.mt5License.findMany({
       where: {
         accountNumber: BigInt(account),
-        eaName: { in: [eaName, 'ALL'] },
       },
-      orderBy: { eaName: 'desc' }, // exact match ('JMEGOLD_DUAL') > 'ALL'
-      take: 2,
+      orderBy: { eaName: 'desc' }, 
     });
 
-    // Pick the best match: prefer exact EA name over 'ALL'
+    // Pick the best match: prefer exact/partial EA name over 'ALL'
+    const searchEa = eaName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
     const lic =
       licenses.find((l) => l.eaName === eaName) ||
+      licenses.find((l) => {
+        const dbEa = l.eaName.toLowerCase().replace(/[^a-z0-9]/g, '');
+        return dbEa === searchEa || searchEa.includes(dbEa) || dbEa.includes(searchEa);
+      }) ||
       licenses.find((l) => l.eaName === 'ALL') ||
       null;
 
