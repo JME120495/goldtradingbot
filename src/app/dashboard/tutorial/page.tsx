@@ -17,6 +17,26 @@ export default function TutorialPage() {
       <div className="space-y-8">
         <div>
           <h2 className="text-xl font-bold mb-4 text-[#D4AF37] flex items-center gap-2">
+            📺 Tutoriel d'Installation (Général)
+          </h2>
+          <div className="bg-[#0F1115] border border-white/10 rounded-2xl overflow-hidden shadow-2xl relative group">
+            <div className="relative w-full rounded-2xl overflow-hidden bg-black">
+              <video 
+                className="w-full h-auto"
+                controls
+                controlsList="nodownload"
+                preload="metadata"
+                poster="/images/video-thumbnail.jpg"
+              >
+                <source src="/videos/tutorial.mp4" type="video/mp4" />
+                Votre navigateur ne supporte pas la lecture de vidéos.
+              </video>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold mb-4 text-[#D4AF37] flex items-center gap-2">
             🇫🇷 Tutoriel en Français
           </h2>
           <div className="bg-[#0F1115] border border-white/10 rounded-2xl overflow-hidden shadow-2xl relative group">
