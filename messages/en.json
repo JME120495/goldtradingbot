@@ -338,5 +338,12 @@
     "step3": "Place the file in the MQL5/Experts folder.",
     "step4": "Go to Tools → Options → Expert Advisors and allow WebRequest for your license URL.",
     "step5": "Drag the EA onto a XAU/USD chart and enable automated trading. 🚀"
+  },
+  "DashboardTutorial": {
+    "important_points": "Important points to remember",
+    "point_1": "Make sure you have downloaded the latest version of the Expert Advisor from the <strong>Downloads</strong> page.",
+    "point_2": "Allow WebRequest (AutoTrading) in MetaTrader 5 options by checking the <strong>\"Allow algorithmic trading\"</strong> box.",
+    "point_3": "Drag and drop the robot onto an M1 or M5 chart (as recommended) for the XAUUSD (Gold) pair.",
+    "point_4": "Enter the email address associated with your Gold Scalper account in the robot parameters to validate your license."
   }
 }

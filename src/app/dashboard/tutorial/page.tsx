@@ -83,24 +83,24 @@ export default function TutorialPage() {
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Points importants à retenir
+          {t('DashboardTutorial.important_points', { fallback: 'Points importants à retenir' })}
         </h3>
         <ul className="space-y-4 text-gray-300">
           <li className="flex items-start gap-3">
             <div className="w-2 h-2 mt-2 rounded-full bg-[#D4AF37] shrink-0"></div>
-            <p>Assurez-vous d'avoir téléchargé la dernière version de l'Expert Advisor depuis la page <strong>Téléchargements</strong>.</p>
+            <p dangerouslySetInnerHTML={{ __html: t('DashboardTutorial.point_1') }}></p>
           </li>
           <li className="flex items-start gap-3">
             <div className="w-2 h-2 mt-2 rounded-full bg-[#D4AF37] shrink-0"></div>
-            <p>Autorisez le WebRequest (AutoTrading) dans les options de MetaTrader 5 en cochant la case <strong>"Autoriser le trading algorithmique"</strong>.</p>
+            <p dangerouslySetInnerHTML={{ __html: t('DashboardTutorial.point_2') }}></p>
           </li>
           <li className="flex items-start gap-3">
             <div className="w-2 h-2 mt-2 rounded-full bg-[#D4AF37] shrink-0"></div>
-            <p>Glissez-déposez le robot sur un graphique M1 ou M5 (selon les recommandations) de la paire XAUUSD (Gold).</p>
+            <p dangerouslySetInnerHTML={{ __html: t('DashboardTutorial.point_3') }}></p>
           </li>
           <li className="flex items-start gap-3">
             <div className="w-2 h-2 mt-2 rounded-full bg-[#D4AF37] shrink-0"></div>
-            <p>Entrez votre adresse email associée à votre compte Gold Scalper dans les paramètres du robot pour valider votre licence.</p>
+            <p dangerouslySetInnerHTML={{ __html: t('DashboardTutorial.point_4') }}></p>
           </li>
         </ul>
       </div>
