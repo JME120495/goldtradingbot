@@ -26,12 +26,12 @@ export class Mt5LicensesController {
 
   // ----------------------------------------------------------
   //  POST /api/license/verify
-  //  PUBLIC — called by the EA. Rate-limited: 30 req / 60s per IP.
+  //  PUBLIC — called by the EA. Rate-limited: 300 req / 60s per IP to allow multiple charts.
   //  Response format: { valid, plan?, lot?, expiry?, message }
   // ----------------------------------------------------------
   @Post('verify')
   @HttpCode(HttpStatus.OK)
-  @Throttle({ default: { limit: 30, ttl: 60000 } })
+  @Throttle({ default: { limit: 300, ttl: 60000 } })
   async verify(@Body() body: VerifyLicenseDto, @Req() req: Request) {
     if (!body.account) {
       return { valid: false, message: 'Compte manquant.' };
