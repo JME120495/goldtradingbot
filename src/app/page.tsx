@@ -214,6 +214,51 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Testimonials Section */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">{t('Testimonials.title')}</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">{t('Testimonials.subtitle')}</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {/* Testimonial 1 */}
+            <div className="bg-[#0F1115] border border-white/10 rounded-2xl p-8 hover:border-[#D4AF37]/30 transition-colors relative">
+              <div className="text-[#D4AF37] mb-4">
+                <svg className="w-8 h-8 opacity-50" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" /></svg>
+              </div>
+              <p className="text-gray-300 mb-6 italic text-sm leading-relaxed">{t('Testimonials.t1_text')}</p>
+              <div>
+                <p className="text-white font-bold">{t('Testimonials.t1_author')}</p>
+                <p className="text-[#D4AF37] text-xs uppercase tracking-wider">{t('Testimonials.t1_role')}</p>
+              </div>
+            </div>
+            
+            {/* Testimonial 2 */}
+            <div className="bg-[#0F1115] border border-[#D4AF37]/30 rounded-2xl p-8 transform md:-translate-y-4 shadow-[0_0_30px_rgba(212,175,55,0.05)] relative">
+              <div className="text-[#D4AF37] mb-4">
+                <svg className="w-8 h-8 opacity-50" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" /></svg>
+              </div>
+              <p className="text-gray-300 mb-6 italic text-sm leading-relaxed">{t('Testimonials.t2_text')}</p>
+              <div>
+                <p className="text-white font-bold">{t('Testimonials.t2_author')}</p>
+                <p className="text-[#D4AF37] text-xs uppercase tracking-wider">{t('Testimonials.t2_role')}</p>
+              </div>
+            </div>
+
+            {/* Testimonial 3 */}
+            <div className="bg-[#0F1115] border border-white/10 rounded-2xl p-8 hover:border-[#D4AF37]/30 transition-colors relative">
+              <div className="text-[#D4AF37] mb-4">
+                <svg className="w-8 h-8 opacity-50" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" /></svg>
+              </div>
+              <p className="text-gray-300 mb-6 italic text-sm leading-relaxed">{t('Testimonials.t3_text')}</p>
+              <div>
+                <p className="text-white font-bold">{t('Testimonials.t3_author')}</p>
+                <p className="text-[#D4AF37] text-xs uppercase tracking-wider">{t('Testimonials.t3_role')}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Pricing Section */}
         <section id="pricing" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5">
           <div className="text-center mb-10">

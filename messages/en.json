@@ -345,5 +345,18 @@
     "point_2": "Allow WebRequest (AutoTrading) in MetaTrader 5 options by checking the <strong>\"Allow algorithmic trading\"</strong> box.",
     "point_3": "Drag and drop the robot onto an M1 or M5 chart (as recommended) for the XAUUSD (Gold) pair.",
     "point_4": "Enter the email address associated with your Gold Scalper account in the robot parameters to validate your license."
+  },
+  "Testimonials": {
+    "title": "Join over 2,000 satisfied traders",
+    "subtitle": "Proven results, every day. Here is what our users think.",
+    "t1_text": "\"Since using this bot, my trading income has increased significantly, and I finally sleep at night!\"",
+    "t1_author": "Marc D.",
+    "t1_role": "Independent Trader",
+    "t2_text": "\"Incredible support and consistent performance, even during heavy economic news.\"",
+    "t2_author": "Sophie L.",
+    "t2_role": "Private Investor",
+    "t3_text": "\"I tested it on a demo account for 2 weeks before going live. The results are mind-blowing.\"",
+    "t3_author": "Thomas P.",
+    "t3_role": "Entrepreneur"
   }
 }

@@ -345,5 +345,18 @@
     "point_2": "Permita o WebRequest (AutoTrading) nas opções do MetaTrader 5 marcando a caixa <strong>\"Permitir negociação algorítmica\"</strong>.",
     "point_3": "Arraste e solte o robô em um gráfico M1 ou M5 (conforme recomendado) para o par XAUUSD (Ouro).",
     "point_4": "Insira o endereço de e-mail associado à sua conta Gold Scalper nos parâmetros do robô para validar sua licença."
+  },
+  "Testimonials": {
+    "title": "Join over 2,000 satisfied traders",
+    "subtitle": "Proven results, every day. Here is what our users think.",
+    "t1_text": "\"Since using this bot, my trading income has increased significantly, and I finally sleep at night!\"",
+    "t1_author": "Marc D.",
+    "t1_role": "Independent Trader",
+    "t2_text": "\"Incredible support and consistent performance, even during heavy economic news.\"",
+    "t2_author": "Sophie L.",
+    "t2_role": "Private Investor",
+    "t3_text": "\"I tested it on a demo account for 2 weeks before going live. The results are mind-blowing.\"",
+    "t3_author": "Thomas P.",
+    "t3_role": "Entrepreneur"
   }
 }
