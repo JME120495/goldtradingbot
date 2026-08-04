@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
@@ -64,7 +68,33 @@ export class AuthService {
     }
 
     // Fire and forget welcome email
-    this.mailService.sendWelcomeEmail(user.email, user.name || '').catch(err => console.error(err));
+    this.mailService
+      .sendWelcomeEmail(user.email, user.name || '')
+      .catch((err) => console.error(err));
+
+    // Automatically grant a 3-day trial license for the Starter plan
+    try {
+      const starterPlan = await this.prisma.productPlan.findFirst({
+        where: { name: 'Starter' },
+        include: { product: true }
+      });
+      if (starterPlan) {
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 3);
+        await this.prisma.license.create({
+          data: {
+            userId: user.id,
+            productId: starterPlan.productId,
+            planId: starterPlan.id,
+            status: 'ACTIVE',
+            lotAllowed: starterPlan.lotAllowed,
+            expiresAt: expiresAt,
+          }
+        });
+      }
+    } catch (e) {
+      console.error('Failed to create trial license:', e);
+    }
 
     return this.generateTokens(user.id, user.role);
   }
@@ -74,13 +104,15 @@ export class AuthService {
       where: { email: data.email },
     });
     if (!user || !user.passwordHash) {
-      console.log(`[DEBUG LOGIN] User not found or no password hash for email: ${data.email}`);
+      console.log(
+        `[DEBUG LOGIN] User not found or no password hash for email: ${data.email}`,
+      );
       throw new UnauthorizedException('Invalid credentials');
     }
-    
+
     let isPasswordValid = false;
     let needsMigration = false;
-    
+
     // Check if the hash format is bcrypt (starts with $2)
     if (user.passwordHash.startsWith('$2')) {
       const bcrypt = require('bcryptjs');
@@ -88,17 +120,23 @@ export class AuthService {
       if (isPasswordValid) {
         needsMigration = true;
       }
-      console.log(`[DEBUG LOGIN] Bcrypt check for ${data.email} - isPasswordValid: ${isPasswordValid}`);
+      console.log(
+        `[DEBUG LOGIN] Bcrypt check for ${data.email} - isPasswordValid: ${isPasswordValid}`,
+      );
     } else {
       isPasswordValid = await argon2.verify(user.passwordHash, data.password);
-      console.log(`[DEBUG LOGIN] Argon2 check for ${data.email} - isPasswordValid: ${isPasswordValid}`);
+      console.log(
+        `[DEBUG LOGIN] Argon2 check for ${data.email} - isPasswordValid: ${isPasswordValid}`,
+      );
     }
-    
+
     if (!isPasswordValid) {
-      console.log(`[DEBUG LOGIN] Password invalid for ${data.email}, throwing UnauthorizedException.`);
+      console.log(
+        `[DEBUG LOGIN] Password invalid for ${data.email}, throwing UnauthorizedException.`,
+      );
       throw new UnauthorizedException('Invalid credentials');
     }
-    
+
     if (needsMigration) {
       console.log(`[DEBUG LOGIN] Migrating password hash for ${data.email}...`);
       const newHash = await argon2.hash(data.password, {
@@ -114,7 +152,9 @@ export class AuthService {
     }
 
     if (!user.isTwoFactorEnabled && user.role === 'ADMIN') {
-      console.log(`[DEBUG LOGIN] Mandatory 2FA setup triggered for ADMIN: ${data.email}`);
+      console.log(
+        `[DEBUG LOGIN] Mandatory 2FA setup triggered for ADMIN: ${data.email}`,
+      );
       try {
         // Mandatory setup for ADMIN
         const tempSecret = require('crypto').randomBytes(16).toString('hex');
@@ -122,11 +162,19 @@ export class AuthService {
           where: { id: user.id },
           data: { twoFactorTempSecret: tempSecret },
         });
-        const tempToken = this.jwtService.sign({ sub: user.id, type: 'setup_2fa', sec: tempSecret }, { expiresIn: '15m' });
-        console.log(`[DEBUG LOGIN] Successfully generated setup token for ${data.email}`);
+        const tempToken = this.jwtService.sign(
+          { sub: user.id, type: 'setup_2fa', sec: tempSecret },
+          { expiresIn: '15m' },
+        );
+        console.log(
+          `[DEBUG LOGIN] Successfully generated setup token for ${data.email}`,
+        );
         return { setup2faRequired: true, temp_token: tempToken };
       } catch (error) {
-        console.error(`[DEBUG LOGIN ERROR] Error during ADMIN 2FA setup block:`, error);
+        console.error(
+          `[DEBUG LOGIN ERROR] Error during ADMIN 2FA setup block:`,
+          error,
+        );
         throw error;
       }
     }
@@ -139,8 +187,13 @@ export class AuthService {
           where: { id: user.id },
           data: { twoFactorTempSecret: tempSecret },
         });
-        const tempToken = this.jwtService.sign({ sub: user.id, type: '2fa', sec: tempSecret }, { expiresIn: '2m' });
-        console.log(`[DEBUG LOGIN] Successfully generated 2FA token for ${data.email}`);
+        const tempToken = this.jwtService.sign(
+          { sub: user.id, type: '2fa', sec: tempSecret },
+          { expiresIn: '2m' },
+        );
+        console.log(
+          `[DEBUG LOGIN] Successfully generated 2FA token for ${data.email}`,
+        );
         return { twoFactorRequired: true, temp_token: tempToken };
       } catch (error) {
         console.error(`[DEBUG LOGIN ERROR] Error during 2FA block:`, error);
@@ -155,27 +208,35 @@ export class AuthService {
   async loginWith2fa(tempToken: string, code: string) {
     let payload: any;
     try {
-      payload = this.jwtService.verify(tempToken, { secret: process.env.JWT_SECRET });
+      payload = this.jwtService.verify(tempToken, {
+        secret: process.env.JWT_SECRET,
+      });
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired temporary token');
     }
-    
+
     if (payload.type !== '2fa') {
       throw new UnauthorizedException('Invalid token type');
     }
 
-    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+    });
     if (!user || user.twoFactorTempSecret !== payload.sec) {
       throw new UnauthorizedException('Token already used or user not found');
     }
 
     // Verify TOTP or backup code
     let isCodeValid = false;
-    
+
     // First, try standard TOTP
     if (code.length === 6) {
-      isCodeValid = this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(code, user);
-    } 
+      isCodeValid =
+        this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(
+          code,
+          user,
+        );
+    }
     // Then try backup codes (assuming they are exactly 8 chars long)
     else if (code.length === 8 && user.backupCodes.length > 0) {
       for (const hash of user.backupCodes) {
@@ -186,9 +247,9 @@ export class AuthService {
             where: { id: user.id },
             data: {
               backupCodes: {
-                set: user.backupCodes.filter(c => c !== hash),
-              }
-            }
+                set: user.backupCodes.filter((c) => c !== hash),
+              },
+            },
           });
           break;
         }
@@ -211,14 +272,18 @@ export class AuthService {
   async verifySetupToken(tempToken: string): Promise<string> {
     let payload: any;
     try {
-      payload = this.jwtService.verify(tempToken, { secret: process.env.JWT_SECRET });
+      payload = this.jwtService.verify(tempToken, {
+        secret: process.env.JWT_SECRET,
+      });
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired temporary token');
     }
     if (payload.type !== 'setup_2fa') {
       throw new UnauthorizedException('Invalid token type');
     }
-    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+    });
     if (!user || user.twoFactorTempSecret !== payload.sec) {
       throw new UnauthorizedException('Token already used or user not found');
     }
@@ -266,10 +331,7 @@ export class AuthService {
     if (!user || !user.refreshTokenHash) {
       throw new UnauthorizedException('User not found or no refresh token');
     }
-    const isValid = await argon2.verify(
-      user.refreshTokenHash,
-      refreshToken,
-    );
+    const isValid = await argon2.verify(user.refreshTokenHash, refreshToken);
     if (!isValid) {
       throw new UnauthorizedException('Invalid refresh token');
     }
