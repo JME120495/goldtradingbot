@@ -139,4 +139,96 @@ export class MailService {
       this.logger.error(`Failed to send welcome email to ${to}`, error.stack || error);
     }
   }
+
+  async sendInvoiceEmail(to: string, clientName: string, planName: string, amount: number, txRef: string, duration: string, date: Date) {
+    const formattedDate = date.toLocaleDateString('fr-FR', {
+      day: '2-digit', month: 'long', year: 'numeric'
+    });
+    const formattedAmount = `$${amount.toFixed(2)}`;
+    
+    const mailOptions = {
+      from: this.fromAddress,
+      to,
+      subject: \`Votre Facture - Gold Trading Bot (\${txRef})\`,
+      html: \`
+        <div style="font-family: Arial, sans-serif; max-w-xl mx-auto p-6 bg-gray-50 border border-gray-200 rounded-lg">
+          <div style="text-align: center; border-bottom: 2px solid #D4AF37; padding-bottom: 20px; margin-bottom: 20px;">
+            <h1 style="color: #D4AF37; margin: 0;">Facture</h1>
+            <p style="color: #666; margin-top: 5px;">Merci pour votre achat !</p>
+          </div>
+          
+          <div style="margin-bottom: 30px;">
+            <p><strong>Bonjour \${clientName || 'Cher client'},</strong></p>
+            <p>Nous vous confirmons la réception de votre paiement. Votre licence a été activée avec succès.</p>
+          </div>
+
+          <div style="background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 30px;">
+            <h3 style="margin-top: 0; color: #333;">Détails de la transaction</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; color: #666;">N° de Transaction :</td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; text-align: right; font-weight: bold;">\${txRef}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; color: #666;">Date :</td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; text-align: right; font-weight: bold;">\${formattedDate}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; color: #666;">Produit :</td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; text-align: right; font-weight: bold;">Licence \${planName} (\${duration})</td>
+              </tr>
+              <tr>
+                <td style="padding: 16px 0 8px 0; color: #333; font-size: 1.1em; font-weight: bold;">Total Payé :</td>
+                <td style="padding: 16px 0 8px 0; text-align: right; font-size: 1.1em; font-weight: bold; color: #D4AF37;">\${formattedAmount}</td>
+              </tr>
+            </table>
+          </div>
+
+          <p>Vous pouvez consulter le statut de vos licences directement depuis votre tableau de bord :</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="\${this.frontendUrl}/dashboard" style="background-color: #D4AF37; color: black; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Accéder au tableau de bord</a>
+          </div>
+          
+          <p style="color: #666; font-size: 13px; border-top: 1px solid #ddd; padding-top: 20px;">
+            Ceci est un e-mail automatique valant pour reçu. Conservez-le précieusement.<br/>
+            L'équipe Gold Trading Bot
+          </p>
+        </div>
+      \`,
+    };
+
+    try {
+      if (!process.env.SMTP_USER) {
+        this.logger.warn(\`Email system not fully configured. Simulated invoice email to \${to}\`);
+        return;
+      }
+
+      if (process.env.SMTP_HOST?.includes('brevo')) {
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'accept': 'application/json',
+            'api-key': process.env.SMTP_PASS || '',
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            sender: { name: "Gold Trading Bot", email: process.env.SMTP_USER },
+            to: [{ email: to }],
+            subject: mailOptions.subject,
+            htmlContent: mailOptions.html
+          })
+        });
+        if (!response.ok) {
+           const errText = await response.text();
+           throw new Error(\`Brevo API Error: \${errText}\`);
+        }
+        this.logger.log(\`Invoice email sent via API to \${to}\`);
+      } else {
+        const info = await this.transporter.sendMail(mailOptions);
+        this.logger.log(\`Invoice email sent to \${to}: \${info.messageId}\`);
+      }
+    } catch (error: any) {
+      this.logger.error(\`Failed to send invoice email to \${to}\`, error.stack || error);
+    }
+  }
 }

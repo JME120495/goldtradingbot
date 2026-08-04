@@ -1,13 +1,19 @@
-import { Injectable, Logger, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Mt5LicensesService } from '../mt5-licenses/mt5-licenses.service';
 import { TelegramService } from '../telegram/telegram.service';
 import { DiscordService } from '../discord/discord.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class PaymentsService {
   private readonly logger = new Logger(PaymentsService.name);
-  
+
   // Flutterwave secret from environment variable
   private readonly FLUTTERWAVE_SECRET = process.env.FLUTTERWAVE_SECRET;
 
@@ -15,14 +21,20 @@ export class PaymentsService {
     private prisma: PrismaService,
     private mt5LicensesService: Mt5LicensesService,
     private telegram: TelegramService,
-    private discord: DiscordService
+    private discord: DiscordService,
+    private mail: MailService,
   ) {}
 
-  async initiatePayment(userId: string, data: { productId: string, planId: string, duration: string }) {
+  async initiatePayment(
+    userId: string,
+    data: { productId: string; planId: string; duration: string },
+  ) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('User not found');
 
-    const plan = await this.prisma.productPlan.findUnique({ where: { id: data.planId } });
+    const plan = await this.prisma.productPlan.findUnique({
+      where: { id: data.planId },
+    });
     if (!plan) throw new NotFoundException('Plan not found');
 
     // Parse prices
@@ -42,7 +54,7 @@ export class PaymentsService {
         provider: 'NOWPAYMENTS',
         providerTxId: txRef,
         status: 'PENDING',
-      }
+      },
     });
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -50,11 +62,13 @@ export class PaymentsService {
 
     // MODE TEST: Si la clé API manque, on simule le paiement pour les tests
     if (!apiKey || apiKey === 'test') {
-      this.logger.log('MODE TEST: NOWPAYMENTS_API_KEY absente. Simulation du paiement et création de la licence...');
-      
+      this.logger.log(
+        'MODE TEST: NOWPAYMENTS_API_KEY absente. Simulation du paiement et création de la licence...',
+      );
+
       await this.prisma.payment.update({
         where: { id: payment.id },
-        data: { status: 'COMPLETED' }
+        data: { status: 'COMPLETED' },
       });
 
       let days = 30;
@@ -70,43 +84,63 @@ export class PaymentsService {
           planId: data.planId,
           status: 'ACTIVE',
           lotAllowed: plan.lotAllowed,
-          expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000) 
-        }
+          expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+        },
       });
 
       // Synchronize to MT5 standalone table
       await this.mt5LicensesService.syncUserToMt5Licenses(payment.userId);
 
       // Handle Affiliate Commission
-      const purchasingUser = await this.prisma.user.findUnique({ where: { id: payment.userId } });
+      const purchasingUser = await this.prisma.user.findUnique({
+        where: { id: payment.userId },
+      });
       if (purchasingUser?.referredById) {
-        const commissionRate = data.duration === 'weekly' ? 0.15 : 0.10;
+        const commissionRate = data.duration === 'weekly' ? 0.15 : 0.1;
         const commission = amount * commissionRate;
         await this.prisma.affiliateSale.create({
           data: {
             affiliateId: purchasingUser.referredById,
             amount: amount,
             commission: commission,
-            isRenewal: false
-          }
+            isRenewal: false,
+          },
         });
       }
 
-      this.telegram.sendMessage(`💰 <b>Nouvelle Vente ! (Mode Test)</b>\n\n<b>Plan:</b> ${plan.name} (${data.duration})\n<b>Montant:</b> $${amount}\n<b>Client ID:</b> ${payment.userId}`);
-      this.discord.sendMessage(`💰 **Nouvelle Vente ! (Mode Test)**\n\n**Plan:** ${plan.name} (${data.duration})\n**Montant:** $${amount}\n**Client ID:** ${payment.userId}`);
+      if (purchasingUser?.email) {
+        await this.mail.sendInvoiceEmail(
+          purchasingUser.email,
+          purchasingUser.firstName || '',
+          plan.name,
+          amount,
+          txRef,
+          data.duration,
+          new Date(),
+        );
+      }
+
+      this.telegram.sendMessage(
+        `💰 <b>Nouvelle Vente ! (Mode Test)</b>\n\n<b>Plan:</b> ${plan.name} (${data.duration})\n<b>Montant:</b> $${amount}\n<b>Client ID:</b> ${payment.userId}`,
+      );
+      this.discord.sendMessage(
+        `💰 **Nouvelle Vente ! (Mode Test)**\n\n**Plan:** ${plan.name} (${data.duration})\n**Montant:** $${amount}\n**Client ID:** ${payment.userId}`,
+      );
 
       return {
-        paymentLink: `${frontendUrl}/dashboard?payment=success_simulated`
+        paymentLink: `${frontendUrl}/dashboard?payment=success_simulated`,
       };
     }
 
     // --- VRAI PAIEMENT NOWPAYMENTS ---
     if (!frontendUrl) {
-      throw new InternalServerErrorException('FRONTEND_URL environment variable is required');
+      throw new InternalServerErrorException(
+        'FRONTEND_URL environment variable is required',
+      );
     }
 
     const backendUrl = process.env.BACKEND_URL;
-    
+
     const invoicePayload: Record<string, any> = {
       price_amount: amount,
       price_currency: 'usd',
@@ -125,38 +159,47 @@ export class PaymentsService {
       method: 'POST',
       headers: {
         'x-api-key': apiKey,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(invoicePayload)
+      body: JSON.stringify(invoicePayload),
     });
 
     if (!response.ok) {
       const errText = await response.text();
       this.logger.error(`NowPayments API error: ${errText}`);
-      throw new InternalServerErrorException(`Erreur NowPayments: ${errText || 'Facture crypto échouée'}`);
+      throw new InternalServerErrorException(
+        `Erreur NowPayments: ${errText || 'Facture crypto échouée'}`,
+      );
     }
 
     const npData = await response.json();
 
     return {
-      paymentLink: npData.invoice_url
+      paymentLink: npData.invoice_url,
     };
   }
 
   async handleWebhook(payload: any) {
     this.logger.log(`Received Webhook: ${JSON.stringify(payload)}`);
-    
+
     // NowPayments envoie payment_status
     // Seuls 'finished' (paiement complet) et 'confirmed' sont considérés comme un succès final.
-    if (payload.payment_status === 'finished' || payload.payment_status === 'confirmed') {
+    if (
+      payload.payment_status === 'finished' ||
+      payload.payment_status === 'confirmed'
+    ) {
       const txRef = payload.order_id;
-      
-      const payment = await this.prisma.payment.findUnique({ where: { providerTxId: txRef } });
+
+      const payment = await this.prisma.payment.findUnique({
+        where: { providerTxId: txRef },
+      });
       if (!payment) return { status: 'ignored' };
 
       // Vérification d'idempotence : on s'assure qu'on ne traite qu'une seule fois
       if (payment.status === 'COMPLETED') {
-        this.logger.log(`Webhook ignoré : Le paiement ${txRef} est déjà traité.`);
+        this.logger.log(
+          `Webhook ignoré : Le paiement ${txRef} est déjà traité.`,
+        );
         return { status: 'already_processed' };
       }
 
@@ -165,10 +208,12 @@ export class PaymentsService {
       const receivedAmount = payload.price_amount; // Le montant en USD enregistré par NowPayments
 
       if (receivedAmount < expectedAmount) {
-        this.logger.error(`Alerte de sécurité : Montant payé insuffisant. Attendu : ${expectedAmount}, Reçu : ${receivedAmount}`);
+        this.logger.error(
+          `Alerte de sécurité : Montant payé insuffisant. Attendu : ${expectedAmount}, Reçu : ${receivedAmount}`,
+        );
         await this.prisma.payment.update({
           where: { id: payment.id },
-          data: { status: 'AMOUNT_MISMATCH' }
+          data: { status: 'AMOUNT_MISMATCH' },
         });
         return { status: 'amount_mismatch' };
       }
@@ -176,7 +221,7 @@ export class PaymentsService {
       // Update Payment Status
       await this.prisma.payment.update({
         where: { id: payment.id },
-        data: { status: 'COMPLETED' }
+        data: { status: 'COMPLETED' },
       });
 
       // Extraire les infos de la référence (GTB_timestamp_productId_planId_duration)
@@ -186,8 +231,10 @@ export class PaymentsService {
         const planId = parts[3];
         const duration = parts[4];
 
-        const plan = await this.prisma.productPlan.findUnique({ where: { id: planId }});
-        
+        const plan = await this.prisma.productPlan.findUnique({
+          where: { id: planId },
+        });
+
         // Calculate expiration date based on duration
         let days = 30;
         if (duration === 'weekly') days = 7;
@@ -202,61 +249,88 @@ export class PaymentsService {
             planId: planId,
             status: 'ACTIVE',
             lotAllowed: plan ? plan.lotAllowed : 0.01,
-            expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000) 
-          }
+            expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+          },
         });
-        
+
         // Synchronize to MT5 standalone table
         await this.mt5LicensesService.syncUserToMt5Licenses(payment.userId);
-        
+
         // Handle Affiliate Commission
-        const purchasingUser = await this.prisma.user.findUnique({ where: { id: payment.userId } });
+        const purchasingUser = await this.prisma.user.findUnique({
+          where: { id: payment.userId },
+        });
         if (purchasingUser?.referredById && plan) {
-          const commissionRate = duration === 'weekly' ? 0.15 : 0.10;
+          const commissionRate = duration === 'weekly' ? 0.15 : 0.1;
           const commission = payment.amount * commissionRate;
           await this.prisma.affiliateSale.create({
             data: {
               affiliateId: purchasingUser.referredById,
               amount: payment.amount,
               commission: commission,
-              isRenewal: false
-            }
+              isRenewal: false,
+            },
           });
         }
         this.logger.log(`License created for user ${payment.userId}`);
 
-        this.telegram.sendMessage(`💰 <b>Nouvelle Vente !</b>\n\n<b>Plan:</b> ${plan?.name || 'Inconnu'} (${duration})\n<b>Montant:</b> $${payment.amount}\n<b>Client ID:</b> ${payment.userId}\n<b>TxID:</b> ${txRef}`);
-        this.discord.sendMessage(`💰 **Nouvelle Vente !**\n\n**Plan:** ${plan?.name || 'Inconnu'} (${duration})\n**Montant:** $${payment.amount}\n**Client ID:** ${payment.userId}\n**TxID:** ${txRef}`);
+        if (purchasingUser?.email && plan) {
+          await this.mail.sendInvoiceEmail(
+            purchasingUser.email,
+            purchasingUser.firstName || '',
+            plan.name,
+            payment.amount,
+            txRef,
+            duration,
+            new Date(),
+          );
+        }
+
+        this.telegram.sendMessage(
+          `💰 <b>Nouvelle Vente !</b>\n\n<b>Plan:</b> ${plan?.name || 'Inconnu'} (${duration})\n<b>Montant:</b> $${payment.amount}\n<b>Client ID:</b> ${payment.userId}\n<b>TxID:</b> ${txRef}`,
+        );
+        this.discord.sendMessage(
+          `💰 **Nouvelle Vente !**\n\n**Plan:** ${plan?.name || 'Inconnu'} (${duration})\n**Montant:** $${payment.amount}\n**Client ID:** ${payment.userId}\n**TxID:** ${txRef}`,
+        );
       }
     } else if (payload.payment_status === 'partially_paid') {
       const txRef = payload.order_id;
-      const payment = await this.prisma.payment.findUnique({ where: { providerTxId: txRef } });
+      const payment = await this.prisma.payment.findUnique({
+        where: { providerTxId: txRef },
+      });
       if (payment) {
         await this.prisma.payment.update({
           where: { id: payment.id },
-          data: { status: 'PARTIALLY_PAID' }
+          data: { status: 'PARTIALLY_PAID' },
         });
       }
     } else if (payload.payment_status === 'refunded') {
       const txRef = payload.order_id;
-      const payment = await this.prisma.payment.findUnique({ where: { providerTxId: txRef } });
+      const payment = await this.prisma.payment.findUnique({
+        where: { providerTxId: txRef },
+      });
       if (payment) {
         await this.prisma.payment.update({
           where: { id: payment.id },
-          data: { status: 'REFUNDED' }
+          data: { status: 'REFUNDED' },
         });
       }
-    } else if (payload.payment_status === 'failed' || payload.payment_status === 'expired') {
+    } else if (
+      payload.payment_status === 'failed' ||
+      payload.payment_status === 'expired'
+    ) {
       const txRef = payload.order_id;
-      const payment = await this.prisma.payment.findUnique({ where: { providerTxId: txRef } });
+      const payment = await this.prisma.payment.findUnique({
+        where: { providerTxId: txRef },
+      });
       if (payment) {
         await this.prisma.payment.update({
           where: { id: payment.id },
-          data: { status: 'FAILED' }
+          data: { status: 'FAILED' },
         });
       }
     }
-    
+
     return { status: 'success' };
   }
 }
