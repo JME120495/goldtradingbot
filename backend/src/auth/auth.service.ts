@@ -80,7 +80,7 @@ export class AuthService {
       });
       if (starterPlan) {
         const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 3);
+        expiresAt.setDate(expiresAt.getDate() + 1);
         await this.prisma.license.create({
           data: {
             userId: user.id,
