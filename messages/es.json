@@ -53,8 +53,7 @@
     "min_capital": "Capital Recomendado",
     "max_lot": "Lote Máximo",
     "most_popular": "El Más Popular",
-    "choose": "Elegir",
-    "trial_promo": "¿Quieres probar primero? Ofrecemos una Prueba Gratuita de 24h en el Plan Starter (lote 0.01) al registrarte."
+    "choose": "Elegir"
   },
   "Language": {
     "en": "English",

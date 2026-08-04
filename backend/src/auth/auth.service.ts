@@ -72,30 +72,6 @@ export class AuthService {
       .sendWelcomeEmail(user.email, user.name || '')
       .catch((err) => console.error(err));
 
-    // Automatically grant a 3-day trial license for the Starter plan
-    try {
-      const starterPlan = await this.prisma.productPlan.findFirst({
-        where: { name: 'Starter' },
-        include: { product: true }
-      });
-      if (starterPlan) {
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 1);
-        await this.prisma.license.create({
-          data: {
-            userId: user.id,
-            productId: starterPlan.productId,
-            planId: starterPlan.id,
-            status: 'ACTIVE',
-            lotAllowed: starterPlan.lotAllowed,
-            expiresAt: expiresAt,
-          }
-        });
-      }
-    } catch (e) {
-      console.error('Failed to create trial license:', e);
-    }
-
     return this.generateTokens(user.id, user.role);
   }
 
