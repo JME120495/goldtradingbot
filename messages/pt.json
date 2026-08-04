@@ -15,6 +15,15 @@
     "start_trial": "Teste Grátis",
     "view_pricing": "Ver Preços"
   },
+  "About": {
+    "title": "O que é o Gold Trading Bot?",
+    "p1": "Imagine ter um especialista financeiro trabalhando para você 24 horas por dia, sem nunca dormir, sem fazer pausas e, acima de tudo... sem se estressar. Isso é exatamente o que é o Gold Trading Bot!",
+    "p2": "Em termos concretos, é um programa de computador inteligente projetado especificamente para negociar Ouro nos mercados financeiros de forma 100% automática.",
+    "p3": "Nosso robô permite que você gere renda passiva sem precisar saber como operar. Você ganha dinheiro automaticamente enquanto se dedica a outras atividades, sem ter que passar um único minuto na frente de gráficos complexos.",
+    "bullet1": "Zero experiência necessária: O robô já integra todas as estratégias dos profissionais.",
+    "bullet2": "Segurança sem emoções: Ele segue regras matemáticas estritas para proteger seu capital.",
+    "bullet3": "Você mantém controle total: Seus fundos permanecem em sua própria conta de negociação segura, só você pode retirá-los."
+  },
   "Features": {
     "f1_title": "Scalping de Alta Frequência",
     "f1_desc": "Executa operações em milissegundos aproveitando os micro-movimentos no mercado de ouro.",

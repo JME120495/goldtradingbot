@@ -15,6 +15,15 @@
     "start_trial": "Start Free Trial",
     "view_pricing": "View Pricing"
   },
+  "About": {
+    "title": "What is Gold Trading Bot?",
+    "p1": "Imagine having a financial expert working for you 24/7, never sleeping, never taking a break, and above all... never stressing. That's exactly what Gold Trading Bot is!",
+    "p2": "In concrete terms, it's an intelligent computer program specifically designed to trade Gold on the financial markets in a 100% automated way.",
+    "p3": "Our robot allows you to generate passive income without needing to know how to trade. You earn money automatically while focusing on other activities, without spending a single minute in front of complex charts.",
+    "bullet1": "Zero experience required: The robot already integrates all professional strategies.",
+    "bullet2": "Emotionless security: It follows strict mathematical rules to protect your capital.",
+    "bullet3": "You keep full control: Your funds remain in your own secure trading account, only you can withdraw them."
+  },
   "Features": {
     "f1_title": "High-Frequency Scalping",
     "f1_desc": "Executes trades in milliseconds taking advantage of micro-movements in the gold market.",
