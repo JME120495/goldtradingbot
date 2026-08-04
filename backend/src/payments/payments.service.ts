@@ -111,7 +111,7 @@ export class PaymentsService {
       if (purchasingUser?.email) {
         await this.mail.sendInvoiceEmail(
           purchasingUser.email,
-          purchasingUser.firstName || '',
+          purchasingUser.name || '',
           plan.name,
           amount,
           txRef,
@@ -277,7 +277,7 @@ export class PaymentsService {
         if (purchasingUser?.email && plan) {
           await this.mail.sendInvoiceEmail(
             purchasingUser.email,
-            purchasingUser.firstName || '',
+            purchasingUser.name || '',
             plan.name,
             payment.amount,
             txRef,
