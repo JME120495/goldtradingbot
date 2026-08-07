@@ -221,14 +221,24 @@ export default function BillingPage() {
                     onChange={(e) => setProvider(e.target.value)}
                     className="w-full bg-[#1A1D24] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
                   >
-                    <option value="MTN_MOMO_CMR">MTN Cameroon</option>
-                    <option value="ORANGE_CMR">Orange Cameroon</option>
-                    <option value="WAVE_CI">Wave Côte d'Ivoire</option>
-                    <option value="MTN_MOMO_CI">MTN Côte d'Ivoire</option>
-                    <option value="ORANGE_CI">Orange Côte d'Ivoire</option>
-                    <option value="MOOV_CI">Moov Côte d'Ivoire</option>
-                    <option value="AIRTEL_GAB">Airtel Gabon</option>
-                    <option value="MOOV_GAB">Moov Gabon</option>
+                    <option value="MTN_MOMO_CMR">Cameroun - MTN</option>
+                    <option value="ORANGE_CMR">Cameroun - Orange</option>
+                    <option value="MTN_MOMO_CIV">Côte d'Ivoire - MTN</option>
+                    <option value="ORANGE_CIV">Côte d'Ivoire - Orange</option>
+                    <option value="AIRTEL_GAB">Gabon - Airtel</option>
+                    <option value="MTN_MOMO_BEN">Bénin - MTN</option>
+                    <option value="MOOV_BEN">Bénin - Moov</option>
+                    <option value="VODACOM_MPESA_COD">RD Congo - Vodacom M-Pesa</option>
+                    <option value="AIRTEL_COD">RD Congo - Airtel</option>
+                    <option value="ORANGE_COD">RD Congo - Orange</option>
+                    <option value="MPESA_KEN">Kenya - M-Pesa</option>
+                    <option value="AIRTEL_COG">Congo - Airtel</option>
+                    <option value="MTN_MOMO_COG">Congo - MTN</option>
+                    <option value="AIRTEL_RWA">Rwanda - Airtel</option>
+                    <option value="MTN_MOMO_RWA">Rwanda - MTN</option>
+                    <option value="FREE_SEN">Sénégal - Free</option>
+                    <option value="ORANGE_SEN">Sénégal - Orange</option>
+                    <option value="ORANGE_SLE">Sierra Leone - Orange</option>
                   </select>
                 </div>
 
