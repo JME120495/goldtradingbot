@@ -1,4 +1,14 @@
-import { Controller, Post, Get, Body, Query, UseGuards, Request, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Query,
+  UseGuards,
+  Request,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { DownloadsService } from './downloads.service';
 import { AuthGuard } from '@nestjs/passport';
 import { PrismaService } from '../prisma/prisma.service';
@@ -20,15 +30,19 @@ export class DownloadsController {
   @UseGuards(AuthGuard('jwt'))
   @Post('generate-url')
   async generateUrl(@Request() req, @Body('product') product: string) {
-    return this.downloadsService.generateSignedUrl(req.user.userId, product, req.user.role);
+    return this.downloadsService.generateSignedUrl(
+      req.user.userId,
+      product,
+      req.user.role,
+    );
   }
 
   @Get('file')
   async getFile(@Query('token') token: string, @Res() res: Response) {
     if (!token) throw new UnauthorizedException('Token required');
-    
+
     const fileInfo = await this.downloadsService.getFile(token);
-    
+
     res.download(fileInfo.path, fileInfo.filename);
   }
 }
@@ -54,4 +68,3 @@ export class LicensesController {
     });
   }
 }
-

@@ -15,7 +15,12 @@ import { EncryptionService } from '../common/encryption.service';
       signOptions: { expiresIn: '15m' },
     }),
   ],
-  providers: [AuthService, JwtStrategy, TwoFactorAuthService, EncryptionService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    TwoFactorAuthService,
+    EncryptionService,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

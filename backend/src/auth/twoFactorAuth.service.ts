@@ -8,26 +8,26 @@ import { EncryptionService } from '../common/encryption.service';
 export class TwoFactorAuthService {
   constructor(
     private prisma: PrismaService,
-    private encryptionService: EncryptionService
+    private encryptionService: EncryptionService,
   ) {}
 
   public async generateTwoFactorAuthenticationSecret(user: any) {
     const appName = 'JME120495/goldtradingbot'; // App name displayed in Authenticator
-    
+
     const secret = speakeasy.generateSecret({
-      name: `${appName} (${user.email})`
+      name: `${appName} (${user.email})`,
     });
 
     const encryptedSecret = this.encryptionService.encrypt(secret.base32);
 
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { twoFactorSecret: encryptedSecret }
+      data: { twoFactorSecret: encryptedSecret },
     });
 
     return {
       secret: secret.base32,
-      otpauthUrl: secret.otpauth_url
+      otpauthUrl: secret.otpauth_url,
     };
   }
 
@@ -35,12 +35,17 @@ export class TwoFactorAuthService {
     return qrcode.toDataURL(otpauthUrl);
   }
 
-  public isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: any) {
+  public isTwoFactorAuthenticationCodeValid(
+    twoFactorAuthenticationCode: string,
+    user: any,
+  ) {
     if (!user.twoFactorSecret) {
       return false;
     }
-    
-    const decryptedSecret = this.encryptionService.decrypt(user.twoFactorSecret);
+
+    const decryptedSecret = this.encryptionService.decrypt(
+      user.twoFactorSecret,
+    );
     if (!decryptedSecret) {
       return false;
     }
@@ -48,7 +53,7 @@ export class TwoFactorAuthService {
     return speakeasy.totp.verify({
       secret: decryptedSecret,
       encoding: 'base32',
-      token: twoFactorAuthenticationCode
+      token: twoFactorAuthenticationCode,
     });
   }
 }

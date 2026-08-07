@@ -14,11 +14,12 @@ async function bootstrap() {
     process.env.JWT_SECRET = 'g0ldtr4d1ng_s3cr3t_k3y_ch4ng3_m3_1n_pr0d';
   }
   if (!process.env.LICENSE_ADMIN_KEY) {
-    process.env.LICENSE_ADMIN_KEY = 'a7f3c9e2b1d4068f5e7a9c3b2d1f4e6a8b0c2d4e6f8a1b3c5d7e9f0a2b4c6d8';
+    process.env.LICENSE_ADMIN_KEY =
+      'a7f3c9e2b1d4068f5e7a9c3b2d1f4e6a8b0c2d4e6f8a1b3c5d7e9f0a2b4c6d8';
   }
 
-  const app = await NestFactory.create(AppModule);
-  
+  const app = await NestFactory.create(AppModule, { rawBody: true });
+
   // Security Headers
   app.use(helmet());
 
@@ -27,21 +28,25 @@ async function bootstrap() {
 
   // CORS configuration
   app.enableCors({
-    origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, 'http://localhost:3000'] : 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL
+      ? [process.env.FRONTEND_URL, 'http://localhost:3000']
+      : 'http://localhost:3000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
-  
+
   // Payload Size Limitation
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
   // Validation
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
   await app.listen(port, '0.0.0.0');

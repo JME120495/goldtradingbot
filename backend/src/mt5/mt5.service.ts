@@ -9,10 +9,12 @@ export class Mt5Service {
   constructor(private prisma: PrismaService) {}
 
   async checkLicense(data: any) {
-    this.logger.log(`Checking license for account: ${data.account} / ${data.broker}`);
-    
+    this.logger.log(
+      `Checking license for account: ${data.account} / ${data.broker}`,
+    );
+
     // Find the trading account linked to the provided details
-    // We relax the strict broker match because MT5 Terminal often sends long company names (e.g. "Exness Technologies Ltd") 
+    // We relax the strict broker match because MT5 Terminal often sends long company names (e.g. "Exness Technologies Ltd")
     // which don't match the short names from the frontend dropdown.
     const account = await this.prisma.tradingAccount.findFirst({
       where: {
@@ -24,17 +26,14 @@ export class Mt5Service {
             licenses: {
               where: {
                 status: 'ACTIVE',
-                OR: [
-                  { expiresAt: null },
-                  { expiresAt: { gt: new Date() } }
-                ]
+                OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
               },
               include: { plan: true },
-              orderBy: { createdAt: 'desc' }
-            }
-          }
-        }
-      }
+              orderBy: { createdAt: 'desc' },
+            },
+          },
+        },
+      },
     });
 
     if (!account || !account.user || account.user.licenses.length === 0) {
@@ -43,14 +42,18 @@ export class Mt5Service {
     }
 
     const activeLicense = account.user.licenses[0];
-    
-    this.logger.log(`License valid. Plan: ${activeLicense.plan.name}, Lot: ${activeLicense.lotAllowed}`);
-    
+
+    this.logger.log(
+      `License valid. Plan: ${activeLicense.plan.name}, Lot: ${activeLicense.lotAllowed}`,
+    );
+
     const payload = {
       active: true,
       plan: activeLicense.plan.name,
       lot: activeLicense.lotAllowed,
-      expiresAt: activeLicense.expiresAt ? activeLicense.expiresAt.toISOString().split('T')[0] : null
+      expiresAt: activeLicense.expiresAt
+        ? activeLicense.expiresAt.toISOString().split('T')[0]
+        : null,
     };
 
     return this.signPayload(payload);
@@ -59,10 +62,13 @@ export class Mt5Service {
   private signPayload(payload: any) {
     const secret = process.env.EA_SECRET || '';
     const jsonString = JSON.stringify(payload);
-    const signature = crypto.createHmac('sha256', secret).update(jsonString).digest('hex');
+    const signature = crypto
+      .createHmac('sha256', secret)
+      .update(jsonString)
+      .digest('hex');
     return {
       payload,
-      signature
+      signature,
     };
   }
 

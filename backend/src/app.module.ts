@@ -24,10 +24,12 @@ import { DiscordModule } from './discord/discord.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
-    ThrottlerModule.forRoot([{
-      ttl: 60000,   // 60 seconds
-      limit: 30,    // 30 requests per window (default, overridden per-route)
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 60 seconds
+        limit: 30, // 30 requests per window (default, overridden per-route)
+      },
+    ]),
     AuthModule,
     UsersModule,
     PrismaModule,

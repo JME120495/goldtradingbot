@@ -34,7 +34,9 @@ export class TelemetryService {
 
   async processDeal(data: any) {
     if (!data.ticket || !data.account) {
-      throw new Error('Données du trade incomplètes (ticket et account requis).');
+      throw new Error(
+        'Données du trade incomplètes (ticket et account requis).',
+      );
     }
     const accountBigInt = BigInt(data.account);
 

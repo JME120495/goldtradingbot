@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as path from 'path';
@@ -8,7 +12,7 @@ import * as fs from 'fs';
 export class DownloadsService {
   constructor(
     private prisma: PrismaService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async getProducts() {
@@ -19,7 +23,7 @@ export class DownloadsService {
         name: true,
         slug: true,
         description: true,
-      }
+      },
     });
   }
 
@@ -31,15 +35,14 @@ export class DownloadsService {
           userId,
           product: { slug: productSlug },
           status: 'ACTIVE',
-          OR: [
-            { expiresAt: null },
-            { expiresAt: { gt: new Date() } }
-          ]
-        }
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        },
       });
 
       if (!license) {
-        throw new UnauthorizedException('No active license found for this product.');
+        throw new UnauthorizedException(
+          'No active license found for this product.',
+        );
       }
     }
 
@@ -47,7 +50,7 @@ export class DownloadsService {
     const rawToken = require('crypto').randomBytes(32).toString('hex');
     const token = this.jwtService.sign(
       { sub: userId, product: productSlug, type: 'download', jti: rawToken },
-      { expiresIn: '15m' }
+      { expiresIn: '15m' },
     );
 
     // Store token in DB
@@ -55,12 +58,12 @@ export class DownloadsService {
       data: {
         token: rawToken,
         userId: userId,
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000)
-      }
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+      },
     });
 
     return {
-      url: `/downloads/file?token=${token}`
+      url: `/downloads/file?token=${token}`,
     };
   }
 
@@ -73,17 +76,19 @@ export class DownloadsService {
 
       // Check if token exists and is not used
       const dbToken = await this.prisma.downloadToken.findUnique({
-        where: { token: payload.jti }
+        where: { token: payload.jti },
       });
 
       if (!dbToken || dbToken.used || dbToken.expiresAt < new Date()) {
-        throw new UnauthorizedException('This download link has expired or has already been used.');
+        throw new UnauthorizedException(
+          'This download link has expired or has already been used.',
+        );
       }
 
       // Mark as used
       await this.prisma.downloadToken.update({
         where: { token: payload.jti },
-        data: { used: true }
+        data: { used: true },
       });
 
       let filename = `${payload.product}.ex5`;
@@ -92,7 +97,9 @@ export class DownloadsService {
       if (!fs.existsSync(filePath)) {
         const filesDir = path.join(process.cwd(), 'files');
         if (fs.existsSync(filesDir)) {
-          const files = fs.readdirSync(filesDir).filter((f) => f.endsWith('.ex5'));
+          const files = fs
+            .readdirSync(filesDir)
+            .filter((f) => f.endsWith('.ex5'));
           const prodLower = payload.product.toLowerCase();
           const matched =
             files.find(
@@ -100,7 +107,7 @@ export class DownloadsService {
                 f.toLowerCase() === `${prodLower}.ex5` ||
                 f.toLowerCase() === `${prodLower.replace(/ /g, '_')}.ex5` ||
                 f.toLowerCase() === `${prodLower.replace(/ ea$/i, '')}.ex5` ||
-                f.toLowerCase().startsWith(prodLower.split(' ')[0])
+                f.toLowerCase().startsWith(prodLower.split(' ')[0]),
             ) || (files.length > 0 ? files[0] : null);
 
           if (matched) {
@@ -113,9 +120,9 @@ export class DownloadsService {
         throw new NotFoundException('EA file not found on server');
       }
 
-      return { 
+      return {
         filename: path.basename(filePath),
-        path: filePath
+        path: filePath,
       };
     } catch (e) {
       if (e instanceof NotFoundException) throw e;

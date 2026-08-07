@@ -8,7 +8,9 @@ export class TelegramService {
 
   async sendMessage(message: string) {
     if (!this.token || !this.chatId) {
-      this.logger.warn('Telegram bot token or chat ID is missing. Notification not sent.');
+      this.logger.warn(
+        'Telegram bot token or chat ID is missing. Notification not sent.',
+      );
       return;
     }
 

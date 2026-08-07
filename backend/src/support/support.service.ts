@@ -11,19 +11,26 @@ export class SupportService {
     private discord: DiscordService,
   ) {}
 
-  async createTicket(userId: string, data: { subject: string, message: string }) {
+  async createTicket(
+    userId: string,
+    data: { subject: string; message: string },
+  ) {
     const ticket = await this.prisma.supportTicket.create({
       data: {
         userId,
         subject: data.subject,
         message: data.message,
-        status: 'OPEN'
+        status: 'OPEN',
       },
-      include: { user: { select: { email: true, name: true } } }
+      include: { user: { select: { email: true, name: true } } },
     });
 
-    this.telegram.sendMessage(`🎫 <b>Nouveau Ticket de Support</b>\n\n<b>Client:</b> ${ticket.user.name || ticket.user.email}\n<b>Sujet:</b> ${ticket.subject}\n<b>Message:</b>\n${ticket.message}`);
-    this.discord.sendMessage(`🎫 **Nouveau Ticket de Support**\n\n**Client:** ${ticket.user.name || ticket.user.email}\n**Sujet:** ${ticket.subject}\n**Message:**\n${ticket.message}`);
+    this.telegram.sendMessage(
+      `🎫 <b>Nouveau Ticket de Support</b>\n\n<b>Client:</b> ${ticket.user.name || ticket.user.email}\n<b>Sujet:</b> ${ticket.subject}\n<b>Message:</b>\n${ticket.message}`,
+    );
+    this.discord.sendMessage(
+      `🎫 **Nouveau Ticket de Support**\n\n**Client:** ${ticket.user.name || ticket.user.email}\n**Sujet:** ${ticket.subject}\n**Message:**\n${ticket.message}`,
+    );
 
     return ticket;
   }
@@ -31,7 +38,7 @@ export class SupportService {
   async getUserTickets(userId: string) {
     return this.prisma.supportTicket.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -39,20 +46,22 @@ export class SupportService {
     return this.prisma.supportTicket.findMany({
       include: {
         user: {
-          select: { name: true, email: true }
-        }
+          select: { name: true, email: true },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async updateTicketStatus(id: string, status: string) {
-    const ticket = await this.prisma.supportTicket.findUnique({ where: { id } });
+    const ticket = await this.prisma.supportTicket.findUnique({
+      where: { id },
+    });
     if (!ticket) throw new NotFoundException('Ticket not found');
 
     return this.prisma.supportTicket.update({
       where: { id },
-      data: { status }
+      data: { status },
     });
   }
 }

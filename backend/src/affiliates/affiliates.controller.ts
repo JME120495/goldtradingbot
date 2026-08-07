@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Put, Body, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AffiliatesService } from './affiliates.service';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -18,7 +26,10 @@ export class AffiliatesController {
   }
 
   @Put('wallet')
-  async updateWallet(@Request() req, @Body('walletAddress') walletAddress: string) {
+  async updateWallet(
+    @Request() req,
+    @Body('walletAddress') walletAddress: string,
+  ) {
     return this.affiliatesService.updateWallet(req.user.userId, walletAddress);
   }
 

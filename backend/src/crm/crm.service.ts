@@ -12,9 +12,9 @@ export class CrmService {
   @Cron(CronExpression.EVERY_HOUR)
   async checkCrmTasks() {
     this.logger.log('Starting CRM routine...');
-    
+
     // CRM logic for paying users would go here
-    
+
     this.logger.log('CRM routine finished.');
   }
 }

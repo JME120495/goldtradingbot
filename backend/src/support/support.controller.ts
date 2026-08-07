@@ -1,4 +1,13 @@
-import { Controller, Post, Get, Patch, Body, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { SupportService } from './support.service';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from '../auth/admin.guard';
@@ -9,7 +18,10 @@ export class SupportController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  async createTicket(@Request() req, @Body() data: { subject: string, message: string }) {
+  async createTicket(
+    @Request() req,
+    @Body() data: { subject: string; message: string },
+  ) {
     return this.supportService.createTicket(req.user.userId, data);
   }
 
@@ -27,7 +39,10 @@ export class SupportController {
 
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Patch('admin/:id/status')
-  async updateTicketStatus(@Param('id') id: string, @Body('status') status: string) {
+  async updateTicketStatus(
+    @Param('id') id: string,
+    @Body('status') status: string,
+  ) {
     return this.supportService.updateTicketStatus(id, status);
   }
 }

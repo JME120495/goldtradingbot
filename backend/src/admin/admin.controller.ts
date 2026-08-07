@@ -1,4 +1,16 @@
-import { Controller, Get, Patch, Delete, Param, Body, Post, Put, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Post,
+  Put,
+  UseGuards,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from '../auth/admin.guard';
@@ -33,12 +45,18 @@ export class AdminController {
   }
 
   @Patch('affiliates/:id/commission')
-  updateAffiliateCommission(@Param('id') id: string, @Body('rate') rate: number) {
+  updateAffiliateCommission(
+    @Param('id') id: string,
+    @Body('rate') rate: number,
+  ) {
     return this.adminService.updateAffiliateCommission(id, rate);
   }
 
   @Patch('affiliates/:id/status')
-  updateAffiliateStatus(@Param('id') id: string, @Body('status') status: string) {
+  updateAffiliateStatus(
+    @Param('id') id: string,
+    @Body('status') status: string,
+  ) {
     return this.adminService.updateAffiliateStatus(id, status);
   }
 
@@ -68,13 +86,21 @@ export class AdminController {
   }
 
   @Post('licenses/bulk-action')
-  bulkActionLicenses(@Body() body: { ids: string[], action: 'delete' | 'activate' | 'cancel' }) {
+  bulkActionLicenses(
+    @Body() body: { ids: string[]; action: 'delete' | 'activate' | 'cancel' },
+  ) {
     return this.adminService.bulkActionLicenses(body.ids, body.action);
   }
 
   @Post('licenses')
-  createLicense(@Body() body: { email: string, planId: string, durationDays: number }) {
-    return this.adminService.createLicenseManually(body.email, body.planId, body.durationDays);
+  createLicense(
+    @Body() body: { email: string; planId: string; durationDays: number },
+  ) {
+    return this.adminService.createLicenseManually(
+      body.email,
+      body.planId,
+      body.durationDays,
+    );
   }
 
   @Get('plans')
@@ -96,7 +122,7 @@ export class AdminController {
   updateWithdrawalStatus(
     @Param('id') id: string,
     @Body('status') status: string,
-    @Body('txHash') txHash?: string
+    @Body('txHash') txHash?: string,
   ) {
     return this.adminService.updateWithdrawalStatus(id, status, txHash);
   }

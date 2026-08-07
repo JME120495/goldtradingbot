@@ -4,6 +4,6 @@ import { Mt5Controller } from './mt5.controller';
 
 @Module({
   providers: [Mt5Service],
-  controllers: [Mt5Controller]
+  controllers: [Mt5Controller],
 })
 export class Mt5Module {}

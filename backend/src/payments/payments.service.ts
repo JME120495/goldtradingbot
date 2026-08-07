@@ -27,7 +27,7 @@ export class PaymentsService {
 
   async initiatePayment(
     userId: string,
-    data: { productId: string; planId: string; duration: string },
+    data: { productId: string; planId: string; duration: string; method?: string; phoneNumber?: string; provider?: string },
   ) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('User not found');
@@ -51,7 +51,7 @@ export class PaymentsService {
         userId,
         amount,
         currency: 'USD',
-        provider: 'NOWPAYMENTS',
+        provider: data.method === 'MOBILE_MONEY' ? 'KPAY' : 'NOWPAYMENTS',
         providerTxId: txRef,
         status: 'PENDING',
       },
@@ -130,6 +130,11 @@ export class PaymentsService {
       return {
         paymentLink: `${frontendUrl}/dashboard?payment=success_simulated`,
       };
+    }
+
+    // --- VRAI PAIEMENT KPAY ---
+    if (data.method === 'MOBILE_MONEY') {
+      return this.initiateKPay(user, plan, payment, amount, txRef, data.duration, data);
     }
 
     // --- VRAI PAIEMENT NOWPAYMENTS ---
@@ -329,6 +334,174 @@ export class PaymentsService {
           data: { status: 'FAILED' },
         });
       }
+    }
+
+    return { status: 'success' };
+  }
+
+  // --- KPAY INTEGRATION ---
+  
+  private async initiateKPay(user: any, plan: any, payment: any, amountUSD: number, txRef: string, duration: string, data: any) {
+    const apiKey = process.env.KPAY_API_KEY;
+    const secretKey = process.env.KPAY_SECRET_KEY;
+
+    if (!apiKey || !secretKey) {
+      throw new InternalServerErrorException('Clés API KPay manquantes');
+    }
+
+    if (!data.phoneNumber || !data.provider) {
+      throw new InternalServerErrorException('Numéro de téléphone et opérateur requis pour le paiement Mobile Money');
+    }
+
+    // Conversion manuelle: 1 USD = 600 XAF
+    const exchangeRate = 600;
+    const amountXAF = Math.round(amountUSD * exchangeRate);
+
+    const payload = {
+      amount: amountXAF,
+      provider: data.provider,
+      phoneNumber: data.phoneNumber,
+      externalId: txRef,
+      description: `Licence Robot - Plan ${plan.name} (${duration})`,
+      customerName: user.name || 'Client',
+      customerEmail: user.email,
+      metadata: { userId: user.id }
+    };
+
+    try {
+      const response = await fetch('https://admin.kpay.site/api/v1/payments/init', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-API-Key': apiKey,
+          'X-Secret-Key': secretKey
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const resData = await response.json();
+      
+      if (response.ok) {
+        return { paymentStatus: 'PENDING', message: 'Veuillez valider le paiement sur votre téléphone.' };
+      } else {
+        this.logger.error(`KPay init error: ${JSON.stringify(resData)}`);
+        throw new InternalServerErrorException(`Erreur KPay: ${resData.message || 'Paiement échoué'}`);
+      }
+    } catch (err: any) {
+      this.logger.error(`Error calling KPay: ${err.message}`);
+      throw new InternalServerErrorException('Erreur lors de l\'initialisation du paiement Mobile Money');
+    }
+  }
+
+  async handleKpayWebhook(rawBody: Buffer | string, signature: string, eventName: string, parsedBody: any) {
+    this.logger.log(`KPay webhook received for event: ${eventName}`);
+    
+    const secretKey = process.env.KPAY_SECRET_KEY;
+    if (!secretKey) return { status: 'error', message: 'Missing API keys' };
+
+    const crypto = require('crypto');
+    const expectedSignature = crypto
+      .createHmac('sha256', secretKey)
+      .update(rawBody)
+      .digest('hex');
+
+    if (signature !== expectedSignature) {
+      this.logger.warn('KPay signature invalide');
+      return { status: 'error', message: 'Invalid signature' };
+    }
+
+    const payload = parsedBody;
+
+    if (eventName !== 'payment.completed' || payload.status !== 'COMPLETED') {
+       if (payload.status === 'FAILED' || payload.status === 'CANCELLED') {
+         const txRef = payload.externalId;
+         const payment = await this.prisma.payment.findUnique({ where: { providerTxId: txRef } });
+         if (payment && payment.status === 'PENDING') {
+            await this.prisma.payment.update({
+              where: { id: payment.id },
+              data: { status: payload.status }
+            });
+         }
+       }
+       return { status: 'ignored' };
+    }
+
+    const txRef = payload.externalId;
+    const payment = await this.prisma.payment.findUnique({ where: { providerTxId: txRef } });
+    if (!payment) return { status: 'ignored', message: 'Payment not found' };
+
+    if (payment.status === 'COMPLETED') {
+      return { status: 'already_processed' };
+    }
+
+    // Mark payment as completed
+    await this.prisma.payment.update({
+      where: { id: payment.id },
+      data: { status: 'COMPLETED' },
+    });
+
+    // Extract info from txRef (GTB_timestamp_productId_planId_duration)
+    const parts = txRef.split('_');
+    if (parts.length >= 5) {
+      const productId = parts[2];
+      const planId = parts[3];
+      const duration = parts[4];
+
+      const plan = await this.prisma.productPlan.findUnique({ where: { id: planId } });
+
+      let days = 30;
+      if (duration === 'weekly') days = 7;
+      else if (duration === 'monthly') days = 30;
+      else if (duration === 'semiAnnual') days = 182;
+      else if (duration === 'yearly') days = 365;
+
+      await this.prisma.license.create({
+        data: {
+          userId: payment.userId,
+          productId: productId,
+          planId: planId,
+          status: 'ACTIVE',
+          lotAllowed: plan ? plan.lotAllowed : 0.01,
+          expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      await this.mt5LicensesService.syncUserToMt5Licenses(payment.userId);
+
+      // Handle Affiliate Commission
+      const purchasingUser = await this.prisma.user.findUnique({ where: { id: payment.userId } });
+      if (purchasingUser?.referredById && plan) {
+        const commissionRate = duration === 'weekly' ? 0.15 : 0.1;
+        const commission = payment.amount * commissionRate;
+        await this.prisma.affiliateSale.create({
+          data: {
+            affiliateId: purchasingUser.referredById,
+            amount: payment.amount,
+            commission: commission,
+            isRenewal: false,
+          },
+        });
+      }
+      this.logger.log(`License created for user ${payment.userId} via KPay`);
+
+      if (purchasingUser?.email && plan) {
+        await this.mail.sendInvoiceEmail(
+          purchasingUser.email,
+          purchasingUser.name || '',
+          plan.name,
+          payment.amount,
+          txRef,
+          duration,
+          new Date(),
+        );
+      }
+
+      this.telegram.sendMessage(
+        `📱 <b>Nouvelle Vente (Mobile Money) !</b>\n\n<b>Plan:</b> ${plan?.name || 'Inconnu'} (${duration})\n<b>Montant:</b> $${payment.amount}\n<b>Client ID:</b> ${payment.userId}`,
+      );
+      this.discord.sendMessage(
+        `📱 **Nouvelle Vente (Mobile Money) !**\n\n**Plan:** ${plan?.name || 'Inconnu'} (${duration})\n**Montant:** $${payment.amount}\n**Client ID:** ${payment.userId}`,
+      );
     }
 
     return { status: 'success' };

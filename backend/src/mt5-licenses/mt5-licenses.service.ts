@@ -22,15 +22,15 @@ export class Mt5LicensesService {
         licenses: {
           where: { status: 'ACTIVE' },
           include: { plan: true, product: true },
-          orderBy: { createdAt: 'desc' }
-        }
-      }
+          orderBy: { createdAt: 'desc' },
+        },
+      },
     });
 
     if (!user) return;
 
     for (const account of user.tradingAccounts) {
-      const webLicense = user.licenses.find(l => {
+      const webLicense = user.licenses.find((l) => {
         if (!l.expiresAt) return true;
         return l.expiresAt > new Date();
       });
@@ -38,7 +38,7 @@ export class Mt5LicensesService {
       if (webLicense) {
         const eaName = webLicense.product.slug;
         const accountNumber = BigInt(account.accountNumber);
-        
+
         // If web license found, upsert an Mt5License to keep the robot working
         await this.prisma.mt5License.upsert({
           where: {
@@ -87,17 +87,21 @@ export class Mt5LicensesService {
       where: {
         accountNumber: BigInt(account),
       },
-      orderBy: { eaName: 'desc' }, 
+      orderBy: { eaName: 'desc' },
     });
 
     // Pick the best match: prefer exact/partial EA name over 'ALL'
     const searchEa = eaName.toLowerCase().replace(/[^a-z0-9]/g, '');
-    
+
     const lic =
       licenses.find((l) => l.eaName === eaName) ||
       licenses.find((l) => {
         const dbEa = l.eaName.toLowerCase().replace(/[^a-z0-9]/g, '');
-        return dbEa === searchEa || searchEa.includes(dbEa) || dbEa.includes(searchEa);
+        return (
+          dbEa === searchEa ||
+          searchEa.includes(dbEa) ||
+          dbEa.includes(searchEa)
+        );
       }) ||
       licenses.find((l) => l.eaName === 'ALL') ||
       null;
@@ -112,16 +116,20 @@ export class Mt5LicensesService {
               licenses: {
                 where: { status: 'ACTIVE' },
                 include: { plan: true },
-                orderBy: { createdAt: 'desc' }
-              }
-            }
-          }
-        }
+                orderBy: { createdAt: 'desc' },
+              },
+            },
+          },
+        },
       });
 
-      if (tradingAccount && tradingAccount.user && tradingAccount.user.licenses.length > 0) {
+      if (
+        tradingAccount &&
+        tradingAccount.user &&
+        tradingAccount.user.licenses.length > 0
+      ) {
         // Find a valid unexpired license
-        const webLicense = tradingAccount.user.licenses.find(l => {
+        const webLicense = tradingAccount.user.licenses.find((l) => {
           if (!l.expiresAt) return true;
           return l.expiresAt > new Date();
         });
@@ -131,21 +139,26 @@ export class Mt5LicensesService {
             active: true,
             plan: webLicense.plan.name,
             lot: Number(webLicense.lotAllowed),
-            expiresAt: webLicense.expiresAt ? this.formatDate(webLicense.expiresAt) : null,
+            expiresAt: webLicense.expiresAt
+              ? this.formatDate(webLicense.expiresAt)
+              : null,
           };
           return {
             valid: true,
             plan: webLicense.plan.name,
             lot: Number(webLicense.lotAllowed),
-            expiry: webLicense.expiresAt ? this.formatDate(webLicense.expiresAt) : null,
+            expiry: webLicense.expiresAt
+              ? this.formatDate(webLicense.expiresAt)
+              : null,
             message: 'Licence valide.',
-            ...this.signPayload(payload)
+            ...this.signPayload(payload),
           };
         } else {
           return {
             valid: false,
-            message: 'Licence expirée. Renouvelez votre abonnement sur le site.',
-            ...this.signPayload({ active: false })
+            message:
+              'Licence expirée. Renouvelez votre abonnement sur le site.',
+            ...this.signPayload({ active: false }),
           };
         }
       }
@@ -153,7 +166,7 @@ export class Mt5LicensesService {
       return {
         valid: false,
         message: 'Aucune licence trouvée pour ce compte.',
-        ...this.signPayload({ active: false })
+        ...this.signPayload({ active: false }),
       };
     }
 
@@ -167,9 +180,7 @@ export class Mt5LicensesService {
           checkCount: { increment: 1 },
         },
       })
-      .catch((e) =>
-        this.logger.error('Erreur mise à jour suivi:', e.message),
-      );
+      .catch((e) => this.logger.error('Erreur mise à jour suivi:', e.message));
 
     const today = new Date();
     const expiry = new Date(lic.expiryDate);
@@ -179,14 +190,14 @@ export class Mt5LicensesService {
       return {
         valid: false,
         message: 'Licence suspendue. Contactez le support.',
-        ...this.signPayload({ active: false })
+        ...this.signPayload({ active: false }),
       };
     }
     if (lic.status === 'cancelled') {
-      return { 
-        valid: false, 
+      return {
+        valid: false,
         message: 'Licence annulée.',
-        ...this.signPayload({ active: false })
+        ...this.signPayload({ active: false }),
       };
     }
     if (lic.status === 'expired' || isExpired) {
@@ -195,7 +206,7 @@ export class Mt5LicensesService {
         plan: lic.plan,
         expiry: this.formatDate(lic.expiryDate),
         message: 'Licence expirée. Renouvelez votre abonnement.',
-        ...this.signPayload({ active: false })
+        ...this.signPayload({ active: false }),
       };
     }
 
@@ -203,7 +214,7 @@ export class Mt5LicensesService {
       active: true,
       plan: lic.plan,
       lot: Number(lic.lot),
-      expiresAt: this.formatDate(lic.expiryDate)
+      expiresAt: this.formatDate(lic.expiryDate),
     };
 
     return {
@@ -212,7 +223,7 @@ export class Mt5LicensesService {
       lot: Number(lic.lot),
       expiry: this.formatDate(lic.expiryDate),
       message: 'Licence valide.',
-      ...this.signPayload(payload)
+      ...this.signPayload(payload),
     };
   }
 
@@ -315,7 +326,10 @@ export class Mt5LicensesService {
   // ----------------------------------------------------------
   //  Admin — Bulk Actions
   // ----------------------------------------------------------
-  async bulkActionMt5Licenses(ids: number[], action: 'delete' | 'suspend' | 'reactivate') {
+  async bulkActionMt5Licenses(
+    ids: number[],
+    action: 'delete' | 'suspend' | 'reactivate',
+  ) {
     try {
       if (action === 'delete') {
         await this.prisma.mt5License.deleteMany({
@@ -382,10 +396,13 @@ export class Mt5LicensesService {
   private signPayload(payload: any) {
     const secret = process.env.EA_SECRET || '';
     const jsonString = JSON.stringify(payload);
-    const signature = crypto.createHmac('sha256', secret).update(jsonString).digest('hex');
+    const signature = crypto
+      .createHmac('sha256', secret)
+      .update(jsonString)
+      .digest('hex');
     return {
       payload,
-      signature
+      signature,
     };
   }
 

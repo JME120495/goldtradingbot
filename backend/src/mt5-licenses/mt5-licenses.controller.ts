@@ -117,7 +117,11 @@ export class Mt5LicensesController {
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   async bulkAction(
-    @Body() body: { ids: number[]; action: 'delete' | 'suspend' | 'reactivate' },
+    @Body()
+    body: {
+      ids: number[];
+      action: 'delete' | 'suspend' | 'reactivate';
+    },
   ) {
     if (!body.ids || !Array.isArray(body.ids) || !body.action) {
       throw new BadRequestException('Paramètres invalides.');

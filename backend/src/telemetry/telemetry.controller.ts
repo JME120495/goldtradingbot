@@ -1,4 +1,14 @@
-import { Controller, Post, Get, Body, Param, UseGuards, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
 import { TelemetryService } from './telemetry.service';
 import { AuthGuard } from '@nestjs/passport';
 import { SnapshotDto } from './dto/snapshot.dto';
@@ -14,7 +24,9 @@ export class TelemetryController {
     try {
       return await this.telemetryService.processSnapshot(body);
     } catch (e: any) {
-      throw new BadRequestException({ error: e.message || 'Erreur lors du traitement du snapshot.' });
+      throw new BadRequestException({
+        error: e.message || 'Erreur lors du traitement du snapshot.',
+      });
     }
   }
 
@@ -24,7 +36,9 @@ export class TelemetryController {
     try {
       return await this.telemetryService.processDeal(body);
     } catch (e: any) {
-      throw new BadRequestException({ error: e.message || 'Erreur lors du traitement du deal.' });
+      throw new BadRequestException({
+        error: e.message || 'Erreur lors du traitement du deal.',
+      });
     }
   }
 

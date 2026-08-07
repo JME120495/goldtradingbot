@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class InitiatePaymentDto {
   @IsString()
@@ -12,4 +12,16 @@ export class InitiatePaymentDto {
   @IsString()
   @IsNotEmpty()
   duration: string;
+
+  @IsOptional()
+  @IsString()
+  method?: string; // 'CRYPTO' | 'MOBILE_MONEY'
+
+  @IsOptional()
+  @IsString()
+  phoneNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  provider?: string;
 }

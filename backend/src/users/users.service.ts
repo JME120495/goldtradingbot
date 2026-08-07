@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as argon2 from 'argon2';
 
@@ -19,10 +23,10 @@ export class UsersService {
           include: {
             product: true,
             plan: true,
-            tradingAccount: true
+            tradingAccount: true,
           },
-          orderBy: { createdAt: 'desc' }
-        }
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
 
@@ -57,7 +61,10 @@ export class UsersService {
       throw new NotFoundException('Utilisateur introuvable ou compte externe.');
     }
 
-    const isPasswordValid = await argon2.verify(user.passwordHash, data.currentPassword);
+    const isPasswordValid = await argon2.verify(
+      user.passwordHash,
+      data.currentPassword,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Le mot de passe actuel est incorrect.');
     }

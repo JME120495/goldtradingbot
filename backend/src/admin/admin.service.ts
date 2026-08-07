@@ -17,25 +17,25 @@ export class AdminService {
         createdAt: true,
         isBanned: true,
         licenses: { select: { id: true } },
-        tradingAccounts: { select: { id: true } }
+        tradingAccounts: { select: { id: true } },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
-    
-    return users.map(user => ({
+
+    return users.map((user) => ({
       ...user,
       licensesCount: user.licenses.length,
       tradingAccountsCount: user.tradingAccounts.length,
       // Remove the raw arrays to keep response clean
       licenses: undefined,
-      tradingAccounts: undefined
+      tradingAccounts: undefined,
     }));
   }
 
   async toggleBanUser(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new Error('User not found');
-    
+
     // Un admin ne peut pas se bannir lui-même ou bannir un autre admin
     if (user.role === 'ADMIN') {
       throw new Error('Cannot ban an administrator');
@@ -44,22 +44,23 @@ export class AdminService {
     return this.prisma.user.update({
       where: { id: userId },
       data: { isBanned: !user.isBanned },
-      select: { id: true, isBanned: true }
+      select: { id: true, isBanned: true },
     });
   }
 
   async getEAs() {
     const filesDir = path.join(process.cwd(), 'files');
-    if (!fs.existsSync(filesDir)) return [{ value: 'ALL', label: 'ALL (tous les EA)' }];
-    
+    if (!fs.existsSync(filesDir))
+      return [{ value: 'ALL', label: 'ALL (tous les EA)' }];
+
     const files = fs.readdirSync(filesDir);
     const eas = files
-      .filter(f => f.endsWith('.ex5'))
-      .map(f => {
+      .filter((f) => f.endsWith('.ex5'))
+      .map((f) => {
         const eaName = f.replace('.ex5', '');
         return { value: eaName, label: eaName };
       });
-      
+
     // Always add 'ALL' at the end
     eas.push({ value: 'ALL', label: 'ALL (tous les EA)' });
     return eas;
@@ -69,12 +70,15 @@ export class AdminService {
     const affiliates = await this.prisma.affiliate.findMany({
       include: {
         user: { select: { name: true, email: true } },
-        sales: true
-      }
+        sales: true,
+      },
     });
-    
-    return affiliates.map(aff => {
-      const totalEarned = aff.sales.reduce((sum, sale) => sum + sale.commission, 0);
+
+    return affiliates.map((aff) => {
+      const totalEarned = aff.sales.reduce(
+        (sum, sale) => sum + sale.commission,
+        0,
+      );
       const totalSales = aff.sales.length;
       return { ...aff, totalEarned, totalSales };
     });
@@ -83,14 +87,14 @@ export class AdminService {
   async updateAffiliateCommission(id: string, rate: number) {
     return this.prisma.affiliate.update({
       where: { id },
-      data: { commissionRate: rate }
+      data: { commissionRate: rate },
     });
   }
 
   async updateAffiliateStatus(id: string, status: string) {
     return this.prisma.affiliate.update({
       where: { id },
-      data: { status }
+      data: { status },
     });
   }
 
@@ -103,8 +107,10 @@ export class AdminService {
     if (!user) {
       throw new Error('User not found');
     }
-    
-    const existing = await this.prisma.affiliate.findUnique({ where: { userId: user.id } });
+
+    const existing = await this.prisma.affiliate.findUnique({
+      where: { userId: user.id },
+    });
     if (existing) {
       return existing;
     }
@@ -117,7 +123,7 @@ export class AdminService {
         userId: user.id,
         code,
         status: 'APPROVED',
-      }
+      },
     });
   }
 
@@ -125,15 +131,15 @@ export class AdminService {
     return this.prisma.license.findMany({
       include: {
         user: { select: { name: true, email: true } },
-        plan: { select: { name: true, lotAllowed: true } }
-      }
+        plan: { select: { name: true, lotAllowed: true } },
+      },
     });
   }
 
   async updateLicenseStatus(id: string, status: string) {
     return this.prisma.license.update({
       where: { id },
-      data: { status }
+      data: { status },
     });
   }
 
@@ -141,43 +147,52 @@ export class AdminService {
     // Nullify payment relations first to avoid foreign key constraints
     await this.prisma.payment.updateMany({
       where: { licenseId: id },
-      data: { licenseId: null }
+      data: { licenseId: null },
     });
     return this.prisma.license.delete({
-      where: { id }
+      where: { id },
     });
   }
 
-  async bulkActionLicenses(ids: string[], action: 'delete' | 'activate' | 'cancel') {
+  async bulkActionLicenses(
+    ids: string[],
+    action: 'delete' | 'activate' | 'cancel',
+  ) {
     if (action === 'delete') {
       await this.prisma.payment.updateMany({
         where: { licenseId: { in: ids } },
-        data: { licenseId: null }
+        data: { licenseId: null },
       });
       return this.prisma.license.deleteMany({
-        where: { id: { in: ids } }
+        where: { id: { in: ids } },
       });
     } else if (action === 'activate') {
       return this.prisma.license.updateMany({
         where: { id: { in: ids } },
-        data: { status: 'ACTIVE' }
+        data: { status: 'ACTIVE' },
       });
     } else if (action === 'cancel') {
       return this.prisma.license.updateMany({
         where: { id: { in: ids } },
-        data: { status: 'CANCELLED' }
+        data: { status: 'CANCELLED' },
       });
     }
     throw new Error('Invalid action');
   }
 
-  async createLicenseManually(email: string, planId: string, durationDays: number) {
+  async createLicenseManually(
+    email: string,
+    planId: string,
+    durationDays: number,
+  ) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) {
       throw new Error('User not found');
     }
 
-    const plan = await this.prisma.productPlan.findUnique({ where: { id: planId } });
+    const plan = await this.prisma.productPlan.findUnique({
+      where: { id: planId },
+    });
     if (!plan) {
       throw new Error('Plan not found');
     }
@@ -195,14 +210,14 @@ export class AdminService {
         planId: plan.id,
         status: 'ACTIVE',
         lotAllowed: plan.lotAllowed,
-        expiresAt
-      }
+        expiresAt,
+      },
     });
   }
 
   async getPlans() {
     return this.prisma.productPlan.findMany({
-      include: { product: true }
+      include: { product: true },
     });
   }
 
@@ -212,17 +227,19 @@ export class AdminService {
       where: { slug: 'GOLD_SCALPER' },
       update: {
         name: 'GOLD_SCALPER',
-        description: 'Expert Advisor Gold Scalper (MT5)'
+        description: 'Expert Advisor Gold Scalper (MT5)',
       },
       create: {
         name: 'GOLD_SCALPER',
         slug: 'GOLD_SCALPER',
-        description: 'Expert Advisor Gold Scalper (MT5)'
-      }
+        description: 'Expert Advisor Gold Scalper (MT5)',
+      },
     });
 
     // Clear existing plans for this product to avoid duplicates during seed
-    await this.prisma.productPlan.deleteMany({ where: { productId: product.id } });
+    await this.prisma.productPlan.deleteMany({
+      where: { productId: product.id },
+    });
 
     await this.prisma.productPlan.createMany({
       data: [
@@ -230,15 +247,15 @@ export class AdminService {
           productId: product.id,
           name: 'Starter',
           lotAllowed: 0.01,
-          prices: '{"monthly": 50, "yearly": 400}'
+          prices: '{"monthly": 50, "yearly": 400}',
         },
         {
           productId: product.id,
           name: 'Pro',
           lotAllowed: 0.1,
-          prices: '{"monthly": 100, "yearly": 800}'
-        }
-      ]
+          prices: '{"monthly": 100, "yearly": 800}',
+        },
+      ],
     });
 
     return { success: true, message: 'Products seeded successfully' };
@@ -249,78 +266,85 @@ export class AdminService {
       include: {
         affiliate: {
           include: {
-            user: { select: { name: true, email: true } }
-          }
-        }
+            user: { select: { name: true, email: true } },
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async updateWithdrawalStatus(id: string, status: string, txHash?: string) {
     return this.prisma.withdrawalRequest.update({
       where: { id },
-      data: { status, txHash }
+      data: { status, txHash },
     });
   }
 
   async getAnalytics() {
     const totalUsers = await this.prisma.user.count();
-    const activeLicenses = await this.prisma.license.count({ where: { status: 'ACTIVE' } });
-    const totalSales = await this.prisma.payment.count({ where: { status: 'COMPLETED' } });
+    const activeLicenses = await this.prisma.license.count({
+      where: { status: 'ACTIVE' },
+    });
+    const totalSales = await this.prisma.payment.count({
+      where: { status: 'COMPLETED' },
+    });
     const revenueResult = await this.prisma.payment.aggregate({
       _sum: { amount: true },
-      where: { status: 'COMPLETED' }
+      where: { status: 'COMPLETED' },
     });
-    
+
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
     const payments = await this.prisma.payment.findMany({
       where: { status: 'COMPLETED', createdAt: { gte: sixMonthsAgo } },
-      select: { amount: true, createdAt: true }
+      select: { amount: true, createdAt: true },
     });
 
     const monthlyRevenue: Record<string, number> = {};
-    payments.forEach(p => {
-      const month = p.createdAt.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
+    payments.forEach((p) => {
+      const month = p.createdAt.toLocaleString('fr-FR', {
+        month: 'short',
+        year: 'numeric',
+      });
       monthlyRevenue[month] = (monthlyRevenue[month] || 0) + p.amount;
     });
 
-    const revenueData = Object.keys(monthlyRevenue).map(key => ({
+    const revenueData = Object.keys(monthlyRevenue).map((key) => ({
       name: key,
-      revenue: monthlyRevenue[key]
+      revenue: monthlyRevenue[key],
     }));
 
     // --- NEW: MT5 Analytics ---
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    
+
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     const mt5EquityAgg = await this.prisma.mt5AccountStat.aggregate({
-      _sum: { equity: true }
+      _sum: { equity: true },
     });
     const totalMt5Equity = Number(mt5EquityAgg._sum.equity || 0);
 
     const activeMt5Accounts24h = await this.prisma.mt5License.count({
-      where: { lastCheckAt: { gte: yesterday } }
+      where: { lastCheckAt: { gte: yesterday } },
     });
 
     const recentMt5Trades = await this.prisma.mt5TradeHistory.findMany({
       where: { openTime: { gte: sevenDaysAgo } },
-      select: { openTime: true, profit: true }
+      select: { openTime: true, profit: true },
     });
 
     const tradesByDay: Record<string, number> = {};
-    recentMt5Trades.forEach(t => {
+    recentMt5Trades.forEach((t) => {
       const day = t.openTime.toLocaleDateString('fr-FR', { weekday: 'short' });
       tradesByDay[day] = (tradesByDay[day] || 0) + Number(t.profit);
     });
 
-    const mt5ProfitData = Object.keys(tradesByDay).map(day => ({
+    const mt5ProfitData = Object.keys(tradesByDay).map((day) => ({
       name: day,
-      profit: tradesByDay[day]
+      profit: tradesByDay[day],
     }));
 
     return {
@@ -331,7 +355,7 @@ export class AdminService {
       revenueData,
       totalMt5Equity,
       activeMt5Accounts24h,
-      mt5ProfitData
+      mt5ProfitData,
     };
   }
 }

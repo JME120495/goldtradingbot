@@ -7,7 +7,9 @@ export class DiscordService {
 
   async sendMessage(message: string) {
     if (!this.webhookUrl) {
-      this.logger.warn('Discord webhook URL is missing. Notification not sent.');
+      this.logger.warn(
+        'Discord webhook URL is missing. Notification not sent.',
+      );
       return;
     }
 
