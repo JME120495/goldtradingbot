@@ -340,6 +340,28 @@ export class PaymentsService {
   }
 
   // --- KPAY INTEGRATION ---
+
+  // Map provider code -> country dial code
+  private getCountryCode(provider: string): string {
+    const map: Record<string, string> = {
+      'MTN_MOMO_CMR': '237',
+      'ORANGE_CMR': '237',
+      'MTN_MOMO_CI': '225',
+      'ORANGE_CI': '225',
+      'WAVE_CI': '225',
+      'MOOV_CI': '225',
+      'AIRTEL_GAB': '241',
+      'MOOV_GAB': '241',
+      'MTN_MOMO_BEN': '229',
+      'MOOV_BEN': '229',
+      'WAVE_SEN': '221',
+      'ORANGE_SEN': '221',
+      'FREE_SEN': '221',
+      'MTN_MOMO_COG': '242',
+      'AIRTEL_COG': '242',
+    };
+    return map[provider] || '';
+  }
   
   private async initiateKPay(user: any, plan: any, payment: any, amountUSD: number, txRef: string, duration: string, data: any) {
     const apiKey = process.env.KPAY_API_KEY;
@@ -353,20 +375,29 @@ export class PaymentsService {
       throw new InternalServerErrorException('Numéro de téléphone et opérateur requis pour le paiement Mobile Money');
     }
 
-    // Conversion manuelle: 1 USD = 600 XAF
+    // Auto-prefix country code if the user didn't include it
+    let phoneNumber = data.phoneNumber.replace(/\s+/g, '').replace(/^\+/, '');
+    const countryCode = this.getCountryCode(data.provider);
+    if (countryCode && !phoneNumber.startsWith(countryCode)) {
+      phoneNumber = countryCode + phoneNumber;
+    }
+
+    // Conversion manuelle: 1 USD = 600 XAF (zone CEMAC/UEMOA)
     const exchangeRate = 600;
     const amountXAF = Math.round(amountUSD * exchangeRate);
 
     const payload = {
       amount: amountXAF,
       provider: data.provider,
-      phoneNumber: data.phoneNumber,
+      phoneNumber: phoneNumber,
       externalId: txRef,
       description: `Licence Robot - Plan ${plan.name} (${duration})`,
       customerName: user.name || 'Client',
       customerEmail: user.email,
       metadata: { userId: user.id }
     };
+
+    this.logger.log(`KPay init payload: ${JSON.stringify(payload)}`);
 
     try {
       const response = await fetch('https://admin.kpay.site/api/v1/payments/init', {
@@ -380,16 +411,18 @@ export class PaymentsService {
       });
 
       const resData = await response.json();
+      this.logger.log(`KPay init response (${response.status}): ${JSON.stringify(resData)}`);
       
       if (response.ok) {
         return { paymentStatus: 'PENDING', message: 'Veuillez valider le paiement sur votre téléphone.' };
       } else {
         this.logger.error(`KPay init error: ${JSON.stringify(resData)}`);
-        throw new InternalServerErrorException(`Erreur KPay: ${resData.message || 'Paiement échoué'}`);
+        throw new InternalServerErrorException(`Erreur KPay: ${resData.message || resData.error || 'Paiement échoué'}`);
       }
     } catch (err: any) {
+      if (err instanceof InternalServerErrorException) throw err;
       this.logger.error(`Error calling KPay: ${err.message}`);
-      throw new InternalServerErrorException('Erreur lors de l\'initialisation du paiement Mobile Money');
+      throw new InternalServerErrorException(`Erreur Mobile Money: ${err.message}`);
     }
   }
 
