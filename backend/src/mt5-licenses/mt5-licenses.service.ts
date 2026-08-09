@@ -18,26 +18,29 @@ export class Mt5LicensesService {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
-        tradingAccounts: true,
+        tradingAccounts: {
+          orderBy: { createdAt: 'asc' }, // Oldest accounts get priority
+        },
         licenses: {
           where: { status: 'ACTIVE' },
           include: { plan: true, product: true },
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: 'desc' }, // Newest/best licenses first
         },
       },
     });
 
     if (!user) return;
 
+    // Filter to truly active licenses
+    const activeLicenses = user.licenses.filter(l => !l.expiresAt || l.expiresAt > new Date());
+    let licenseIndex = 0;
+
     for (const account of user.tradingAccounts) {
-      const webLicense = user.licenses.find((l) => {
-        if (!l.expiresAt) return true;
-        return l.expiresAt > new Date();
-      });
+      const webLicense = activeLicenses[licenseIndex];
+      const accountNumber = BigInt(account.accountNumber);
 
       if (webLicense) {
         const eaName = webLicense.product.slug;
-        const accountNumber = BigInt(account.accountNumber);
 
         // If web license found, upsert an Mt5License to keep the robot working
         await this.prisma.mt5License.upsert({
@@ -67,7 +70,37 @@ export class Mt5LicensesService {
             expiryDate: webLicense.expiresAt || new Date('2099-12-31'),
           },
         });
+
+        // Link the web license to this trading account in DB
+        await this.prisma.license.update({
+          where: { id: webLicense.id },
+          data: { tradingAccountId: account.id }
+        });
+
+        licenseIndex++; // Move to the next license for the next account
+      } else {
+        // No more active licenses for remaining accounts. Suspend their MT5 licenses.
+        try {
+           await this.prisma.mt5License.updateMany({
+             where: { accountNumber },
+             data: { status: 'suspended' }
+           });
+        } catch(e) {}
+        
+        // Also ensure tradingAccountId is null for any license that might have been tied
+        await this.prisma.license.updateMany({
+          where: { tradingAccountId: account.id },
+          data: { tradingAccountId: null }
+        });
       }
+    }
+
+    // Any remaining licenses that were not assigned to an account should have tradingAccountId = null
+    for (let i = licenseIndex; i < activeLicenses.length; i++) {
+       await this.prisma.license.update({
+          where: { id: activeLicenses[i].id },
+          data: { tradingAccountId: null }
+       });
     }
   }
 
@@ -111,25 +144,20 @@ export class Mt5LicensesService {
       const tradingAccount = await this.prisma.tradingAccount.findFirst({
         where: { accountNumber: String(account) },
         include: {
-          user: {
-            include: {
-              licenses: {
-                where: { status: 'ACTIVE' },
-                include: { plan: true },
-                orderBy: { createdAt: 'desc' },
-              },
-            },
+          licenses: {
+            where: { status: 'ACTIVE' },
+            include: { plan: true },
+            orderBy: { createdAt: 'desc' },
           },
         },
       });
 
       if (
         tradingAccount &&
-        tradingAccount.user &&
-        tradingAccount.user.licenses.length > 0
+        tradingAccount.licenses.length > 0
       ) {
-        // Find a valid unexpired license
-        const webLicense = tradingAccount.user.licenses.find((l) => {
+        // Find a valid unexpired license explicitly linked to this account
+        const webLicense = tradingAccount.licenses.find((l) => {
           if (!l.expiresAt) return true;
           return l.expiresAt > new Date();
         });
