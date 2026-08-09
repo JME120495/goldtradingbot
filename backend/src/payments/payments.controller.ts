@@ -66,14 +66,20 @@ export class PaymentsController {
     @Headers('x-kpay-signature') signature: string,
     @Headers('x-kpay-event') event: string
   ) {
-    console.log('KPay webhook received:', event);
+    console.log('=== KPAY WEBHOOK RECEIVED ===');
+    console.log('Event:', event);
+    console.log('Signature present:', !!signature);
+    console.log('Body:', JSON.stringify(body));
+    console.log('rawBody available:', !!req.rawBody);
     
     if (!signature || !event) {
+      console.log('REJECTED: Missing headers');
       return { status: 'error', message: 'Missing headers' };
     }
 
-    // Try to get rawBody, fallback to stringified body
+    // rawBody from NestJS { rawBody: true } option
     const rawBody = req.rawBody || Buffer.from(JSON.stringify(body));
+    console.log('rawBody type:', typeof rawBody, 'isBuffer:', Buffer.isBuffer(rawBody));
 
     return this.paymentsService.handleKpayWebhook(rawBody, signature, event, body);
   }

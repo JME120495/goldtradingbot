@@ -35,24 +35,9 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Payload Size Limitation and Raw Body for Webhooks
-  app.use(
-    express.json({
-      limit: '1mb',
-      verify: (req: any, res, buf) => {
-        req.rawBody = buf;
-      },
-    }),
-  );
-  app.use(
-    express.urlencoded({
-      extended: true,
-      limit: '1mb',
-      verify: (req: any, res, buf) => {
-        req.rawBody = buf;
-      },
-    }),
-  );
+  // Payload Size Limitation
+  app.use(express.json({ limit: '1mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
   // Validation
   app.useGlobalPipes(
