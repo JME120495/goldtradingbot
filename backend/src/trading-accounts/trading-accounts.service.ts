@@ -74,12 +74,19 @@ export class TradingAccountsService {
       data: { tradingAccountId: null },
     });
 
+    // Suspend old MT5 licenses to prevent the old account from continuing to trade
+    try {
+      await this.prisma.mt5License.updateMany({
+        where: { accountNumber: BigInt(account.accountNumber) },
+        data: { status: 'suspended' },
+      });
+    } catch (e) {
+      console.warn('Could not suspend MT5 license during account deletion', e);
+    }
+
     const deleted = await this.prisma.tradingAccount.delete({
       where: { id: accountId },
     });
-
-    // We leave the old MT5 licenses for now or we could suspend them.
-    // Usually they are detached or can just be left since the web account is unlinked.
 
     return deleted;
   }
