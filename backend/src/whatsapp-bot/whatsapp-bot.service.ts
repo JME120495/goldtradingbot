@@ -79,9 +79,11 @@ BROKERS ET RECOMMANDATIONS :
 - Toutefois, le client n'est pas obligé d'utiliser Fusion Markets, le robot fonctionne avec tous les brokers.
 
 PRIX ET LICENCES :
-- Licence Standard (1 mois) : 50$ (ou environ 30.000 FCFA). Limite de lot : 0.01 lot maximum.
-- Licence Pro (1 mois) : 100$ (ou environ 60.000 FCFA). Limite de lot : 0.1 lot maximum.
-- Licences Annuelles : Standard à 400$, Pro à 800$.
+- Plan Starter : 79$/mois. Limite de lot : 0.01. (Capital minimum recommandé : 100$)
+- Plan Standard : 149$/mois. Limite de lot : 0.10. (Capital minimum recommandé : 1000$)
+- Plan Pro : 299$/mois. Limite de lot : 0.50. (Capital minimum recommandé : 5000$)
+- Plan VIP : 599$/mois. Limite de lot : 1.00. (Capital minimum recommandé : 10000$)
+(Des abonnements hebdomadaires et annuels sont aussi disponibles sur le site).
 - Mode de paiement : Crypto-monnaie ou Mobile Money Africain. (Ne cite jamais de nom de plateforme ou d'agrégateur).
 
 COMMENT ACHETER / DÉMARRER :
