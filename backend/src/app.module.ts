@@ -21,6 +21,8 @@ import { MailModule } from './mail/mail.module';
 import { TelegramModule } from './telegram/telegram.module';
 import { DiscordModule } from './discord/discord.module';
 
+import { WhatsappBotModule } from './whatsapp-bot/whatsapp-bot.module';
+
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -46,6 +48,7 @@ import { DiscordModule } from './discord/discord.module';
     MailModule,
     TelegramModule,
     DiscordModule,
+    WhatsappBotModule,
   ],
   controllers: [AppController],
   providers: [
