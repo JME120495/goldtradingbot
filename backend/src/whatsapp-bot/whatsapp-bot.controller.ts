@@ -1,6 +1,6 @@
 import { Controller, Post, Get, Body, Query, Req, Res, HttpStatus } from '@nestjs/common';
 import { WhatsappBotService } from './whatsapp-bot.service';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 @Controller('api/whatsapp')
 export class WhatsappBotController {

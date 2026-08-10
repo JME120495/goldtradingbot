@@ -55,10 +55,11 @@ export class WhatsappBotService {
   private async processAndReply(phone: string, userText: string) {
     try {
       // 1. Get or create chat history for this user
-      if (!this.sessions.has(phone)) {
-        this.sessions.set(phone, []);
+      let history = this.sessions.get(phone);
+      if (!history) {
+        history = [];
+        this.sessions.set(phone, history);
       }
-      const history = this.sessions.get(phone);
 
       // System Prompt (Context for the AI)
       const systemPrompt = `
@@ -142,7 +143,7 @@ INSTRUCTIONS DE RÉPONSE :
     }
 
     try {
-      const url = \`https://graph.facebook.com/v19.0/\${phoneNumberId}/messages\`;
+      const url = `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`;
       
       const payload = {
         messaging_product: 'whatsapp',
@@ -153,7 +154,7 @@ INSTRUCTIONS DE RÉPONSE :
 
       await axios.post(url, payload, {
         headers: {
-          Authorization: \`Bearer \${token}\`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
