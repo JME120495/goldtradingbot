@@ -36,6 +36,9 @@ export class WhatsappBotController {
   // ----------------------------------------------------------
   @Post('webhook')
   async handleWebhook(@Body() body: any, @Res() res: Response) {
+    console.log('--- INCOMING WEBHOOK FROM META ---');
+    console.log(JSON.stringify(body, null, 2));
+    
     // Acknowledge receipt to Meta immediately (they expect 200 OK within 20 seconds)
     res.sendStatus(HttpStatus.OK);
     
