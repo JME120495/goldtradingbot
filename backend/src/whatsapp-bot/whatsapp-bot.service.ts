@@ -102,7 +102,7 @@ INSTRUCTIONS DE RÉPONSE :
 
       // Combine history with current prompt
       const model = this.genAI.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
+        model: 'gemini-flash-latest',
         systemInstruction: systemPrompt 
       });
 
