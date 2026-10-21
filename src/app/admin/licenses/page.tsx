@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { useTranslations } from 'next-intl';
 
@@ -74,6 +74,43 @@ export default function AdminLicenses() {
       fetchLicenses();
     } catch (err) {
       alert(`Erreur lors de l'action en masse (${action})`);
+    }
+  };
+
+  const [historyFor, setHistoryFor] = useState<string | null>(null);
+  const [history, setHistory] = useState<any[]>([]);
+
+  const toggleHistory = async (id: string) => {
+    if (historyFor === id) {
+      setHistoryFor(null);
+      return;
+    }
+    try {
+      const res = await api.get(`/license/admin/account-history/${id}`);
+      setHistory(res.data);
+      setHistoryFor(id);
+    } catch (err) {
+      alert("Erreur lors du chargement de l'historique");
+    }
+  };
+
+  const adminChangeAccount = async (lic: any) => {
+    const accountNumber = prompt(
+      `Nouveau compte MT5 pour cette licence (actuel : ${lic.tradingAccount?.accountNumber || 'aucun'}).\nChangement admin : sans limite de 30 jours, ne remet pas à zéro le délai du client.`,
+    );
+    if (!accountNumber) return;
+    try {
+      await api.post('/license/admin/change-account', {
+        license_id: lic.id,
+        account_number: accountNumber.trim(),
+      });
+      await fetchLicenses();
+      if (historyFor === lic.id) {
+        const res = await api.get(`/license/admin/account-history/${lic.id}`);
+        setHistory(res.data);
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Erreur lors du changement de compte');
     }
   };
 
@@ -195,15 +232,17 @@ export default function AdminLicenses() {
               <th className="p-4 text-gray-400">{t('plan')}</th>
               <th className="p-4 text-gray-400">{t('lot_allowed')}</th>
               <th className="p-4 text-gray-400">Expire le</th>
+              <th className="p-4 text-gray-400">Compte MT5</th>
               <th className="p-4 text-gray-400">{t('status')}</th>
               <th className="p-4 text-gray-400">{t('actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/10">
             {loading ? (
-              <tr><td colSpan={7} className="p-4 text-center">{t('loading')}</td></tr>
+              <tr><td colSpan={8} className="p-4 text-center">{t('loading')}</td></tr>
             ) : licenses.map((lic) => (
-              <tr key={lic.id} className="hover:bg-white/5">
+              <Fragment key={lic.id}>
+              <tr className="hover:bg-white/5">
                 <td className="p-4">
                   <input
                     type="checkbox"
@@ -216,6 +255,21 @@ export default function AdminLicenses() {
                 <td className="p-4">{lic.plan?.name}</td>
                 <td className="p-4">{lic.plan?.lotAllowed}</td>
                 <td className="p-4">{lic.expiresAt ? new Date(lic.expiresAt).toLocaleDateString() : 'À vie'}</td>
+                <td className="p-4">
+                  <div className="font-mono font-bold">{lic.tradingAccount?.accountNumber || <span className="text-amber-400 font-sans font-normal">En attente</span>}</div>
+                  <div className="text-xs text-gray-500">
+                    {lic.accountChangeCount || 0} changement(s)
+                    {lic.accountChangedAt && ` · dernier le ${new Date(lic.accountChangedAt).toLocaleDateString()}`}
+                  </div>
+                  <div className="flex gap-3 mt-1 text-xs">
+                    <button onClick={() => adminChangeAccount(lic)} className="text-[#D4AF37] hover:underline">
+                      Changer le compte (admin)
+                    </button>
+                    <button onClick={() => toggleHistory(lic.id)} className="text-gray-400 hover:text-white">
+                      {historyFor === lic.id ? 'Masquer' : 'Historique'}
+                    </button>
+                  </div>
+                </td>
                 <td className="p-4">
                   <span className={`px-2 py-1 rounded text-xs font-bold ${lic.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                     {lic.status === 'CANCELLED' ? 'ANNULÉ' : lic.status}
@@ -236,6 +290,25 @@ export default function AdminLicenses() {
                   </button>
                 </td>
               </tr>
+              {historyFor === lic.id && (
+                <tr className="bg-black/40">
+                  <td colSpan={8} className="p-4">
+                    {history.length === 0 ? (
+                      <span className="text-gray-500">Aucun changement de compte enregistré.</span>
+                    ) : (
+                      <ul className="space-y-1 font-mono text-xs">
+                        {history.map((h) => (
+                          <li key={h.id}>
+                            {new Date(h.changedAt).toLocaleString()} — {h.oldAccount ?? '∅'} → {h.newAccount}{' '}
+                            <span className={h.changedBy === 'admin' ? 'text-[#D4AF37]' : 'text-gray-400'}>({h.changedBy})</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </td>
+                </tr>
+              )}
+              </Fragment>
             ))}
           </tbody>
         </table>

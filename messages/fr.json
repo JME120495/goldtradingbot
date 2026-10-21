@@ -8,18 +8,18 @@
     "get_started": "Commencer"
   },
   "Hero": {
-    "subtitle": "Expert Advisor MT5",
+    "subtitle": "2 Expert Advisors MT5 · Gold AI & Gold Scalper",
     "title1": "Générez des Revenus Passifs",
     "title2": "Sur l'Or. Sans Stress.",
-    "description": "Fini les nuits blanches devant les graphiques et les comptes cramés. Laissez notre algorithme de niveau institutionnel scalper l'Or pour vous, 24h/24, avec un contrôle strict du risque.",
+    "description": "Fini les nuits blanches devant les graphiques et les comptes cramés. Choisissez votre robot, Gold AI ou Gold Scalper, et laissez-le trader l'Or pour vous, 24h/24, avec un contrôle strict du risque.",
     "start_trial": "Essai Gratuit",
     "view_pricing": "Voir les Tarifs"
   },
   "About": {
     "title": "Qu'est-ce que Gold Trading Bot ?",
     "p1": "Imaginez avoir un expert financier qui travaille pour vous 24 heures sur 24, sans jamais dormir, sans jamais faire de pause, et surtout... sans jamais stresser. C'est exactement ce qu'est Gold Trading Bot !",
-    "p2": "Concrètement, c'est un programme informatique intelligent conçu spécifiquement pour trader l'Or sur les marchés financiers, de manière 100% automatique.",
-    "p3": "Notre robot vous permet de générer des revenus passifs sans que vous ayez besoin de savoir trader. Vous gagnez de l'argent automatiquement pendant que vous vous consacrez à d'autres activités, sans avoir à passer la moindre minute devant des graphiques complexes.",
+    "p2": "Concrètement, ce sont des programmes informatiques intelligents conçus spécifiquement pour trader l'Or (XAUUSD) sur MetaTrader 5, de manière 100% automatique. Nous en proposons deux : Gold AI et Gold Scalper.",
+    "p3": "Nos robots vous permettent de générer des revenus passifs sans que vous ayez besoin de savoir trader. Vous gagnez de l'argent automatiquement pendant que vous vous consacrez à d'autres activités, sans avoir à passer la moindre minute devant des graphiques complexes.",
     "bullet1": "Zéro expérience requise : Le robot intègre déjà toutes les stratégies des professionnels.",
     "bullet2": "Une sécurité sans émotion : Il suit des règles mathématiques strictes pour protéger votre capital.",
     "bullet3": "Vous gardez le contrôle total : Vos fonds restent sur votre propre compte de trading sécurisé, vous seul pouvez les retirer."
@@ -45,7 +45,7 @@
   },
   "Pricing": {
     "title": "Rejoignez l'Élite des Traders Rentables",
-    "subtitle": "Choisissez le plan adapté à votre capital. Support 24/7. Annulable à tout moment. Rentabilisé en quelques trades.",
+    "subtitle": "Chaque robot a sa propre tarification : choisissez le vôtre, puis la formule qui vous convient. Une licence = un compte MT5. Support 24/7.",
     "weekly": "Hebdo",
     "monthly": "Mensuel",
     "semi_annual": "6 Mois",
@@ -76,7 +76,14 @@
     "feat_support": "Support technique 24/7",
     "feat_vip_support": "Support VIP & assistance à l'installation",
     "feat_cancel": "Sans engagement, annulable à tout moment",
-    "feat_no_sub": "Zéro abonnement, aucun frais récurrent"
+    "feat_no_sub": "Zéro abonnement, aucun frais récurrent",
+    "goldai_feat_ea": "Robot Gold AI MT5 (XAUUSD)",
+    "goldai_feat_lot": "Vous choisissez votre lot, tous les autres réglages sont verrouillés",
+    "goldai_feat_account": "Une licence = un seul compte MT5",
+    "discount_40": "-40% Fin d'Année",
+    "scalper_support_standard": "Support standard",
+    "scalper_support_priority": "Support prioritaire",
+    "scalper_support_vip": "Installation & support individuel"
   },
   "Language": {
     "en": "English",
@@ -146,6 +153,19 @@
     "mt5_account": "Compte MT5",
     "manage": "Gérer",
     "add_account": "Ajouter un Compte",
+    "acc_help": "Le numéro est celui affiché dans MT5 (ex: 12345678). Le robot ne fonctionnera que sur ce compte.",
+    "acc_placeholder": "Numéro de compte MT5",
+    "acc_save": "Enregistrer",
+    "acc_saving": "Enregistrement...",
+    "acc_change": "Changer de compte",
+    "acc_change_warning": "Un seul changement par 30 jours.",
+    "acc_next_change": "Prochain changement possible le",
+    "acc_cancel": "Annuler",
+    "acc_pending": "En attente de compte",
+    "acc_active": "Active",
+    "acc_expired": "Expirée",
+    "acc_invalid": "Entier positif uniquement (ex: 12345678).",
+    "acc_error": "Erreur lors de l'enregistrement du compte.",
     "download_ea": "Télécharger l'EA",
     "your_affiliate_link": "Votre Lien d'Affiliation",
     "sales": "Ventes Totales",
@@ -175,7 +195,7 @@
     "art2_p1": "Le Site propose la vente de licences d'utilisation d'un Expert Advisor (EA) pour la plateforme MetaTrader 5 (MT5), destiné au trading automatisé sur l'or (XAU/USD).",
     "art2_l1": "Les licences sont proposées sous différents plans (Starter, Standard, Pro, VIP) avec des tailles de lots maximales différentes.",
     "art2_l2": "Chaque licence est liée à un numéro de compte MT5 unique.",
-    "art2_l3": "Les licences sont vendues sous forme d'abonnement mensuel ou d'achat unique de licence à vie (lifetime).",
+    "art2_l3": "Les licences sont vendues pour une durée déterminée (hebdomadaire, mensuelle, semestrielle, annuelle) ou, selon le robot, sous forme d'abonnement mensuel ou de licence à vie (achat unique).",
     "art3_title": "Prix et Paiement",
     "art3_p1": "Les prix sont indiqués en dollars américains (USD) et sont susceptibles d'être modifiés à tout moment. Le prix applicable est celui affiché au moment de la commande.",
     "art3_p2": "Le paiement est effectué exclusivement en cryptomonnaie via notre prestataire de paiement sécurisé. La licence est activée automatiquement après confirmation du paiement par le réseau blockchain.",
@@ -354,7 +374,9 @@
     "save_300": "Économisez 300 $",
     "unlimited_lots": "Tous les lots autorisés (aucun bridage)",
     "billed_monthly": "/mois",
-    "one_time": "paiement unique"
+    "one_time": "paiement unique",
+    "promo_badge": "-{pct}% Fin d'Année",
+    "save_amount": "Économisez {amount} $"
   },
   "DashboardDownloads": {
     "title": "Téléchargements",
@@ -396,5 +418,35 @@
     "t3_text": "\"Je l'ai testé en mode démo pendant 2 semaines puis je suis passé en réel. Les résultats sont bluffants.\"",
     "t3_author": "Thomas P.",
     "t3_role": "Entrepreneur"
+  },
+  "Products": {
+    "GoldAI_desc": "Robot de trading sur l'or (XAUUSD). Vous choisissez uniquement votre taille de lot, tous les autres réglages sont verrouillés. Une licence = un seul compte MT5."
+  },
+  "Robots": {
+    "title": "Choisissez votre Robot",
+    "subtitle": "Deux Expert Advisors pour trader l'Or (XAUUSD) sur MetaTrader 5. Chacun a sa propre tarification.",
+    "new_badge": "Nouveau",
+    "goldai_p1": "Vous choisissez librement votre taille de lot",
+    "goldai_p2": "Tous les autres réglages sont verrouillés",
+    "goldai_p3": "Abonnement mensuel ou licence à vie",
+    "scalper_desc": "Robot de scalping haute fréquence sur l'or (XAUUSD), avec 4 plans selon votre capital.",
+    "scalper_p1": "Plans Starter, Standard, Pro et VIP",
+    "scalper_p2": "Lot maximum selon le plan (0,01 à 1,00)",
+    "scalper_p3": "Licence hebdomadaire, mensuelle, 6 mois ou annuelle",
+    "one_account": "1 licence = 1 compte MT5",
+    "from": "À partir de",
+    "cta": "Voir la tarification"
+  },
+  "HowItWorks": {
+    "title": "Comment ça marche ?",
+    "subtitle": "De l'achat au premier trade en quelques minutes.",
+    "s1_title": "Choisissez votre robot",
+    "s1_desc": "Gold AI ou Gold Scalper, puis la licence qui vous convient. Paiement par Mobile Money ou en crypto.",
+    "s2_title": "Enregistrez votre compte MT5",
+    "s2_desc": "Dans votre espace client, saisissez le numéro de votre compte MT5. Une licence fonctionne sur un seul compte (changement possible une fois tous les 30 jours).",
+    "s3_title": "Installez le robot",
+    "s3_desc": "Téléchargez l'EA depuis votre espace client et placez-le sur le graphique XAUUSD dans MetaTrader 5. Un VPS est recommandé pour un fonctionnement 24/7.",
+    "s4_title": "Laissez-le trader",
+    "s4_desc": "Le robot vérifie automatiquement votre licence et trade pour vous, sans intervention."
   }
 }

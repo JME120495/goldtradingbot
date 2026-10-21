@@ -44,6 +44,16 @@ export class TradingAccountsService {
       }
     }
 
+    // Same MT5 number under another broker name must not bypass the check above
+    const takenByOther = await this.prisma.tradingAccount.findFirst({
+      where: { accountNumber: data.accountNumber, userId: { not: userId } },
+    });
+    if (takenByOther) {
+      throw new ConflictException(
+        'This account is already linked by another user.',
+      );
+    }
+
     const newAccount = await this.prisma.tradingAccount.create({
       data: {
         userId,
@@ -66,6 +76,20 @@ export class TradingAccountsService {
 
     if (!account) {
       throw new NotFoundException('Account not found');
+    }
+
+    // 1 licence = 1 compte: deleting a bound account would bypass the 30-day change limit
+    const boundLicense = await this.prisma.license.findFirst({
+      where: {
+        tradingAccountId: accountId,
+        status: 'ACTIVE',
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+      },
+    });
+    if (boundLicense) {
+      throw new ConflictException(
+        'Ce compte est lié à une licence active. Utilisez « Changer de compte » dans Mes licences.',
+      );
     }
 
     // Detach licenses (set tradingAccountId to null)

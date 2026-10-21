@@ -29,6 +29,7 @@ import { useTranslations } from 'next-intl';
 
 export default function DownloadsPage() {
   const t = useTranslations('DashboardDownloads');
+  const tProducts = useTranslations('Products');
   const [loading, setLoading] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
@@ -147,7 +148,9 @@ export default function DownloadsPage() {
                 </div>
 
                 <p className="text-gray-400 mb-2 text-sm">
-                  {product.description || 'Expert Advisor MetaTrader 5'}
+                  {tProducts.has(`${product.slug}_desc`)
+                    ? tProducts(`${product.slug}_desc`)
+                    : product.description || 'Expert Advisor MetaTrader 5'}
                 </p>
 
                 {/* License Details */}

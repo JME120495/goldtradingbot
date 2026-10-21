@@ -13,17 +13,18 @@ export default function DashboardOverview() {
   const router = useRouter();
   const t = useTranslations('Dashboard');
   
+  const fetchUser = async () => {
+    try {
+      const res = await api.get('/users/me');
+      setUser(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get('/users/me');
-        setUser(res.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUser();
   }, []);
 
@@ -114,14 +115,10 @@ export default function DashboardOverview() {
                       {license.expiresAt ? new Date(license.expiresAt).toLocaleDateString() : 'Lifetime'}
                     </td>
                     <td className="p-4">
-                      <span className={`px-2 py-1 rounded text-xs font-bold ${license.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                        {license.status}
-                      </span>
+                      <LicenseStatusBadge license={license} />
                     </td>
                     <td className="p-4">
-                      {license.tradingAccount ? license.tradingAccount.accountNumber : 
-                        <Link href="/dashboard/accounts" className="text-[#D4AF37] hover:underline text-sm">{t('add_account')}</Link>
-                      }
+                      <LicenseAccountCell license={license} onUpdated={fetchUser} />
                     </td>
                   </tr>
                 ))}
@@ -137,5 +134,108 @@ export default function DashboardOverview() {
         </Link>
       </div>
     </div>
+  );
+}
+
+const ACCOUNT_CHANGE_DAYS = 30;
+
+function LicenseStatusBadge({ license }: { license: any }) {
+  const t = useTranslations('Dashboard');
+  const isExpired = license.expiresAt && new Date(license.expiresAt) < new Date();
+
+  if (license.status !== 'ACTIVE') {
+    return <span className="px-2 py-1 rounded text-xs font-bold bg-red-500/20 text-red-400">{license.status}</span>;
+  }
+  if (isExpired) {
+    return <span className="px-2 py-1 rounded text-xs font-bold bg-red-500/20 text-red-400">{t('acc_expired')}</span>;
+  }
+  if (!license.tradingAccount) {
+    return <span className="px-2 py-1 rounded text-xs font-bold bg-amber-500/20 text-amber-400">{t('acc_pending')}</span>;
+  }
+  return <span className="px-2 py-1 rounded text-xs font-bold bg-green-500/20 text-green-400">{t('acc_active')}</span>;
+}
+
+// 1 licence = 1 compte MT5: first registration, then one change per 30 days
+function LicenseAccountCell({ license, onUpdated }: { license: any; onUpdated: () => void }) {
+  const t = useTranslations('Dashboard');
+  const [editing, setEditing] = useState(false);
+  const [accountNumber, setAccountNumber] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const boundAccount = license.tradingAccount?.accountNumber;
+  const nextChangeAt = license.accountChangedAt
+    ? new Date(new Date(license.accountChangedAt).getTime() + ACCOUNT_CHANGE_DAYS * 24 * 60 * 60 * 1000)
+    : null;
+  const canChange = !nextChangeAt || nextChangeAt <= new Date();
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!/^[1-9]\d*$/.test(accountNumber.trim())) {
+      setError(t('acc_invalid'));
+      return;
+    }
+    setSaving(true);
+    setError('');
+    try {
+      await api.post('/license/account/register', {
+        license_id: license.id,
+        account_number: accountNumber.trim(),
+      });
+      setEditing(false);
+      setAccountNumber('');
+      onUpdated();
+    } catch (err: any) {
+      setError(err.response?.data?.message || t('acc_error'));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (boundAccount && !editing) {
+    return (
+      <div className="space-y-1">
+        <div className="font-mono font-bold">{boundAccount}</div>
+        {canChange ? (
+          <button onClick={() => setEditing(true)} className="text-[#D4AF37] hover:underline text-sm">
+            {t('acc_change')}
+          </button>
+        ) : (
+          <div className="text-xs text-gray-500">
+            {t('acc_next_change')} {nextChangeAt!.toLocaleDateString()}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSave} className="space-y-2 min-w-[220px]">
+      {boundAccount && <div className="text-xs text-amber-400">{t('acc_change_warning')}</div>}
+      <div className="flex gap-2">
+        <input
+          type="text"
+          inputMode="numeric"
+          value={accountNumber}
+          onChange={e => setAccountNumber(e.target.value)}
+          placeholder={t('acc_placeholder')}
+          className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#D4AF37]"
+        />
+        <button
+          type="submit"
+          disabled={saving}
+          className="bg-[#D4AF37] text-black font-bold text-sm px-3 py-2 rounded-lg hover:bg-[#AA8B2C] transition-colors whitespace-nowrap"
+        >
+          {saving ? t('acc_saving') : t('acc_save')}
+        </button>
+        {editing && (
+          <button type="button" onClick={() => { setEditing(false); setError(''); }} className="text-gray-400 hover:text-white text-sm">
+            {t('acc_cancel')}
+          </button>
+        )}
+      </div>
+      {error && <div className="text-xs text-red-400">{error}</div>}
+      <div className="text-xs text-gray-500">{t('acc_help')}</div>
+    </form>
   );
 }

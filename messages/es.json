@@ -8,18 +8,18 @@
     "get_started": "Comenzar"
   },
   "Hero": {
-    "subtitle": "Expert Advisor MT5",
+    "subtitle": "2 Expert Advisors MT5 · Gold AI y Gold Scalper",
     "title1": "Trading de Oro Automatizado",
     "title2": "Con Precisión.",
-    "description": "Maximice sus ganancias con nuestro Gold Scalper MT5 de nivel institucional. Totalmente automatizado, probado y optimizado para XAUUSD.",
+    "description": "Maximice sus ganancias con nuestros robots MT5 de nivel institucional, Gold AI y Gold Scalper. Totalmente automatizados y optimizados para XAUUSD.",
     "start_trial": "Prueba Gratuita",
     "view_pricing": "Ver Precios"
   },
   "About": {
     "title": "¿Qué es Gold Trading Bot?",
     "p1": "Imagina tener un experto financiero trabajando para ti las 24 horas del día, sin dormir nunca, sin tomar descansos y, sobre todo... sin estresarse. ¡Eso es exactamente Gold Trading Bot!",
-    "p2": "En concreto, es un programa informático inteligente diseñado específicamente para operar con Oro en los mercados financieros de forma 100% automática.",
-    "p3": "Nuestro robot te permite generar ingresos pasivos sin necesidad de saber hacer trading. Ganas dinero automáticamente mientras te dedicas a otras actividades, sin tener que pasar ni un minuto frente a gráficos complejos.",
+    "p2": "En concreto, son programas informáticos inteligentes diseñados específicamente para operar con Oro (XAUUSD) en MetaTrader 5 de forma 100% automática. Ofrecemos dos: Gold AI y Gold Scalper.",
+    "p3": "Nuestros robots te permiten generar ingresos pasivos sin necesidad de saber hacer trading. Ganas dinero automáticamente mientras te dedicas a otras actividades, sin tener que pasar ni un minuto frente a gráficos complejos.",
     "bullet1": "Cero experiencia requerida: El robot ya integra todas las estrategias de los profesionales.",
     "bullet2": "Seguridad sin emociones: Sigue reglas matemáticas estrictas para proteger tu capital.",
     "bullet3": "Mantienes el control total: Tus fondos permanecen en tu propia cuenta de trading segura, solo tú puedes retirarlos."
@@ -45,7 +45,7 @@
   },
   "Pricing": {
     "title": "Precios Simples y Transparentes",
-    "subtitle": "Elija el plan que se adapte a su capital. Sin tarifas ocultas. Cancele en cualquier momento.",
+    "subtitle": "Cada robot tiene su propia tarifa: elija el suyo y luego la fórmula que le convenga. Una licencia = una cuenta MT5. Sin tarifas ocultas.",
     "weekly": "Semanal",
     "monthly": "Mensual",
     "semi_annual": "6 Meses",
@@ -76,7 +76,14 @@
     "feat_support": "Soporte técnico 24/7",
     "feat_vip_support": "Soporte VIP prioritario y configuración",
     "feat_cancel": "Sin permanencia, cancela cuando quieras",
-    "feat_no_sub": "Cero cuotas recurrentes"
+    "feat_no_sub": "Cero cuotas recurrentes",
+    "goldai_feat_ea": "Robot Gold AI MT5 (XAUUSD)",
+    "goldai_feat_lot": "Usted elige su lote, todos los demás ajustes están bloqueados",
+    "goldai_feat_account": "Una licencia = una sola cuenta MT5",
+    "discount_40": "-40% Fin de Año",
+    "scalper_support_standard": "Soporte estándar",
+    "scalper_support_priority": "Soporte prioritario",
+    "scalper_support_vip": "Instalación y soporte personalizado"
   },
   "Language": {
     "en": "English",
@@ -146,6 +153,19 @@
     "mt5_account": "Cuenta MT5",
     "manage": "Gestionar",
     "add_account": "Añadir Cuenta",
+    "acc_help": "El número es el que aparece en MT5 (ej: 12345678). El robot solo funcionará en esta cuenta.",
+    "acc_placeholder": "Número de cuenta MT5",
+    "acc_save": "Guardar",
+    "acc_saving": "Guardando...",
+    "acc_change": "Cambiar de cuenta",
+    "acc_change_warning": "Solo un cambio cada 30 días.",
+    "acc_next_change": "Próximo cambio posible el",
+    "acc_cancel": "Cancelar",
+    "acc_pending": "Esperando cuenta",
+    "acc_active": "Activa",
+    "acc_expired": "Expirada",
+    "acc_invalid": "Solo número entero positivo (ej: 12345678).",
+    "acc_error": "Error al guardar la cuenta.",
     "download_ea": "Descargar EA",
     "your_affiliate_link": "Su Enlace de Afiliado",
     "sales": "Ventas Totales",
@@ -175,7 +195,7 @@
     "art2_p1": "El Sitio ofrece la venta de licencias para usar un Expert Advisor (EA) para la plataforma MetaTrader 5 (MT5), destinado al comercio automatizado de oro (XAU/USD).",
     "art2_l1": "Las licencias se ofrecen bajo diferentes planes (Starter, Standard, Pro, VIP) con diferentes tamaños máximos de lote.",
     "art2_l2": "Cada licencia está vinculada a un número de cuenta MT5 único.",
-    "art2_l3": "Las licencias se venden en forma de suscripción mensual o como compra única de licencia de por vida.",
+    "art2_l3": "Las licencias se venden por un período determinado (semanal, mensual, semestral, anual) o, según el robot, como suscripción mensual o licencia de por vida (pago único).",
     "art3_title": "Precio y Pago",
     "art3_p1": "Los precios se indican en dólares estadounidenses (USD) y están sujetos a cambios en cualquier momento. El precio aplicable es el que se muestra en el momento del pedido.",
     "art3_p2": "El pago se realiza exclusivamente en criptomonedas a través de nuestro proveedor de pagos seguro. La licencia se activa automáticamente tras la confirmación del pago por la red blockchain.",
@@ -354,7 +374,9 @@
     "save_300": "Ahorra $300",
     "unlimited_lots": "Todos los tamaños de lote permitidos",
     "billed_monthly": "/mes",
-    "one_time": "pago único"
+    "one_time": "pago único",
+    "promo_badge": "-{pct}% Fin de Año",
+    "save_amount": "Ahorre {amount} $"
   },
   "DashboardDownloads": {
     "title": "Descargas",
@@ -396,5 +418,35 @@
     "t3_text": "\"I tested it on a demo account for 2 weeks before going live. The results are mind-blowing.\"",
     "t3_author": "Thomas P.",
     "t3_role": "Entrepreneur"
+  },
+  "Products": {
+    "GoldAI_desc": "Robot de trading de oro (XAUUSD). Usted solo elige el tamaño de su lote, todos los demás ajustes están bloqueados. Una licencia = una sola cuenta MT5."
+  },
+  "Robots": {
+    "title": "Elija su Robot",
+    "subtitle": "Dos Expert Advisors para operar Oro (XAUUSD) en MetaTrader 5. Cada uno tiene su propia tarifa.",
+    "new_badge": "Nuevo",
+    "goldai_p1": "Usted elige libremente el tamaño de su lote",
+    "goldai_p2": "Todos los demás ajustes están bloqueados",
+    "goldai_p3": "Suscripción mensual o licencia de por vida",
+    "scalper_desc": "Robot de scalping de alta frecuencia en oro (XAUUSD), con 4 planes según su capital.",
+    "scalper_p1": "Planes Starter, Standard, Pro y VIP",
+    "scalper_p2": "Lote máximo según el plan (0,01 a 1,00)",
+    "scalper_p3": "Licencia semanal, mensual, 6 meses o anual",
+    "one_account": "1 licencia = 1 cuenta MT5",
+    "from": "Desde",
+    "cta": "Ver tarifas"
+  },
+  "HowItWorks": {
+    "title": "¿Cómo funciona?",
+    "subtitle": "De la compra a la primera operación en pocos minutos.",
+    "s1_title": "Elija su robot",
+    "s1_desc": "Gold AI o Gold Scalper, y luego la licencia que le convenga. Pago con Mobile Money o cripto.",
+    "s2_title": "Registre su cuenta MT5",
+    "s2_desc": "En su área de cliente, introduzca el número de su cuenta MT5. Una licencia funciona en una sola cuenta (se puede cambiar una vez cada 30 días).",
+    "s3_title": "Instale el robot",
+    "s3_desc": "Descargue el EA desde su área de cliente y colóquelo en el gráfico XAUUSD en MetaTrader 5. Se recomienda un VPS para un funcionamiento 24/7.",
+    "s4_title": "Déjelo operar",
+    "s4_desc": "El robot verifica automáticamente su licencia y opera por usted, sin intervención."
   }
 }

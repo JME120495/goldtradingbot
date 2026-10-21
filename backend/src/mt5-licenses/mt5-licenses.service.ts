@@ -1,8 +1,20 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMt5LicenseDto } from './dto/create-mt5-license.dto';
 import { SyncHistoryDto } from './dto/sync-history.dto';
+
+const ACCOUNT_CHANGE_DAYS = 30;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class Mt5LicensesService {
@@ -33,16 +45,52 @@ export class Mt5LicensesService {
 
     // Filter to truly active licenses
     const activeLicenses = user.licenses.filter(l => !l.expiresAt || l.expiresAt > new Date());
-    let licenseIndex = 0;
+
+    // 1 licence = 1 compte: a license already bound to an account is never moved.
+    // Only unbound licenses are auto-linked to accounts that hold no active license.
+    const boundAccountIds = new Set(activeLicenses.map(l => l.tradingAccountId));
+    const freeAccounts = user.tradingAccounts.filter(a => !boundAccountIds.has(a.id));
+
+    for (const webLicense of activeLicenses.filter(l => !l.tradingAccountId)) {
+      const account = freeAccounts.shift();
+      if (!account) break;
+
+      await this.prisma.$transaction([
+        this.prisma.license.update({
+          where: { id: webLicense.id },
+          data: { tradingAccountId: account.id },
+        }),
+        this.prisma.licenseAccountHistory.create({
+          data: {
+            licenseId: webLicense.id,
+            oldAccount: null,
+            newAccount: BigInt(account.accountNumber),
+            changedBy: 'client',
+          },
+        }),
+      ]);
+      webLicense.tradingAccountId = account.id;
+    }
 
     for (const account of user.tradingAccounts) {
-      const webLicense = activeLicenses[licenseIndex];
       const accountNumber = BigInt(account.accountNumber);
+      const accountLicenses = activeLicenses.filter(l => l.tradingAccountId === account.id);
 
-      if (webLicense) {
+      if (accountLicenses.length === 0) {
+        // No active license on this account. Suspend its MT5 licenses.
+        try {
+           await this.prisma.mt5License.updateMany({
+             where: { accountNumber },
+             data: { status: 'suspended' }
+           });
+        } catch(e) {}
+        continue;
+      }
+
+      for (const webLicense of accountLicenses) {
         const eaName = webLicense.product.slug;
 
-        // If web license found, upsert an Mt5License to keep the robot working
+        // Upsert an Mt5License to keep the robot working
         await this.prisma.mt5License.upsert({
           where: {
             accountNumber_eaName: { accountNumber, eaName },
@@ -70,38 +118,195 @@ export class Mt5LicensesService {
             expiryDate: webLicense.expiresAt || new Date('2099-12-31'),
           },
         });
+      }
+    }
+  }
 
-        // Link the web license to this trading account in DB
-        await this.prisma.license.update({
-          where: { id: webLicense.id },
-          data: { tradingAccountId: account.id }
-        });
+  // ----------------------------------------------------------
+  //  1 licence = 1 compte MT5
+  // ----------------------------------------------------------
 
-        licenseIndex++; // Move to the next license for the next account
-      } else {
-        // No more active licenses for remaining accounts. Suspend their MT5 licenses.
-        try {
-           await this.prisma.mt5License.updateMany({
-             where: { accountNumber },
-             data: { status: 'suspended' }
-           });
-        } catch(e) {}
-        
-        // Also ensure tradingAccountId is null for any license that might have been tied
-        await this.prisma.license.updateMany({
-          where: { tradingAccountId: account.id },
-          data: { tradingAccountId: null }
+  /** Client (JWT): bind or change the MT5 account of one of their licenses. */
+  async registerAccount(userId: string, licenseId: string, rawAccount: unknown) {
+    const accountNumber = this.parseAccountNumber(rawAccount);
+    const license = await this.prisma.license.findUnique({
+      where: { id: String(licenseId || '') },
+      include: { tradingAccount: true },
+    });
+    if (!license || license.userId !== userId) {
+      throw new NotFoundException('Licence introuvable.');
+    }
+
+    // First binding is free; afterwards one change per ACCOUNT_CHANGE_DAYS
+    if (license.tradingAccountId && license.accountChangedAt) {
+      const nextChangeAt = new Date(
+        license.accountChangedAt.getTime() + ACCOUNT_CHANGE_DAYS * DAY_MS,
+      );
+      if (nextChangeAt > new Date()) {
+        throw new HttpException(
+          {
+            statusCode: HttpStatus.TOO_MANY_REQUESTS,
+            message: `Un seul changement de compte par ${ACCOUNT_CHANGE_DAYS} jours. Prochain changement possible le ${nextChangeAt.toLocaleDateString('fr-FR')}.`,
+            next_change_at: nextChangeAt.toISOString(),
+          },
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
+    }
+
+    return this.bindAccount(license, accountNumber, 'client');
+  }
+
+  /** Admin: change the MT5 account without the 30-day limit (client timer untouched). */
+  async adminChangeAccount(licenseId: string, rawAccount: unknown) {
+    const accountNumber = this.parseAccountNumber(rawAccount);
+    const license = await this.prisma.license.findUnique({
+      where: { id: String(licenseId || '') },
+      include: { tradingAccount: true },
+    });
+    if (!license) {
+      throw new NotFoundException('Licence introuvable.');
+    }
+    return this.bindAccount(license, accountNumber, 'admin');
+  }
+
+  async getLicenseAccountHistory(licenseId: string) {
+    const history = await this.prisma.licenseAccountHistory.findMany({
+      where: { licenseId },
+      orderBy: { changedAt: 'desc' },
+    });
+    return history.map((h) => ({
+      ...h,
+      oldAccount: h.oldAccount === null ? null : Number(h.oldAccount),
+      newAccount: Number(h.newAccount),
+    }));
+  }
+
+  private async bindAccount(
+    license: Prisma.LicenseGetPayload<{ include: { tradingAccount: true } }>,
+    accountNumber: bigint,
+    changedBy: 'client' | 'admin',
+  ) {
+    const newAccount = accountNumber.toString();
+    const oldAccount = license.tradingAccount?.accountNumber ?? null;
+    if (oldAccount === newAccount) {
+      throw new BadRequestException('Cette licence est déjà liée à ce compte MT5.');
+    }
+
+    const product = await this.prisma.product.findUnique({
+      where: { id: license.productId },
+    });
+    const owner = await this.prisma.user.findUnique({
+      where: { id: license.userId },
+    });
+    const eaName = product?.slug || 'ALL';
+
+    // The account must not belong to another client, nor carry another
+    // license for the same EA (web license or manual mt5_licenses row).
+    const conflict =
+      (await this.prisma.tradingAccount.findFirst({
+        where: { accountNumber: newAccount, userId: { not: license.userId } },
+      })) ||
+      (await this.prisma.license.findFirst({
+        where: {
+          id: { not: license.id },
+          productId: license.productId,
+          status: 'ACTIVE',
+          tradingAccount: { accountNumber: newAccount },
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        },
+      })) ||
+      (await this.prisma.mt5License.findFirst({
+        where: {
+          accountNumber,
+          eaName,
+          status: 'active',
+          clientEmail: { not: owner?.email },
+        },
+      }));
+    if (conflict) {
+      throw new ConflictException('Ce compte MT5 est déjà lié à une autre licence');
+    }
+
+    const tradingAccount =
+      (await this.prisma.tradingAccount.findFirst({
+        where: { userId: license.userId, accountNumber: newAccount },
+      })) ||
+      (await this.prisma.tradingAccount.create({
+        data: { userId: license.userId, accountNumber: newAccount, broker: '' },
+      }));
+
+    const isChange = oldAccount !== null;
+    await this.prisma.$transaction([
+      this.prisma.license.update({
+        where: { id: license.id },
+        data: {
+          tradingAccountId: tradingAccount.id,
+          ...(isChange && { accountChangeCount: { increment: 1 } }),
+          // Admin changes do not reset the client's 30-day timer
+          ...(isChange && changedBy === 'client' && { accountChangedAt: new Date() }),
+        },
+      }),
+      this.prisma.licenseAccountHistory.create({
+        data: {
+          licenseId: license.id,
+          oldAccount: oldAccount === null ? null : BigInt(oldAccount),
+          newAccount: accountNumber,
+          changedBy,
+        },
+      }),
+    ]);
+
+    // The old account loses this EA unless another active license of the same product stays on it
+    if (isChange && license.tradingAccountId) {
+      const stillCovered = await this.prisma.license.findFirst({
+        where: {
+          tradingAccountId: license.tradingAccountId,
+          productId: license.productId,
+          status: 'ACTIVE',
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        },
+      });
+      if (!stillCovered) {
+        await this.prisma.mt5License.updateMany({
+          where: { accountNumber: BigInt(oldAccount!), eaName },
+          data: { status: 'suspended' },
         });
       }
     }
 
-    // Any remaining licenses that were not assigned to an account should have tradingAccountId = null
-    for (let i = licenseIndex; i < activeLicenses.length; i++) {
-       await this.prisma.license.update({
-          where: { id: activeLicenses[i].id },
-          data: { tradingAccountId: null }
-       });
+    await this.syncUserToMt5Licenses(license.userId);
+
+    const updated = await this.prisma.license.findUnique({
+      where: { id: license.id },
+      include: { tradingAccount: true },
+    });
+    return {
+      success: true,
+      license_id: license.id,
+      account_number: Number(accountNumber),
+      account_change_count: updated?.accountChangeCount ?? 0,
+      account_changed_at: updated?.accountChangedAt ?? null,
+      next_change_at: updated?.accountChangedAt
+        ? new Date(updated.accountChangedAt.getTime() + ACCOUNT_CHANGE_DAYS * DAY_MS)
+        : null,
+    };
+  }
+
+  /** Strictly a positive integer (number or digit string), nothing else. */
+  private parseAccountNumber(raw: unknown): bigint {
+    const str =
+      typeof raw === 'number' && Number.isSafeInteger(raw)
+        ? String(raw)
+        : typeof raw === 'string'
+          ? raw.trim()
+          : '';
+    if (!/^[1-9]\d{0,17}$/.test(str)) {
+      throw new BadRequestException(
+        'Numéro de compte MT5 invalide : entier positif uniquement.',
+      );
     }
+    return BigInt(str);
   }
 
   async verifyLicense(

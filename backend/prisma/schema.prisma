@@ -82,7 +82,26 @@ model License {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  payments Payment[]
+  // 1 license = 1 MT5 account: client may change it once per 30 days
+  accountChangedAt   DateTime?
+  accountChangeCount Int       @default(0)
+
+  payments       Payment[]
+  accountHistory LicenseAccountHistory[]
+}
+
+/// Audit log of MT5 account bindings/changes on a web License.
+model LicenseAccountHistory {
+  id         Int      @id @default(autoincrement())
+  licenseId  String
+  license    License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  oldAccount BigInt?
+  newAccount BigInt
+  changedBy  String   @default("client") @db.VarChar(20) // 'client' | 'admin'
+  changedAt  DateTime @default(now()) @db.Timestamptz()
+
+  @@index([licenseId])
+  @@map("license_account_history")
 }
 
 model TradingAccount {

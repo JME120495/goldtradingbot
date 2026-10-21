@@ -68,8 +68,9 @@ export default function AccountsPage() {
     try {
       await api.delete(`/trading-accounts/${id}`);
       await fetchAccounts();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      if (err.response?.data?.message) alert(err.response.data.message);
     }
   };
 

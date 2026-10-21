@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Throttle } from '@nestjs/throttler';
+import { AdminGuard } from '../auth/admin.guard';
 import { Mt5LicensesService } from './mt5-licenses.service';
 import { VerifyLicenseDto } from './dto/verify-license.dto';
 import { CreateMt5LicenseDto } from './dto/create-mt5-license.dto';
@@ -52,11 +53,33 @@ export class Mt5LicensesController {
   }
 
   // ----------------------------------------------------------
-  //  Admin routes — JWT-protected
+  //  POST /api/license/account/register
+  //  CLIENT (JWT) — bind / change the MT5 account of one of my licenses
+  //  Body: { license_id, account_number }
+  // ----------------------------------------------------------
+  @Post('account/register')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  async registerAccount(
+    @Req() req: Request,
+    @Body() body: { license_id: string; account_number: unknown },
+  ) {
+    if (!body.license_id) {
+      throw new BadRequestException('license_id requis.');
+    }
+    return this.mt5LicensesService.registerAccount(
+      (req.user as { userId: string }).userId,
+      body.license_id,
+      body.account_number,
+    );
+  }
+
+  // ----------------------------------------------------------
+  //  Admin routes — JWT + ADMIN role
   // ----------------------------------------------------------
 
   @Post('admin/create')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @HttpCode(HttpStatus.OK)
   async createLicense(@Body() body: CreateMt5LicenseDto) {
     if (
@@ -73,7 +96,7 @@ export class Mt5LicensesController {
   }
 
   @Post('admin/suspend')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @HttpCode(HttpStatus.OK)
   async suspendLicense(
     @Body() body: { account_number: number; ea_name?: string },
@@ -88,7 +111,7 @@ export class Mt5LicensesController {
   }
 
   @Post('admin/reactivate')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @HttpCode(HttpStatus.OK)
   async reactivateLicense(
     @Body() body: { account_number: number; ea_name?: string },
@@ -103,7 +126,7 @@ export class Mt5LicensesController {
   }
 
   @Delete('admin/delete/:id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @HttpCode(HttpStatus.OK)
   async deleteLicense(@Param('id') id: string) {
     const licenseId = parseInt(id, 10);
@@ -114,7 +137,7 @@ export class Mt5LicensesController {
   }
 
   @Post('admin/bulk-action')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @HttpCode(HttpStatus.OK)
   async bulkAction(
     @Body()
@@ -129,8 +152,29 @@ export class Mt5LicensesController {
     return this.mt5LicensesService.bulkActionMt5Licenses(body.ids, body.action);
   }
 
+  @Post('admin/change-account')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @HttpCode(HttpStatus.OK)
+  async adminChangeAccount(
+    @Body() body: { license_id: string; account_number: unknown },
+  ) {
+    if (!body.license_id) {
+      throw new BadRequestException('license_id requis.');
+    }
+    return this.mt5LicensesService.adminChangeAccount(
+      body.license_id,
+      body.account_number,
+    );
+  }
+
+  @Get('admin/account-history/:licenseId')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  async getLicenseAccountHistory(@Param('licenseId') licenseId: string) {
+    return this.mt5LicensesService.getLicenseAccountHistory(licenseId);
+  }
+
   @Get('admin/list')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   async listLicenses(
     @Query('limit') limit?: string,
     @Query('offset') offset?: string,
@@ -158,7 +202,7 @@ export class Mt5LicensesController {
   }
 
   @Get('admin/history/:account')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   async getAccountHistory(@Req() req: Request) {
     const accountNumber = parseInt(req.params.account as string, 10);
     if (isNaN(accountNumber)) {

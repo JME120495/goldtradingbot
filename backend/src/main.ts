@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import * as express from 'express';
 import cookieParser from 'cookie-parser';
+import { randomBytes } from 'crypto';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -11,11 +12,10 @@ async function bootstrap() {
     console.warn('WARNING: DATABASE_URL is missing!');
   }
   if (!process.env.JWT_SECRET) {
-    process.env.JWT_SECRET = 'g0ldtr4d1ng_s3cr3t_k3y_ch4ng3_m3_1n_pr0d';
-  }
-  if (!process.env.LICENSE_ADMIN_KEY) {
-    process.env.LICENSE_ADMIN_KEY =
-      'a7f3c9e2b1d4068f5e7a9c3b2d1f4e6a8b0c2d4e6f8a1b3c5d7e9f0a2b4c6d8';
+    // Random per-process secret: never a guessable hardcoded value.
+    // Sessions are invalidated on restart until JWT_SECRET is set.
+    console.warn('WARNING: JWT_SECRET is missing! Using a random secret.');
+    process.env.JWT_SECRET = randomBytes(48).toString('hex');
   }
 
   const app = await NestFactory.create(AppModule, { rawBody: true });

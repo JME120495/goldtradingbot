@@ -100,15 +100,17 @@ export class DownloadsService {
           const files = fs
             .readdirSync(filesDir)
             .filter((f) => f.endsWith('.ex5'));
-          const prodLower = payload.product.toLowerCase();
-          const matched =
-            files.find(
-              (f) =>
-                f.toLowerCase() === `${prodLower}.ex5` ||
-                f.toLowerCase() === `${prodLower.replace(/ /g, '_')}.ex5` ||
-                f.toLowerCase() === `${prodLower.replace(/ ea$/i, '')}.ex5` ||
-                f.toLowerCase().startsWith(prodLower.split(' ')[0]),
-            ) || (files.length > 0 ? files[0] : null);
+          // Match the product's own file, ignoring case, spaces and "_"
+          // (GOLD_SCALPER -> GoldScalper.ex5). Never fall back to another
+          // product's file: no match means 404.
+          const normalize = (s: string) =>
+            s.toLowerCase().replace(/\.ex5$/, '').replace(/[^a-z0-9]/g, '');
+          const wanted = normalize(payload.product);
+          const matched = files.find(
+            (f) =>
+              normalize(f) === wanted ||
+              normalize(f) === wanted.replace(/ea$/, ''),
+          );
 
           if (matched) {
             filePath = path.join(filesDir, matched);
