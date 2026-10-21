@@ -364,6 +364,9 @@ export default function Home() {
             <div className="space-y-6 text-gray-300 text-lg leading-relaxed">
               <p>{t('Performance.p1')}</p>
               <p>{t('Performance.p2')}</p>
+              <Link href="#backtest" className="inline-block text-[#D4AF37] font-semibold hover:underline">
+                {t('Performance.backtest_link')} →
+              </Link>
             </div>
             <div className="mt-8 pt-8 border-t border-white/5">
               <p className="text-sm text-gray-500 italic">

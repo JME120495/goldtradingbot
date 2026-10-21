@@ -178,8 +178,9 @@
   "Performance": {
     "title": "Rendimiento probado, un enfoque basado en la consistencia",
     "p1": "Nuestro Expert Advisor fue desarrollado y probado con un objetivo claro: buscar un rendimiento constante aplicando una estricta gestión de riesgos.",
-    "p2": "Durante nuestras pruebas internas y en las condiciones de mercado observadas, nuestra estrategia ha generado frecuentemente resultados iguales o superiores a 20 USD por día en las configuraciones recomendadas.",
-    "disclaimer": "Estos resultados se proporcionan con fines informativos y no constituyen una garantía de rendimiento. Los mercados financieros implican riesgos, y los resultados pueden variar según el capital, las condiciones del mercado, el bróker, la ejecución de órdenes y los parámetros utilizados."
+    "p2": "Sin promesas: consulte a continuación los resultados del backtest de Gold AI, mes a mes, con datos reales de 2026.",
+    "disclaimer": "Estos resultados se proporcionan con fines informativos y no constituyen una garantía de rendimiento. Los mercados financieros implican riesgos, y los resultados pueden variar según el capital, las condiciones del mercado, el bróker, la ejecución de órdenes y los parámetros utilizados.",
+    "backtest_link": "Ver los resultados del backtest"
   },
   "Terms": {
     "title": "Términos y Condiciones",
@@ -463,6 +464,10 @@
     "continuous_heading": "Robot en funcionamiento sin interrupción",
     "continuous_intro": "Si hubiera iniciado el robot el {from} sin detenerlo hasta el {to}, este es el resultado:",
     "continuous_label": "Resultado sin interrupción",
-    "continuous_details": "{trades} operaciones"
+    "continuous_details": "{trades} operaciones",
+    "downloads_heading": "Descargar los informes Excel del backtest",
+    "downloads_intro": "Los informes del probador de estrategias de MetaTrader 5, con el detalle de cada operación (ajustes internos del robot ocultos).",
+    "download_continuous": "Sin interrupción: del {from} al {to}",
+    "download_all": "Descargar todo (ZIP)"
   }
 }

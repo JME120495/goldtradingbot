@@ -96,6 +96,47 @@ export default function GoldAiBacktest() {
         <div className="text-sm text-gray-400">{t('continuous_details', { trades: continuous.trades })}</div>
       </div>
 
+      {/* Downloadable MT5 reports (cleaned copies: robot settings hidden) */}
+      <h3 className="text-xl sm:text-2xl font-bold mt-14 mb-2">{t('downloads_heading')}</h3>
+      <p className="text-gray-400 mb-6">{t('downloads_intro')}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {backtest.monthly.map((m) => (
+          <a
+            key={m.month}
+            href={(backtest.downloads.monthly as Record<string, string>)[m.month]}
+            download
+            className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#0F1115] border border-white/10 hover:border-[#D4AF37]/50 text-sm text-gray-200 transition-colors"
+          >
+            <svg className="w-4 h-4 text-[#D4AF37] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span className="capitalize">{monthName(m.month)}</span>
+          </a>
+        ))}
+      </div>
+      <div className="mt-4 flex flex-col sm:flex-row gap-3">
+        <a
+          href={backtest.downloads.continuous}
+          download
+          className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#0F1115] border border-[#D4AF37]/40 hover:border-[#D4AF37] text-sm text-gray-200 transition-colors"
+        >
+          <svg className="w-4 h-4 text-[#D4AF37] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          {t('download_continuous', { from: day(continuous.from), to: day(continuous.to) })}
+        </a>
+        <a
+          href={backtest.downloads.all}
+          download
+          className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#D4AF37] text-black font-bold hover:bg-[#AA8B2C] transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          {t('download_all')}
+        </a>
+      </div>
+
       <div className="mt-10 space-y-3 text-sm text-gray-400 max-w-4xl">
         <p>
           {t('conditions', {

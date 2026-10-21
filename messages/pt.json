@@ -178,8 +178,9 @@
   "Performance": {
     "title": "Desempenho testado, uma abordagem focada na consistência",
     "p1": "Nosso Expert Advisor foi desenvolvido e testado com um objetivo claro: buscar desempenho consistente aplicando um rigoroso gerenciamento de risco.",
-    "p2": "Durante nossos testes internos e nas condições de mercado observadas, nossa estratégia gerou frequentemente resultados iguais ou superiores a 20 USD por dia nas configurações recomendadas.",
-    "disclaimer": "Estes resultados são fornecidos apenas para fins informativos e não constituem uma garantia de desempenho. Os mercados financeiros envolvem riscos, e os resultados podem variar dependendo do capital, condições de mercado, corretora, execução de ordens e parâmetros utilizados."
+    "p2": "Sem promessas: confira abaixo os resultados do backtest do Gold AI, mês a mês, com dados reais de 2026.",
+    "disclaimer": "Estes resultados são fornecidos apenas para fins informativos e não constituem uma garantia de desempenho. Os mercados financeiros envolvem riscos, e os resultados podem variar dependendo do capital, condições de mercado, corretora, execução de ordens e parâmetros utilizados.",
+    "backtest_link": "Ver os resultados do backtest"
   },
   "Terms": {
     "title": "Termos e Condições",
@@ -463,6 +464,10 @@
     "continuous_heading": "Robô funcionando sem interrupção",
     "continuous_intro": "Se você tivesse iniciado o robô em {from} sem pará-lo até {to}, este seria o resultado:",
     "continuous_label": "Resultado sem interrupção",
-    "continuous_details": "{trades} operações"
+    "continuous_details": "{trades} operações",
+    "downloads_heading": "Baixar os relatórios Excel do backtest",
+    "downloads_intro": "Os relatórios do testador de estratégia do MetaTrader 5, com o detalhe de cada operação (configurações internas do robô ocultas).",
+    "download_continuous": "Sem interrupção: de {from} a {to}",
+    "download_all": "Baixar tudo (ZIP)"
   }
 }

@@ -58,5 +58,20 @@
   "to": "2026-10-01",
   "netProfit": 35360.53,
   "trades": 214
+ },
+ "downloads": {
+  "monthly": {
+   "2026-01": "/backtests/gold-ai/GoldAI_backtest_2026-01.xlsx",
+   "2026-02": "/backtests/gold-ai/GoldAI_backtest_2026-02.xlsx",
+   "2026-03": "/backtests/gold-ai/GoldAI_backtest_2026-03.xlsx",
+   "2026-04": "/backtests/gold-ai/GoldAI_backtest_2026-04.xlsx",
+   "2026-05": "/backtests/gold-ai/GoldAI_backtest_2026-05.xlsx",
+   "2026-06": "/backtests/gold-ai/GoldAI_backtest_2026-06.xlsx",
+   "2026-07": "/backtests/gold-ai/GoldAI_backtest_2026-07.xlsx",
+   "2026-08": "/backtests/gold-ai/GoldAI_backtest_2026-08.xlsx",
+   "2026-09": "/backtests/gold-ai/GoldAI_backtest_2026-09.xlsx"
+  },
+  "continuous": "/backtests/gold-ai/GoldAI_backtest_2026-01_to_2026-10_continuous.xlsx",
+  "all": "/backtests/gold-ai/GoldAI_backtest_reports.zip"
  }
 }

@@ -178,8 +178,9 @@
   "Performance": {
     "title": "Des Profits Réguliers. Un Drawdown Maîtrisé.",
     "p1": "La plupart des robots finissent par exploser votre compte au premier gros mouvement de marché. Pas le nôtre. Gold Scalper a été pensé avec une seule obsession : la préservation de votre capital.",
-    "p2": "Grâce à des algorithmes de suivi de tendance ultra-réactifs, visez une rentabilité stable (ex: 20$ à 50$ par jour selon le capital) sans jamais transpirer devant vos écrans.",
-    "disclaimer": "Ces résultats sont fournis à titre indicatif et ne constituent pas une garantie de performance. Les marchés financiers comportent des risques, et les résultats peuvent varier en fonction du capital, des conditions de marché, du broker, de l'exécution des ordres et des paramètres utilisés."
+    "p2": "Pas de promesses : consultez ci-dessous les résultats du backtest de Gold AI, mois par mois, sur des données réelles de 2026.",
+    "disclaimer": "Ces résultats sont fournis à titre indicatif et ne constituent pas une garantie de performance. Les marchés financiers comportent des risques, et les résultats peuvent varier en fonction du capital, des conditions de marché, du broker, de l'exécution des ordres et des paramètres utilisés.",
+    "backtest_link": "Voir les résultats du backtest"
   },
   "Terms": {
     "title": "Conditions Générales de Vente",
@@ -463,6 +464,10 @@
     "continuous_heading": "Robot lancé sans interruption",
     "continuous_intro": "Si vous aviez lancé le robot du {from} au {to} sans jamais l’arrêter, voici le résultat :",
     "continuous_label": "Résultat sans interruption",
-    "continuous_details": "{trades} trades"
+    "continuous_details": "{trades} trades",
+    "downloads_heading": "Télécharger les rapports Excel du backtest",
+    "downloads_intro": "Les rapports du testeur de stratégie MetaTrader 5, avec le détail de chaque trade (réglages internes du robot masqués).",
+    "download_continuous": "Sans interruption : du {from} au {to}",
+    "download_all": "Tout télécharger (ZIP)"
   }
 }

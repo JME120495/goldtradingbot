@@ -178,8 +178,9 @@
   "Performance": {
     "title": "Tested performance, a consistency-driven approach",
     "p1": "Our Expert Advisor was developed and tested with a clear goal: seeking consistent performance while applying strict risk management.",
-    "p2": "During our internal tests and in observed market conditions, our strategy has frequently generated results equal to or greater than $20 USD per day on recommended configurations.",
-    "disclaimer": "These results are provided for informational purposes and do not constitute a guarantee of performance. Financial markets involve risks, and results may vary depending on capital, market conditions, broker, order execution, and used parameters."
+    "p2": "No promises: see the Gold AI backtest results below, month by month, on real 2026 data.",
+    "disclaimer": "These results are provided for informational purposes and do not constitute a guarantee of performance. Financial markets involve risks, and results may vary depending on capital, market conditions, broker, order execution, and used parameters.",
+    "backtest_link": "See the backtest results"
   },
   "Terms": {
     "title": "Terms and Conditions",
@@ -463,6 +464,10 @@
     "continuous_heading": "Robot running without interruption",
     "continuous_intro": "Had you started the robot on {from} and left it running until {to}, here is the result:",
     "continuous_label": "Result without interruption",
-    "continuous_details": "{trades} trades"
+    "continuous_details": "{trades} trades",
+    "downloads_heading": "Download the backtest Excel reports",
+    "downloads_intro": "The MetaTrader 5 Strategy Tester reports, with every trade in detail (the robot’s internal settings are hidden).",
+    "download_continuous": "Without interruption: {from} to {to}",
+    "download_all": "Download all (ZIP)"
   }
 }
