@@ -45,7 +45,9 @@ async function handleProxy(req: Request, pathArray: string[]) {
   try {
     const cleanBackendUrl = getRealBackendUrl();
     const pathStr = pathArray.join('/');
-    let targetUrl = `${cleanBackendUrl}/${pathStr}`;
+    // Forward the query string (?a=1&b=2) too, not only the path
+    const search = new URL(req.url).search;
+    let targetUrl = `${cleanBackendUrl}/${pathStr}${search}`;
     
     // Anti-loop protection in case NEXT_PUBLIC_API_URL = '/api'
     if (targetUrl.includes('/api/api/')) {
@@ -88,7 +90,7 @@ async function handleProxy(req: Request, pathArray: string[]) {
 
     // If initial attempt returns 404 and pathStr doesn't start with api/, retry with /api/ prefix
     if (response.status === 404 && !pathStr.startsWith('api/')) {
-      const fallbackUrl = `${cleanBackendUrl}/api/${pathStr}`;
+      const fallbackUrl = `${cleanBackendUrl}/api/${pathStr}${search}`;
       const fallbackRes = await fetch(fallbackUrl, {
         method: req.method,
         headers,
