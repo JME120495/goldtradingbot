@@ -38,8 +38,8 @@ export class PaymentsService {
     if (!plan) throw new NotFoundException('Plan not found');
 
     // Parse prices
-    const prices = JSON.parse(plan.prices);
-    const amount = prices[data.duration] || prices['monthly'];
+    const prices = typeof plan.prices === 'string' ? JSON.parse(plan.prices) : plan.prices;
+    const amount = prices[data.duration] ?? (data.duration === 'lifetime' ? (prices['lifetime'] ?? 200) : (prices['monthly'] ?? 25.5));
 
     // Générer une référence unique contenant les infos nécessaires
     // Format: GTB_timestamp_productId_planId_duration
@@ -71,11 +71,18 @@ export class PaymentsService {
         data: { status: 'COMPLETED' },
       });
 
-      let days = 30;
-      if (data.duration === 'weekly') days = 7;
-      else if (data.duration === 'monthly') days = 30;
-      else if (data.duration === 'semiAnnual') days = 182;
-      else if (data.duration === 'yearly') days = 365;
+      let expiresAt: Date | null = null;
+      if (data.duration === 'lifetime') {
+        expiresAt = null;
+      } else if (data.duration === 'weekly') {
+        expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      } else if (data.duration === 'semiAnnual') {
+        expiresAt = new Date(Date.now() + 182 * 24 * 60 * 60 * 1000);
+      } else if (data.duration === 'yearly') {
+        expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+      } else {
+        expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      }
 
       await this.prisma.license.create({
         data: {
@@ -84,7 +91,7 @@ export class PaymentsService {
           planId: data.planId,
           status: 'ACTIVE',
           lotAllowed: plan.lotAllowed,
-          expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+          expiresAt: expiresAt,
         },
       });
 
@@ -241,11 +248,18 @@ export class PaymentsService {
         });
 
         // Calculate expiration date based on duration
-        let days = 30;
-        if (duration === 'weekly') days = 7;
-        else if (duration === 'monthly') days = 30;
-        else if (duration === 'semiAnnual') days = 182;
-        else if (duration === 'yearly') days = 365;
+        let expiresAt: Date | null = null;
+        if (duration === 'lifetime') {
+          expiresAt = null;
+        } else if (duration === 'weekly') {
+          expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        } else if (duration === 'semiAnnual') {
+          expiresAt = new Date(Date.now() + 182 * 24 * 60 * 60 * 1000);
+        } else if (duration === 'yearly') {
+          expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+        } else {
+          expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        }
 
         await this.prisma.license.create({
           data: {
@@ -253,8 +267,8 @@ export class PaymentsService {
             productId: productId,
             planId: planId,
             status: 'ACTIVE',
-            lotAllowed: plan ? plan.lotAllowed : 0.01,
-            expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+            lotAllowed: plan ? plan.lotAllowed : 100.0,
+            expiresAt: expiresAt,
           },
         });
 
@@ -497,11 +511,18 @@ export class PaymentsService {
 
       const plan = await this.prisma.productPlan.findUnique({ where: { id: planId } });
 
-      let days = 30;
-      if (duration === 'weekly') days = 7;
-      else if (duration === 'monthly') days = 30;
-      else if (duration === 'semiAnnual') days = 182;
-      else if (duration === 'yearly') days = 365;
+      let expiresAt: Date | null = null;
+      if (duration === 'lifetime') {
+        expiresAt = null;
+      } else if (duration === 'weekly') {
+        expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      } else if (duration === 'semiAnnual') {
+        expiresAt = new Date(Date.now() + 182 * 24 * 60 * 60 * 1000);
+      } else if (duration === 'yearly') {
+        expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+      } else {
+        expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      }
 
       await this.prisma.license.create({
         data: {
@@ -509,8 +530,8 @@ export class PaymentsService {
           productId: productId,
           planId: planId,
           status: 'ACTIVE',
-          lotAllowed: plan ? plan.lotAllowed : 0.01,
-          expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+          lotAllowed: plan ? plan.lotAllowed : 100.0,
+          expiresAt: expiresAt,
         },
       });
 

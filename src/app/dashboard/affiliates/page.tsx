@@ -121,7 +121,7 @@ export default function AffiliatesDashboard() {
           <div className="bg-[#0F1115] border border-white/10 p-6 rounded-2xl flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold uppercase tracking-wider text-[#D4AF37]">PARTNER</h2>
-              <p className="opacity-80">Vous gagnez des commissions sur les achats de vos filleuls (15% sur les abonnements hebdomadaires, 10% sur les autres).</p>
+              <p className="opacity-80">Vous gagnez 10% de commission sur tous les achats de vos filleuls (abonnements mensuels et licences à vie).</p>
             </div>
             <div className="text-right">
               <p className="text-sm opacity-80 mb-1">{t('your_affiliate_link')}</p>

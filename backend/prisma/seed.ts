@@ -21,27 +21,15 @@ async function main() {
 
   const plans = [
     {
-      name: 'Starter',
-      lotAllowed: 0.01,
-      prices: JSON.stringify({ weekly: 25, monthly: 79, semiAnnual: 399, yearly: 699 }),
-      isTrial: true, // Only Starter can be used for Trial
-    },
-    {
-      name: 'Standard',
-      lotAllowed: 0.10,
-      prices: JSON.stringify({ weekly: 49, monthly: 149, semiAnnual: 749, yearly: 1299 }),
+      name: 'Plan Mensuel',
+      lotAllowed: 100.0,
+      prices: JSON.stringify({ monthly: 25.5, original: 30, discount: 15 }),
       isTrial: false,
     },
     {
-      name: 'Pro',
-      lotAllowed: 0.50,
-      prices: JSON.stringify({ weekly: 99, monthly: 299, semiAnnual: 1499, yearly: 2599 }),
-      isTrial: false,
-    },
-    {
-      name: 'VIP',
-      lotAllowed: 1.00,
-      prices: JSON.stringify({ weekly: 199, monthly: 599, semiAnnual: 2999, yearly: 4999 }),
+      name: 'Licence à Vie',
+      lotAllowed: 100.0,
+      prices: JSON.stringify({ lifetime: 200, original: 500, discount: 60 }),
       isTrial: false,
     }
   ];

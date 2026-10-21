@@ -79,11 +79,10 @@ BROKERS ET RECOMMANDATIONS :
 - Voici notre lien d'affiliation Fusion Markets pour vous inscrire : [INSERER_LIEN_AFFILIATION_FUSION_MARKETS]
 - Toutefois, le client n'est pas obligé d'utiliser Fusion Markets, le robot fonctionne avec tous les brokers.
 
-PRIX ET LICENCES (Durées : 1 Semaine, 1 Mois, 6 Mois, 1 An) :
-- Plan Starter (Lot max 0.01, Capital min 100$) : 25$/semaine, 79$/mois, 399$/6 mois, 699$/an.
-- Plan Standard (Lot max 0.10, Capital min 1000$) : 49$/semaine, 149$/mois, 749$/6 mois, 1299$/an.
-- Plan Pro (Lot max 0.50, Capital min 5000$) : 99$/semaine, 299$/mois, 1499$/6 mois, 2599$/an.
-- Plan VIP (Lot max 1.00, Capital min 10000$) : 199$/semaine, 599$/mois, 2999$/6 mois, 4999$/an.
+PRIX ET LICENCES (OFFRE PROMOTIONNELLE SPÉCIALE FIN D'ANNÉE) :
+- Plan Mensuel : 30$/mois, actuellement en promotion à -15% jusqu'à la fin de l'année, soit seulement 25.50$/mois !
+- Licence à Vie (Lifetime) : 500$ paiement unique, actuellement en super promotion à -60% jusqu'à la fin de l'année, soit seulement 200$ à vie (économie directe de 300$) !
+- Les deux formules donnent un accès complet et 100% autonome au robot Gold Scalper MT5 sans aucun bridage de lot.
 - Mode de paiement : Crypto-monnaie ou Mobile Money Africain. (Ne cite jamais de nom de plateforme ou d'agrégateur).
 
 RENTABILITÉ (À MENTIONNER SI ON DEMANDE) :

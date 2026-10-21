@@ -9,41 +9,50 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Home() {
   const t = useTranslations();
-  const [duration, setDuration] = useState<'weekly' | 'monthly' | 'semi_annual' | 'yearly'>('monthly');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const plans = [
     {
-      name: "Starter",
-      lot: 0.01,
-      minCapital: 100,
-      prices: { weekly: 25, monthly: 79, semi_annual: 399, yearly: 699 },
-      features: ["1 Live Account", "Standard Support"],
+      id: 'monthly',
+      name: t('Pricing.monthly_plan'),
+      originalPrice: 30,
+      discountedPrice: '25.50',
+      discountBadge: t('Pricing.discount_15'),
+      savingsBadge: null,
+      period: t('Pricing.billed_monthly'),
+      description: t('Pricing.monthly_desc'),
+      features: [
+        t('Pricing.feat_ea'),
+        t('Pricing.feat_account'),
+        t('Pricing.feat_lots'),
+        t('Pricing.feat_auto'),
+        t('Pricing.feat_updates'),
+        t('Pricing.feat_support'),
+        t('Pricing.feat_cancel')
+      ],
       isPopular: false,
+      ctaText: t('Pricing.choose_monthly')
     },
     {
-      name: "Standard",
-      lot: 0.10,
-      minCapital: 1000,
-      prices: { weekly: 49, monthly: 149, semi_annual: 749, yearly: 1299 },
-      features: ["1 Live Account", "Priority Support"],
+      id: 'lifetime',
+      name: t('Pricing.lifetime_plan'),
+      originalPrice: 500,
+      discountedPrice: '200',
+      discountBadge: t('Pricing.discount_60'),
+      savingsBadge: t('Pricing.save_300'),
+      period: t('Pricing.one_time'),
+      description: t('Pricing.lifetime_desc'),
+      features: [
+        t('Pricing.feat_ea'),
+        t('Pricing.feat_account'),
+        t('Pricing.feat_lots'),
+        t('Pricing.feat_auto'),
+        t('Pricing.feat_lifetime_updates'),
+        t('Pricing.feat_vip_support'),
+        t('Pricing.feat_no_sub')
+      ],
       isPopular: true,
-    },
-    {
-      name: "Pro",
-      lot: 0.50,
-      minCapital: 5000,
-      prices: { weekly: 99, monthly: 299, semi_annual: 1499, yearly: 2599 },
-      features: ["1 Live Account", "Priority Support"],
-      isPopular: false,
-    },
-    {
-      name: "VIP",
-      lot: 1.00,
-      minCapital: 10000,
-      prices: { weekly: 199, monthly: 599, semi_annual: 2999, yearly: 4999 },
-      features: ["1 Live Account", "1-on-1 Setup & Support"],
-      isPopular: false,
+      ctaText: t('Pricing.choose_lifetime')
     }
   ];
 
@@ -301,84 +310,86 @@ export default function Home() {
 
         {/* Pricing Section */}
         <section id="pricing" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5">
-          <div className="text-center mb-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold uppercase tracking-wider mb-4 animate-pulse">
+              <span>🔥</span> {t('Pricing.promo_tag')}
+            </div>
             <h2 className="text-3xl sm:text-5xl font-bold mb-4">{t('Pricing.title')}</h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">{t('Pricing.subtitle')}</p>
           </div>
-          
-          <div className="flex justify-center mb-12">
-            <div className="bg-[#0F1115] border border-white/10 rounded-xl p-1 inline-flex flex-wrap justify-center gap-1">
-              {[
-                { id: 'weekly', label: t('Pricing.weekly') },
-                { id: 'monthly', label: t('Pricing.monthly') },
-                { id: 'semi_annual', label: t('Pricing.semi_annual') },
-                { id: 'yearly', label: t('Pricing.yearly') }
-              ].map((t_item) => (
-                <button
-                  key={t_item.id}
-                  onClick={() => setDuration(t_item.id as any)}
-                  className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    duration === t_item.id 
-                      ? 'bg-[#D4AF37] text-black shadow-md' 
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {t_item.label}
-                </button>
-              ))}
-            </div>
-          </div>
 
-          <div className="grid md:grid-cols-4 gap-6 max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
             {plans.map((plan) => (
               <div 
-                key={plan.name}
-                className={`p-6 rounded-2xl border flex flex-col transition-all ${
+                key={plan.id}
+                className={`p-8 rounded-3xl border flex flex-col transition-all duration-300 ${
                   plan.isPopular 
-                    ? 'bg-gradient-to-b from-[#1A1C23] to-[#0F1115] border-[#D4AF37] transform md:-translate-y-2 shadow-[0_0_30px_rgba(212,175,55,0.15)] relative'
+                    ? 'bg-gradient-to-b from-[#1c1a14] via-[#14151a] to-[#0F1115] border-[#D4AF37] transform md:-translate-y-2 shadow-[0_0_40px_rgba(212,175,55,0.2)] relative'
                     : 'bg-[#0F1115] border-white/10 hover:border-[#D4AF37]/50'
                 }`}
               >
                 {plan.isPopular && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#D4AF37] text-black text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                    {t('Pricing.most_popular')}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-[#D4AF37] to-[#AA8B2C] text-black text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1.5 whitespace-nowrap">
+                    <span>⭐</span> {t('Pricing.most_popular')}
                   </div>
                 )}
-                <h3 className={`text-xl font-medium mb-2 ${plan.isPopular ? 'text-[#D4AF37]' : 'text-gray-300'}`}>
-                  {plan.name}
-                </h3>
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-4xl font-bold">${plan.prices[duration]}</span>
-                  <span className="text-gray-500 text-sm">/{t(`Pricing.${duration}`)}</span>
-                </div>
-                
-                <div className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-lg p-3 mb-6 text-center">
-                  <span className="text-xs text-[#D4AF37] uppercase font-bold tracking-wider block mb-1">{t('Pricing.min_capital')}</span>
-                  <span className="text-lg font-bold text-white">${plan.minCapital.toLocaleString()}</span>
+
+                <div className="flex justify-between items-start gap-4 mb-3">
+                  <div>
+                    <h3 className={`text-2xl font-bold ${plan.isPopular ? 'text-[#D4AF37]' : 'text-white'}`}>
+                      {plan.name}
+                    </h3>
+                    <p className="text-gray-400 text-xs mt-1">{plan.description}</p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5">
+                    <span className="bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
+                      {plan.discountBadge}
+                    </span>
+                    {plan.savingsBadge && (
+                      <span className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+                        {plan.savingsBadge}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                <ul className="space-y-4 mb-8 flex-1">
-                  <li className="flex items-center gap-3 text-gray-300 text-sm">
-                    <svg className="w-5 h-5 text-[#D4AF37] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                    {t('Pricing.max_lot')}: <strong className="text-white ml-1">{plan.lot.toFixed(2)}</strong>
-                  </li>
+                <div className="my-5 p-4 rounded-2xl bg-white/[0.03] border border-white/5">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-gray-500 text-xl line-through">${plan.originalPrice}</span>
+                    <span className="text-4xl sm:text-5xl font-extrabold text-white">${plan.discountedPrice}</span>
+                    <span className="text-gray-400 text-sm">{plan.period}</span>
+                  </div>
+                  <p className="text-xs text-emerald-400 font-medium mt-1.5 flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    {t('Pricing.promo_end_year')}
+                  </p>
+                </div>
+
+                <ul className="space-y-3.5 mb-8 flex-1">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-center gap-3 text-gray-300 text-sm">
-                      <svg className="w-5 h-5 text-[#D4AF37] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                      {feature}
+                      <div className="w-5 h-5 rounded-full bg-[#D4AF37]/10 flex items-center justify-center shrink-0">
+                        <svg className="w-3.5 h-3.5 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
-                <Link href="/register">
+
+                <Link href="/register" className="w-full">
                   <Button 
                     variant={plan.isPopular ? "default" : "outline"} 
-                    className={`w-full h-12 font-bold ${
+                    className={`w-full h-12 font-bold text-base transition-all ${
                       plan.isPopular 
-                        ? 'bg-[#D4AF37] text-black hover:bg-[#AA8B2C] border-0' 
+                        ? 'bg-[#D4AF37] text-black hover:bg-[#AA8B2C] shadow-lg shadow-[#D4AF37]/20 border-0' 
                         : 'border-white/20 hover:bg-white/10 text-white'
                     }`}
                   >
-                    {t('Pricing.choose')} {plan.name}
+                    {plan.ctaText}
                   </Button>
                 </Link>
               </div>
