@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { setUserLocale } from "@/services/locale";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import GoldAiBacktest from "@/components/GoldAiBacktest";
 
 
 export default function Home() {
@@ -371,6 +372,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Gold AI backtest results (data: src/data/backtests/goldai.json) */}
+        <GoldAiBacktest />
 
         {/* Recommendations Section */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5">

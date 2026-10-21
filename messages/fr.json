@@ -448,5 +448,21 @@
     "s3_desc": "Téléchargez l'EA depuis votre espace client et placez-le sur le graphique XAUUSD dans MetaTrader 5. Un VPS est recommandé pour un fonctionnement 24/7.",
     "s4_title": "Laissez-le trader",
     "s4_desc": "Le robot vérifie automatiquement votre licence et trade pour vous, sans intervention."
+  },
+  "Backtest": {
+    "title": "Gold AI : résultats du backtest",
+    "subtitle": "Tests réalisés dans MetaTrader 5 sur des données réelles. Choisissez une taille de lot : tous les montants s’adaptent.",
+    "lot_label": "Taille de lot",
+    "tested": "lot du test",
+    "conditions": "Conditions des tests : {symbol} en {timeframe}, broker {broker}, données 100 % ticks réels, lot fixe de {lot}, capital de départ {deposit}.",
+    "disclaimer": "Résultats de backtest : il s’agit d’une simulation sur des données historiques, pas de résultats de trading réels. Les performances passées ne garantissent pas les résultats futurs. Le trading comporte un risque de perte en capital.",
+    "total_details": "{positive} mois positifs sur {count} · {trades} trades",
+    "monthly_heading": "Robot lancé chaque mois, puis arrêté en fin de mois",
+    "monthly_intro": "Chaque mois est un test séparé : le robot démarre le 1er du mois avec un capital de {deposit} et s’arrête à la fin du mois.",
+    "monthly_total_label": "Total des {count} mois",
+    "continuous_heading": "Robot lancé sans interruption",
+    "continuous_intro": "Si vous aviez lancé le robot du {from} au {to} sans jamais l’arrêter, voici le résultat :",
+    "continuous_label": "Résultat sans interruption",
+    "continuous_details": "{trades} trades"
   }
 }

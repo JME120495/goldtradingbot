@@ -1,12 +1,15 @@
 import {
   Controller,
+  Get,
   Post,
   Body,
+  Query,
   UseGuards,
   Request,
   Headers,
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
+import { KPAY_PROVIDERS } from './kpay-providers';
 import { AuthGuard } from '@nestjs/passport';
 import { InitiatePaymentDto } from './dto/initiate-payment.dto';
 
@@ -18,6 +21,18 @@ export class PaymentsController {
   @Post('initiate')
   async initiate(@Request() req, @Body() body: InitiatePaymentDto) {
     return this.paymentsService.initiatePayment(req.user.userId, body);
+  }
+
+  // Mobile Money operators supported by KPay (12 countries)
+  @Get('kpay-providers')
+  kpayProviders() {
+    return KPAY_PROVIDERS.map(({ code, country, operator, currency }) => ({ code, country, operator, currency }));
+  }
+
+  // Amount the customer will pay in the operator's currency
+  @Get('kpay-quote')
+  kpayQuote(@Query('provider') provider: string, @Query('usd') usd: string) {
+    return this.paymentsService.getKpayQuote(provider, Number(usd));
   }
 
   // Webhook is public (called by NowPayments server)

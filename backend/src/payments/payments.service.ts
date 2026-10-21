@@ -1,10 +1,12 @@
 import {
+  BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { findKpayProvider, toKpayAmount } from './kpay-providers';
 import { Mt5LicensesService } from '../mt5-licenses/mt5-licenses.service';
 import { TelegramService } from '../telegram/telegram.service';
 import { DiscordService } from '../discord/discord.service';
@@ -357,29 +359,18 @@ export class PaymentsService {
 
   // Map provider code -> country dial code
   private getCountryCode(provider: string): string {
-    const map: Record<string, string> = {
-      'MTN_MOMO_CMR': '237',
-      'ORANGE_CMR': '237',
-      'MTN_MOMO_CIV': '225',
-      'ORANGE_CIV': '225',
-      'AIRTEL_GAB': '241',
-      'MTN_MOMO_BEN': '229',
-      'MOOV_BEN': '229',
-      'VODACOM_MPESA_COD': '243',
-      'AIRTEL_COD': '243',
-      'ORANGE_COD': '243',
-      'MPESA_KEN': '254',
-      'AIRTEL_COG': '242',
-      'MTN_MOMO_COG': '242',
-      'AIRTEL_RWA': '250',
-      'MTN_MOMO_RWA': '250',
-      'FREE_SEN': '221',
-      'ORANGE_SEN': '221',
-      'ORANGE_SLE': '232',
-    };
-    return map[provider] || '';
+    return findKpayProvider(provider)?.dialCode || '';
   }
-  
+
+  /** Price shown to the customer before a Mobile Money payment (same conversion as initiateKPay). */
+  async getKpayQuote(provider: string, amountUSD: number) {
+    const kpayProvider = findKpayProvider(provider);
+    if (!kpayProvider) throw new BadRequestException('Opérateur Mobile Money inconnu.');
+    if (!(amountUSD > 0)) throw new BadRequestException('Montant invalide.');
+    const { amount, currency } = await toKpayAmount(amountUSD, kpayProvider);
+    return { amount, currency };
+  }
+
   private async initiateKPay(user: any, plan: any, payment: any, amountUSD: number, txRef: string, duration: string, data: any) {
     const apiKey = process.env.KPAY_API_KEY;
     const secretKey = process.env.KPAY_SECRET_KEY;
@@ -392,6 +383,11 @@ export class PaymentsService {
       throw new InternalServerErrorException('Numéro de téléphone et opérateur requis pour le paiement Mobile Money');
     }
 
+    const kpayProvider = findKpayProvider(data.provider);
+    if (!kpayProvider) {
+      throw new BadRequestException('Opérateur Mobile Money inconnu.');
+    }
+
     // Auto-prefix country code if the user didn't include it
     let phoneNumber = data.phoneNumber.replace(/\s+/g, '').replace(/^\+/, '');
     const countryCode = this.getCountryCode(data.provider);
@@ -399,12 +395,12 @@ export class PaymentsService {
       phoneNumber = countryCode + phoneNumber;
     }
 
-    // Conversion manuelle: 1 USD = 600 XAF (zone CEMAC/UEMOA)
-    const exchangeRate = 600;
-    const amountXAF = Math.round(amountUSD * exchangeRate);
+    // KPay charges in the operator's currency: CFA franc at 1 USD = 600, other currencies at the daily rate
+    const { amount: localAmount, currency, rate, rateSource } = await toKpayAmount(amountUSD, kpayProvider);
+    this.logger.log(`KPay conversion: ${amountUSD} USD -> ${localAmount} ${currency} (taux ${rate}, ${rateSource})`);
 
     const payload = {
-      amount: amountXAF,
+      amount: localAmount,
       provider: data.provider,
       phoneNumber: phoneNumber,
       externalId: txRef,

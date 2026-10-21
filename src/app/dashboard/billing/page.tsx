@@ -13,6 +13,13 @@ interface Plan {
   product?: { name: string; slug: string; description: string | null; createdAt?: string };
 }
 
+interface KpayProvider {
+  code: string;
+  country: string;
+  operator: string;
+  currency: string;
+}
+
 type FixedDuration = 'weekly' | 'monthly' | 'semiAnnual' | 'yearly';
 type Duration = FixedDuration | 'lifetime';
 
@@ -44,6 +51,8 @@ export default function BillingPage() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [provider, setProvider] = useState('MTN_MOMO_CMR');
   const [momoMessage, setMomoMessage] = useState('');
+  const [kpayProviders, setKpayProviders] = useState<KpayProvider[]>([]);
+  const [momoQuote, setMomoQuote] = useState<{ key: string; amount: number; currency: string } | null>(null);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -55,8 +64,37 @@ export default function BillingPage() {
         setError(t('err_load'));
       }
     };
+    const fetchKpayProviders = async () => {
+      try {
+        const res = await api.get('/payments/kpay-providers');
+        setKpayProviders(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
     fetchPlans();
+    fetchKpayProviders();
   }, []);
+
+  // Amount in the operator's currency (KPay charges locally: XAF, XOF, KES, ...)
+  const momoUsd = selectedPlanForMomo?.price;
+  const momoQuoteKey = `${provider}:${momoUsd}`;
+  useEffect(() => {
+    if (!showMomoModal || !momoUsd) return;
+    let cancelled = false;
+    api.get('/payments/kpay-quote', { params: { provider, usd: momoUsd } })
+      .then((res) => { if (!cancelled) setMomoQuote({ key: `${provider}:${momoUsd}`, ...res.data }); })
+      .catch((err) => console.error(err));
+    return () => { cancelled = true; };
+  }, [showMomoModal, provider, momoUsd]);
+  // Only show a quote computed for the current operator and price
+  const currentQuote = momoQuote?.key === momoQuoteKey ? momoQuote : null;
+
+  // Operators grouped by country for the <select>
+  const kpayCountries = kpayProviders.reduce<Record<string, KpayProvider[]>>((acc, p) => {
+    (acc[p.country] ||= []).push(p);
+    return acc;
+  }, {});
 
   const handleSubscribe = async (plan: Plan, duration: Duration, method: 'CRYPTO' | 'MOBILE_MONEY', phone?: string, prov?: string) => {
     setLoading(true);
@@ -405,17 +443,19 @@ export default function BillingPage() {
                     onChange={(e) => setProvider(e.target.value)}
                     className="w-full bg-[#1A1C23] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37]"
                   >
-                    <option value="MTN_MOMO_CMR">MTN Mobile Money (Cameroun)</option>
-                    <option value="ORANGE_MONEY_CMR">Orange Money (Cameroun)</option>
-                    <option value="AIRTEL_MONEY_GAB">Airtel Money (Gabon)</option>
-                    <option value="AIRTEL_MONEY_COG">Airtel Money (Congo)</option>
-                    <option value="MOOV_MONEY_CIV">Moov Money (Côte d'Ivoire)</option>
-                    <option value="MTN_MOMO_CIV">MTN MoMo (Côte d'Ivoire)</option>
-                    <option value="ORANGE_MONEY_CIV">Orange Money (Côte d'Ivoire)</option>
-                    <option value="WAVE_CIV">Wave (Côte d'Ivoire)</option>
-                    <option value="ORANGE_MONEY_SEN">Orange Money (Sénégal)</option>
-                    <option value="WAVE_SEN">Wave (Sénégal)</option>
+                    {Object.entries(kpayCountries).map(([country, operators]) => (
+                      <optgroup key={country} label={country}>
+                        {operators.map((op) => (
+                          <option key={op.code} value={op.code}>{op.operator} ({country})</option>
+                        ))}
+                      </optgroup>
+                    ))}
                   </select>
+                  {currentQuote && (
+                    <p className="text-sm text-[#D4AF37] font-semibold mt-2">
+                      Montant à payer : {currentQuote.amount.toLocaleString('fr-FR')} {currentQuote.currency}
+                    </p>
+                  )}
                 </div>
 
                 <div>

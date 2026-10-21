@@ -1,0 +1,62 @@
+{
+ "source": "MT5 Strategy Tester",
+ "symbol": "XAUUSD",
+ "timeframe": "M1",
+ "broker": "Fusion Markets Pty Ltd",
+ "deposit": 2000,
+ "leverage": "1:500",
+ "testedLot": 0.1,
+ "monthly": [
+  {
+   "month": "2026-01",
+   "netProfit": 5810.44,
+   "trades": 27
+  },
+  {
+   "month": "2026-02",
+   "netProfit": 7195.12,
+   "trades": 34
+  },
+  {
+   "month": "2026-03",
+   "netProfit": 3070.85,
+   "trades": 15
+  },
+  {
+   "month": "2026-04",
+   "netProfit": -604.6,
+   "trades": 29
+  },
+  {
+   "month": "2026-05",
+   "netProfit": 594.74,
+   "trades": 32
+  },
+  {
+   "month": "2026-06",
+   "netProfit": 6964.87,
+   "trades": 17
+  },
+  {
+   "month": "2026-07",
+   "netProfit": 1259.46,
+   "trades": 32
+  },
+  {
+   "month": "2026-08",
+   "netProfit": 2736.3,
+   "trades": 28
+  },
+  {
+   "month": "2026-09",
+   "netProfit": -1407.33,
+   "trades": 35
+  }
+ ],
+ "continuous": {
+  "from": "2026-01-01",
+  "to": "2026-10-01",
+  "netProfit": 35360.53,
+  "trades": 214
+ }
+}
