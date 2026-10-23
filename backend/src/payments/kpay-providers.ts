@@ -37,8 +37,14 @@ export const KPAY_PROVIDERS: KpayProvider[] = [
   { code: 'ZAMTEL_ZMB', country: 'Zambie', operator: 'Zamtel', dialCode: '260', currency: 'ZMW', decimals: 2 },
 ];
 
+// Mobile Money is offered in Cameroon only for now (crypto stays available everywhere).
+// To open another KPay country, add its provider codes here.
+const ENABLED_CODES = ['MTN_MOMO_CMR', 'ORANGE_CMR'];
+export const KPAY_ENABLED_PROVIDERS = KPAY_PROVIDERS.filter((p) => ENABLED_CODES.includes(p.code));
+
+// Only enabled operators can be quoted or charged
 export const findKpayProvider = (code: string) =>
-  KPAY_PROVIDERS.find((p) => p.code === code);
+  KPAY_ENABLED_PROVIDERS.find((p) => p.code === code);
 
 // CFA franc (XAF / XOF) keeps the site's fixed rate: 1 USD = 600.
 const CFA_RATE = 600;

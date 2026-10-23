@@ -9,7 +9,7 @@ import {
   Headers,
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
-import { KPAY_PROVIDERS } from './kpay-providers';
+import { KPAY_ENABLED_PROVIDERS } from './kpay-providers';
 import { AuthGuard } from '@nestjs/passport';
 import { InitiatePaymentDto } from './dto/initiate-payment.dto';
 
@@ -23,10 +23,10 @@ export class PaymentsController {
     return this.paymentsService.initiatePayment(req.user.userId, body);
   }
 
-  // Mobile Money operators supported by KPay (12 countries)
+  // Mobile Money operators currently offered (see KPAY_ENABLED_PROVIDERS)
   @Get('kpay-providers')
   kpayProviders() {
-    return KPAY_PROVIDERS.map(({ code, country, operator, currency }) => ({ code, country, operator, currency }));
+    return KPAY_ENABLED_PROVIDERS.map(({ code, country, operator, currency }) => ({ code, country, operator, currency }));
   }
 
   // Amount the customer will pay in the operator's currency

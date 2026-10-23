@@ -413,8 +413,11 @@ export default function BillingPage() {
               </svg>
             </button>
             <h2 className="text-2xl font-bold text-white mb-1">Paiement Mobile Money</h2>
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-gray-400 text-sm mb-1">
               {selectedPlanForMomo.plan.name} — <strong className="text-[#D4AF37]">${selectedPlanForMomo.price}</strong>
+            </p>
+            <p className="text-gray-500 text-xs mb-4">
+              Disponible uniquement au Cameroun (MTN, Orange). Depuis un autre pays, payez en crypto.
             </p>
             
             {momoMessage ? (
