@@ -444,26 +444,25 @@ export class PaymentsService {
     this.logger.log(`Event: ${eventName}`);
     this.logger.log(`Body status: ${parsedBody?.status}, externalId: ${parsedBody?.externalId}`);
     
-    const secretKey = process.env.KPAY_SECRET_KEY;
-    if (!secretKey) {
-      this.logger.error('KPAY_SECRET_KEY is missing!');
-      return { status: 'error', message: 'Missing API keys' };
+    // KPay signs webhooks with the application's WEBHOOK secret (not the API secret key):
+    // HMAC-SHA256 of the raw body, hex (https://kpay.site/documentation/webhooks)
+    const webhookSecret = process.env.KPAY_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      this.logger.error('KPAY_WEBHOOK_SECRET is missing: KPay webhook rejected.');
+      throw new InternalServerErrorException('Webhook secret not configured');
     }
 
     const crypto = require('crypto');
     const expectedSignature = crypto
-      .createHmac('sha256', secretKey)
+      .createHmac('sha256', webhookSecret)
       .update(rawBody)
       .digest('hex');
 
-    this.logger.log(`Received signature: ${signature}`);
-    this.logger.log(`Computed signature: ${expectedSignature}`);
-    this.logger.log(`Signatures match: ${signature === expectedSignature}`);
-
-    if (signature !== expectedSignature) {
-      this.logger.warn(`KPay signature MISMATCH - received: ${signature.substring(0, 20)}... computed: ${expectedSignature.substring(0, 20)}...`);
-      // Log for debugging but DON'T reject - process anyway while we debug
-      this.logger.warn('Processing webhook despite signature mismatch (debug mode)');
+    const received = Buffer.from(String(signature));
+    const expected = Buffer.from(expectedSignature);
+    if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) {
+      this.logger.warn(`KPay webhook rejected: invalid signature (externalId: ${parsedBody?.externalId})`);
+      throw new BadRequestException('Invalid signature');
     }
 
     const payload = parsedBody;

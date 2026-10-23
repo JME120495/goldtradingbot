@@ -81,6 +81,13 @@ async function handleProxy(req: Request, pathArray: string[]) {
     if (authHeader) {
       headers['Authorization'] = authHeader;
     }
+
+    // Payment webhooks: keep the provider's signature/event headers (KPay, NOWPayments)
+    req.headers.forEach((value, key) => {
+      if (key.startsWith('x-kpay-') || key === 'x-nowpayments-sig') {
+        headers[key] = value;
+      }
+    });
     
     let response = await fetch(targetUrl, {
       method: req.method,
