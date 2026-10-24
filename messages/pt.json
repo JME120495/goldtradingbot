@@ -173,7 +173,8 @@
     "become_partner": "Tornar-se Parceiro",
     "loading": "Carregando...",
     "profile": "Perfil",
-    "admin_panel": "Painel de Admin"
+    "admin_panel": "Painel de Admin",
+    "back_to_site": "Voltar ao site"
   },
   "Performance": {
     "title": "Desempenho testado, uma abordagem focada na consistência",

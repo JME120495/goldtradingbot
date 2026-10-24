@@ -173,7 +173,8 @@
     "become_partner": "كن شريكاً",
     "loading": "جاري التحميل...",
     "profile": "الملف الشخصي",
-    "admin_panel": "لوحة الإدارة"
+    "admin_panel": "لوحة الإدارة",
+    "back_to_site": "العودة إلى الموقع"
   },
   "Performance": {
     "title": "أداء مختبر، نهج يركز على الاتساق",

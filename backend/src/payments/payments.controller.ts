@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Query,
+  Param,
   UseGuards,
   Request,
   Headers,
@@ -21,6 +22,13 @@ export class PaymentsController {
   @Post('initiate')
   async initiate(@Request() req, @Body() body: InitiatePaymentDto) {
     return this.paymentsService.initiatePayment(req.user.userId, body);
+  }
+
+  // Result of one of my payments (PENDING / COMPLETED / FAILED / CANCELLED + reason)
+  @UseGuards(AuthGuard('jwt'))
+  @Get('status/:reference')
+  status(@Request() req, @Param('reference') reference: string) {
+    return this.paymentsService.getPaymentStatus(req.user.userId, reference);
   }
 
   // Mobile Money operators currently offered (see KPAY_ENABLED_PROVIDERS)

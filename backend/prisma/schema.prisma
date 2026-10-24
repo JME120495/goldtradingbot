@@ -149,6 +149,7 @@ model Payment {
   status       String  @default("PENDING")
   provider     String // STRIPE, PAYPAL, NOWPAYMENTS, FLUTTERWAVE
   providerTxId String? @unique
+  failureReason String? // reason sent by the provider (e.g. KPay failureReason)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

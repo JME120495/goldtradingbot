@@ -173,7 +173,8 @@
     "become_partner": "Become a Partner",
     "loading": "Loading...",
     "profile": "Profile",
-    "admin_panel": "Admin Panel"
+    "admin_panel": "Admin Panel",
+    "back_to_site": "Back to website"
   },
   "Performance": {
     "title": "Tested performance, a consistency-driven approach",

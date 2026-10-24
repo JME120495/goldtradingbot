@@ -51,6 +51,41 @@ export default function BillingPage() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [provider, setProvider] = useState('MTN_MOMO_CMR');
   const [momoMessage, setMomoMessage] = useState('');
+  // Live result of the Mobile Money payment, as reported by KPay to the server
+  const [momoReference, setMomoReference] = useState<string | null>(null);
+  const [momoResult, setMomoResult] = useState<{ status: string; failureReason: string | null } | null>(null);
+  const [momoTimedOut, setMomoTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (!momoReference) return;
+    let tries = 0;
+    const timer = setInterval(async () => {
+      tries++;
+      try {
+        const res = await api.get(`/payments/status/${encodeURIComponent(momoReference)}`);
+        if (res.data.status !== 'PENDING') {
+          setMomoResult({ status: res.data.status, failureReason: res.data.failureReason });
+          clearInterval(timer);
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      if (tries >= 60) { // ~3 minutes
+        setMomoTimedOut(true);
+        clearInterval(timer);
+      }
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [momoReference]);
+
+  const resetMomo = () => {
+    setMomoMessage('');
+    setMomoReference(null);
+    setMomoResult(null);
+    setMomoTimedOut(false);
+    setError('');
+  };
   const [kpayProviders, setKpayProviders] = useState<KpayProvider[]>([]);
   const [momoQuote, setMomoQuote] = useState<{ key: string; amount: number; currency: string } | null>(null);
 
@@ -116,6 +151,7 @@ export default function BillingPage() {
       } else {
         if (res.data.paymentStatus === 'PENDING') {
            setMomoMessage(res.data.message || 'Veuillez valider le paiement sur votre téléphone.');
+           setMomoReference(res.data.reference ?? null);
         }
         setLoading(false);
       }
@@ -405,7 +441,7 @@ export default function BillingPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-[#0F1115] border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl relative">
             <button 
-              onClick={() => { setShowMomoModal(false); setMomoMessage(''); setError(''); }}
+              onClick={() => { setShowMomoModal(false); resetMomo(); }}
               className="absolute top-4 right-4 text-gray-400 hover:text-white"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -420,16 +456,56 @@ export default function BillingPage() {
               Disponible uniquement au Cameroun (MTN, Orange). Depuis un autre pays, payez en crypto.
             </p>
             
-            {momoMessage ? (
+            {momoResult?.status === 'COMPLETED' ? (
               <div className="text-center py-6">
                 <div className="text-green-500 mb-4 flex justify-center">
                    <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                    </svg>
                 </div>
-                <p className="text-lg text-white font-medium mb-4">{momoMessage}</p>
-                <button 
-                  onClick={() => { setShowMomoModal(false); setMomoMessage(''); setError(''); }}
+                <p className="text-lg text-white font-medium mb-2">Paiement réussi !</p>
+                <p className="text-sm text-gray-400 mb-5">Votre licence est activée. Enregistrez votre compte MT5 dans votre espace pour utiliser le robot.</p>
+                <a href="/dashboard" className="inline-block bg-[#D4AF37] text-black font-bold px-6 py-2 rounded-lg hover:bg-[#AA8B2C] transition-colors">
+                  Voir mes licences
+                </a>
+              </div>
+            ) : momoResult ? (
+              <div className="text-center py-6">
+                <div className="text-red-500 mb-4 flex justify-center">
+                   <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                   </svg>
+                </div>
+                <p className="text-lg text-white font-medium mb-2">
+                  {momoResult.status === 'CANCELLED' ? 'Paiement annulé' : 'Paiement échoué'}
+                </p>
+                <p className="text-sm text-red-400 bg-red-500/10 rounded-lg p-3 mb-5">
+                  {momoResult.failureReason || 'Aucun motif transmis par KPay.'}
+                </p>
+                <button
+                  onClick={resetMomo}
+                  className="bg-[#D4AF37] text-black font-bold px-6 py-2 rounded-lg hover:bg-[#AA8B2C] transition-colors"
+                >
+                  Réessayer
+                </button>
+              </div>
+            ) : momoMessage ? (
+              <div className="text-center py-6">
+                <div className="mb-4 flex justify-center">
+                  <div className="w-14 h-14 rounded-full border-4 border-[#D4AF37]/20 border-t-[#D4AF37] animate-spin" />
+                </div>
+                <p className="text-lg text-white font-medium mb-2">{momoMessage}</p>
+                {momoTimedOut ? (
+                  <p className="text-sm text-gray-400 mb-4">
+                    Pas encore de réponse de l&apos;opérateur. Si vous avez validé, votre licence apparaîtra automatiquement dans votre espace.
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-400 mb-4">
+                    En attente de la confirmation… Si aucune demande n&apos;apparaît, composez #150*50# (Orange) ou *126# (MTN) pour valider le paiement en attente.
+                  </p>
+                )}
+                <button
+                  onClick={() => { setShowMomoModal(false); resetMomo(); }}
                   className="bg-white/10 text-white px-6 py-2 rounded-lg hover:bg-white/20 transition-colors"
                 >
                   Fermer

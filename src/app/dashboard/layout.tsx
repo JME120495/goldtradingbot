@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
-import { Home, Key, Download, CreditCard, LogOut, Users, User, LifeBuoy, Menu, X, PlayCircle } from 'lucide-react';
+import { Home, Key, Download, CreditCard, LogOut, Users, User, LifeBuoy, Menu, X, PlayCircle, Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
@@ -60,8 +60,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-[#050505] text-white flex">
       {/* Sidebar */}
       <aside className="w-64 border-r border-white/5 bg-[#0F1115] flex flex-col hidden md:flex">
-        <div className="h-20 flex items-center px-8 border-b border-white/5">
-          <span className="text-xl font-bold tracking-wider text-[#D4AF37]">GOLD SCALPER</span>
+        <div className="h-20 flex items-center px-6 border-b border-white/5">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#AA8B2C] flex items-center justify-center">
+              <span className="text-black font-bold text-lg leading-none">G</span>
+            </div>
+            <span className="font-bold text-lg tracking-tight text-white">Gold Trading Bot</span>
+          </Link>
         </div>
         <nav className="flex-1 px-4 py-8 space-y-2">
           {navItems.map((item) => {
@@ -85,7 +90,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="px-4">
             <LanguageSwitcher />
           </div>
-          <button 
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-4 py-3 w-full text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+          >
+            <Globe size={20} />
+            <span className="font-medium">{t('back_to_site')}</span>
+          </Link>
+          <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 w-full text-left text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors"
           >
@@ -108,7 +120,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <span className="font-bold text-[#D4AF37]">GOLD SCALPER</span>
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#AA8B2C] flex items-center justify-center">
+                <span className="text-black font-bold leading-none">G</span>
+              </div>
+              <span className="font-bold text-white">Gold Trading Bot</span>
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
@@ -137,8 +154,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 );
               })}
             </nav>
-            <div className="p-4 border-t border-white/5 mb-8">
-              <button 
+            <div className="p-4 border-t border-white/5 mb-8 space-y-2">
+              <Link
+                href="/"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 w-full text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+              >
+                <Globe size={20} />
+                <span className="font-medium">{t('back_to_site')}</span>
+              </Link>
+              <button
                 onClick={handleLogout}
                 className="flex items-center gap-3 px-4 py-3 w-full text-left text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors"
               >

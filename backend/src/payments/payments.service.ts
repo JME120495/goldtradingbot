@@ -401,6 +401,7 @@ export class PaymentsService {
 
     const payload = {
       amount: localAmount,
+      currency, // required by KPay in the request body (operator currency, e.g. XAF)
       provider: data.provider,
       phoneNumber: phoneNumber,
       externalId: txRef,
@@ -427,16 +428,37 @@ export class PaymentsService {
       this.logger.log(`KPay init response (${response.status}): ${JSON.stringify(resData)}`);
       
       if (response.ok) {
-        return { paymentStatus: 'PENDING', message: 'Veuillez valider le paiement sur votre téléphone.' };
+        // `reference` lets the payment modal follow the result (GET /payments/status/:reference)
+        return { paymentStatus: 'PENDING', message: 'Veuillez valider le paiement sur votre téléphone.', reference: txRef };
       } else {
         this.logger.error(`KPay init error: ${JSON.stringify(resData)}`);
-        throw new InternalServerErrorException(`Erreur KPay: ${resData.message || resData.error || 'Paiement échoué'}`);
+        const reason = `Erreur KPay: ${resData.message || resData.error || 'Paiement échoué'}`;
+        await this.markPaymentFailed(payment.id, reason);
+        throw new InternalServerErrorException(reason);
       }
     } catch (err: any) {
       if (err instanceof InternalServerErrorException) throw err;
       this.logger.error(`Error calling KPay: ${err.message}`);
+      await this.markPaymentFailed(payment.id, `Erreur Mobile Money: ${err.message}`);
       throw new InternalServerErrorException(`Erreur Mobile Money: ${err.message}`);
     }
+  }
+
+  // A payment refused before reaching the operator should not stay PENDING forever
+  private async markPaymentFailed(paymentId: string, reason: string) {
+    await this.prisma.payment
+      .update({ where: { id: paymentId }, data: { status: 'FAILED', failureReason: reason.slice(0, 500) } })
+      .catch((e) => this.logger.error(`Could not mark payment ${paymentId} as failed: ${e.message}`));
+  }
+
+  /** Status of one of the user's own payments, for the payment modal. */
+  async getPaymentStatus(userId: string, reference: string) {
+    const payment = await this.prisma.payment.findFirst({
+      where: { providerTxId: reference, userId },
+      select: { status: true, failureReason: true, amount: true },
+    });
+    if (!payment) throw new NotFoundException('Paiement introuvable.');
+    return payment;
   }
 
   async handleKpayWebhook(rawBody: Buffer | string, signature: string, eventName: string, parsedBody: any) {
@@ -475,7 +497,10 @@ export class PaymentsService {
          if (payment && payment.status === 'PENDING') {
             await this.prisma.payment.update({
               where: { id: payment.id },
-              data: { status: payload.status }
+              data: {
+                status: payload.status,
+                failureReason: payload.failureReason ? String(payload.failureReason).slice(0, 500) : null,
+              }
             });
             this.logger.log(`Payment ${txRef} marked as ${payload.status}`);
          }

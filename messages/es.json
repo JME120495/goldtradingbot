@@ -173,7 +173,8 @@
     "become_partner": "Convertirse en Socio",
     "loading": "Cargando...",
     "profile": "Perfil",
-    "admin_panel": "Panel de Admin"
+    "admin_panel": "Panel de Admin",
+    "back_to_site": "Volver al sitio"
   },
   "Performance": {
     "title": "Rendimiento probado, un enfoque basado en la consistencia",
